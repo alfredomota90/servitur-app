@@ -1,0 +1,11 @@
+#!/bin/sh
+commit_msg=$(cat "$1")
+if ! echo "$commit_msg" | grep -qE '^(fix|feat|refactor|chore): .+$'; then
+  echo ""
+  echo "⛔ ERROR: El mensaje de commit debe seguir el patrón <tipo>: descripción"
+  echo "   Tipos válidos: fix | feat | refactor | chore"
+  echo ""
+  echo "   Ejemplo: refactor: migrate theme to Tailwind dark: classes"
+  echo ""
+  exit 1
+fi

@@ -1,0 +1,25 @@
+import { create } from 'zustand'
+
+interface Toast {
+  id: string
+  type: 'success' | 'error' | 'info'
+  message: string
+}
+
+interface NotificationState {
+  toasts: Toast[]
+  addToast: (toast: Omit<Toast, 'id'>) => void
+  removeToast: (id: string) => void
+}
+
+export const useStore = create<NotificationState>((set) => ({
+  toasts: [],
+  addToast: (toast) => {
+    const id = Date.now().toString()
+    set((state) => ({ toasts: [...state.toasts, { ...toast, id }] }))
+    setTimeout(() => {
+      set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) }))
+    }, 5000)
+  },
+  removeToast: (id) => set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) })),
+}))
