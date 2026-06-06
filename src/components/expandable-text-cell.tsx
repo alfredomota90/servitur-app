@@ -1,23 +1,21 @@
 export default function ExpandableTextCell({
   text,
-  color,
   expanded,
   onToggle,
 }: {
   text: string
-  color: string
   expanded: boolean
   onToggle: () => void
 }) {
   const maxLen = 30
   const truncated = text.length > maxLen ? text.slice(0, maxLen) + '...' : text
 
-  if (text.length <= maxLen) return <span style={{ color }}>{text}</span>
+  if (text.length <= maxLen) return <span>{text}</span>
 
   return (
     <div>
-      <span style={{ color }}>{expanded ? text : truncated}</span>
-      <button onClick={onToggle} className="ml-1 text-xs font-medium" style={{ color: '#c59d5c' }}>
+      <span>{expanded ? text : truncated}</span>
+      <button onClick={onToggle} className="ml-1 text-xs font-medium text-accent">
         {expanded ? 'Ver menos' : 'Ver más'}
       </button>
     </div>

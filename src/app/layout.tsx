@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { useTheme } from '@/lib/theme'
 import { ToastContainer } from '@/components/notifications'
 import { AppRouter } from './router'
 import GlobalThemeToggle from '@/components/global-theme-toggle'
@@ -11,19 +10,12 @@ import AdminTopBar from '@/components/admin-top-bar'
 
 export function AppLayout() {
   const location = useLocation()
-  const { colors } = useTheme()
   const isAdmin = location.pathname.startsWith('/admin')
   const isLogin = location.pathname === '/login'
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div
-      className="min-h-screen transition-colors"
-      style={{
-        backgroundColor: colors.background,
-        color: colors.text,
-      }}
-    >
+    <div className="min-h-screen transition-colors bg-background text-foreground">
       <GlobalThemeToggle />
       <ToastContainer />
       {isAdmin && !isLogin && (

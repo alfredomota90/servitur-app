@@ -1,4 +1,3 @@
-import { useTheme } from '@/lib/theme'
 import type { Invoice } from '@/features/invoices/api'
 import { Modal } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
@@ -31,8 +30,6 @@ export default function PaymentModal({
   onAddMore,
   onClose,
 }: PaymentModalProps) {
-  const { colors } = useTheme()
-
   const totalAmount = invoices.reduce((sum, inv) => sum + (inv.totalMxn || inv.total), 0)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,34 +50,24 @@ export default function PaymentModal({
   return (
     <Modal open={open} title="Registrar pago" onClose={onClose}>
       <div className="p-4 space-y-4">
-        <div
-          className="p-3 rounded-lg space-y-2"
-          style={{ backgroundColor: colors.backgroundSecondary }}
-        >
-          <p className="text-sm font-medium" style={{ color: colors.text }}>
-            Facturas ({invoices.length})
-          </p>
+        <div className="p-3 rounded-lg space-y-2 bg-background-secondary">
+          <p className="text-sm font-medium text-foreground">Facturas ({invoices.length})</p>
           {invoices.map((inv) => (
             <div key={inv.id} className="flex items-center justify-between">
-              <span style={{ color: colors.textMuted }}>{inv.serieFolio || inv.period || '—'}</span>
-              <span className="font-medium" style={{ color: colors.text }}>
+              <span className="text-muted">{inv.serieFolio || inv.period || '—'}</span>
+              <span className="font-medium text-foreground">
                 ${(inv.totalMxn || inv.total).toLocaleString()}
               </span>
             </div>
           ))}
-          <div
-            className="border-t pt-2 flex items-center justify-between font-bold"
-            style={{ borderColor: colors.border }}
-          >
-            <span style={{ color: colors.text }}>Total</span>
-            <span style={{ color: colors.success }}>${totalAmount.toLocaleString()}</span>
+          <div className="border-t border-border pt-2 flex items-center justify-between font-bold">
+            <span className="text-foreground">Total</span>
+            <span className="text-success">${totalAmount.toLocaleString()}</span>
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: colors.text }}>
-            Fecha de pago
-          </label>
+          <label className="block text-sm font-medium mb-1 text-foreground">Fecha de pago</label>
           <input
             type="date"
             value={paymentData.date}
@@ -90,7 +77,7 @@ export default function PaymentModal({
                 date: e.target.value,
               })
             }
-            className="w-full px-3 py-2 border rounded-lg"
+            className="w-full px-3 py-2 border rounded-lg bg-background text-foreground border-border"
           />
         </div>
 
@@ -100,9 +87,7 @@ export default function PaymentModal({
         />
 
         <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: colors.text }}>
-            Referencia
-          </label>
+          <label className="block text-sm font-medium mb-1 text-foreground">Referencia</label>
           <input
             type="text"
             value={paymentData.reference}
@@ -112,7 +97,7 @@ export default function PaymentModal({
                 reference: e.target.value,
               })
             }
-            className="w-full px-3 py-2 border rounded-lg"
+            className="w-full px-3 py-2 border rounded-lg bg-background text-foreground border-border"
             placeholder="Número de transacción"
           />
         </div>

@@ -1,10 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeft, Phone, Mail, MapPin, Send, Loader2, CheckCircle } from 'lucide-react'
-import { useTheme } from '@/lib/theme'
 
 export default function Contact() {
-  const { colors } = useTheme()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -35,28 +33,17 @@ export default function Contact() {
 
   if (isSubmitted) {
     return (
-      <div
-        className="min-h-screen flex items-center justify-center p-4"
-        style={{ backgroundColor: colors.background }}
-      >
-        <div
-          className="rounded-2xl p-8 max-w-md w-full text-center shadow-sm"
-          style={{ backgroundColor: colors.card }}
-        >
-          <div
-            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-            style={{ backgroundColor: 'rgba(74, 222, 128, 0.15)' }}
-          >
-            <CheckCircle style={{ color: colors.success }} size={32} />
+      <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+        <div className="rounded-2xl p-8 max-w-md w-full text-center shadow-sm bg-card">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-success/15">
+            <CheckCircle className="text-success" size={32} />
           </div>
-          <h2 className="text-2xl font-bold mb-2" style={{ color: colors.text }}>
-            ¡Mensaje enviado!
-          </h2>
-          <p className="mb-6" style={{ color: colors.textMuted }}>
+          <h2 className="text-2xl font-bold mb-2 text-foreground">¡Mensaje enviado!</h2>
+          <p className="mb-6 text-muted">
             Gracias por contactarnos. Nos pondremos en contacto contigo en breve para darte tu
             cotización.
           </p>
-          <Link to="/" className="font-medium hover:underline" style={{ color: colors.accent }}>
+          <Link to="/" className="font-medium hover:underline text-accent">
             ← Volver al inicio
           </Link>
         </div>
@@ -66,19 +53,9 @@ export default function Contact() {
 
   return (
     <div className="pb-20 md:pb-0 min-h-screen">
-      <header
-        className="shadow-sm sticky top-0 z-40"
-        style={{
-          backgroundColor: colors.backgroundSecondary,
-          borderBottom: `1px solid ${colors.border}`,
-        }}
-      >
+      <header className="shadow-sm sticky top-0 z-40 bg-background-secondary border-b border-border">
         <div className="max-w-6xl mx-auto px-4 py-4">
-          <Link
-            to="/"
-            className="flex items-center gap-2 font-medium transition-colors"
-            style={{ color: colors.textMuted }}
-          >
+          <Link to="/" className="flex items-center gap-2 font-medium transition-colors text-muted">
             <ArrowLeft size={20} />
             <span>Volver</span>
           </Link>
@@ -86,83 +63,52 @@ export default function Contact() {
       </header>
 
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <h1 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: colors.text }}>
+        <h1 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
           Contacto & Cotización
         </h1>
-        <p className="mb-10 max-w-2xl" style={{ color: colors.textMuted }}>
+        <p className="mb-10 max-w-2xl text-muted">
           ¿Necesitas cotización para un viaje? Completa el formulario y te contactaremos.
         </p>
 
         <div className="grid md:grid-cols-2 gap-8">
           <div className="space-y-6">
-            <div
-              className="rounded-xl p-6 shadow-sm border"
-              style={{ backgroundColor: colors.card, borderColor: colors.border }}
-            >
-              <h3 className="font-bold mb-4" style={{ color: colors.text }}>
-                Información de contacto
-              </h3>
+            <div className="rounded-xl p-6 shadow-sm border bg-card border-border">
+              <h3 className="font-bold mb-4 text-foreground">Información de contacto</h3>
 
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div
-                    className="w-10 h-10 rounded-lg flex items-center justify-center"
-                    style={{ backgroundColor: colors.accentMuted }}
-                  >
-                    <Phone style={{ color: colors.accent }} size={20} />
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-accent-muted">
+                    <Phone className="text-accent" size={20} />
                   </div>
                   <div>
-                    <p className="text-sm" style={{ color: colors.textMuted }}>
-                      Teléfono
-                    </p>
-                    <p className="font-medium" style={{ color: colors.text }}>
-                      618 123 4567
-                    </p>
+                    <p className="text-sm text-muted">Teléfono</p>
+                    <p className="font-medium text-foreground">618 123 4567</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div
-                    className="w-10 h-10 rounded-lg flex items-center justify-center"
-                    style={{ backgroundColor: colors.accentMuted }}
-                  >
-                    <Mail style={{ color: colors.accent }} size={20} />
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-accent-muted">
+                    <Mail className="text-accent" size={20} />
                   </div>
                   <div>
-                    <p className="text-sm" style={{ color: colors.textMuted }}>
-                      Email
-                    </p>
-                    <p className="font-medium" style={{ color: colors.text }}>
-                      servitur@transporte.com
-                    </p>
+                    <p className="text-sm text-muted">Email</p>
+                    <p className="font-medium text-foreground">servitur@transporte.com</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div
-                    className="w-10 h-10 rounded-lg flex items-center justify-center"
-                    style={{ backgroundColor: colors.accentMuted }}
-                  >
-                    <MapPin style={{ color: colors.accent }} size={20} />
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-accent-muted">
+                    <MapPin className="text-accent" size={20} />
                   </div>
                   <div>
-                    <p className="text-sm" style={{ color: colors.textMuted }}>
-                      Ubicación
-                    </p>
-                    <p className="font-medium" style={{ color: colors.text }}>
-                      Durango, Durango, México
-                    </p>
+                    <p className="text-sm text-muted">Ubicación</p>
+                    <p className="font-medium text-foreground">Durango, Durango, México</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div
-              className="rounded-xl p-6 text-white"
-              style={{
-                background: `linear-gradient(135deg, ${colors.accent} 0%, ${colors.accentHover} 100%)`,
-              }}
-            >
+            <div className="rounded-xl p-6 text-background bg-gradient-to-br from-accent to-accent-hover">
               <h3 className="font-bold text-lg mb-2">¿Por qué cotizar con nosotros?</h3>
               <ul className="space-y-2 text-sm opacity-90">
                 <li>✓ Respuesta rápida</li>
@@ -173,47 +119,30 @@ export default function Contact() {
             </div>
           </div>
 
-          <div
-            className="rounded-xl p-6 shadow-sm border"
-            style={{ backgroundColor: colors.card, borderColor: colors.border }}
-          >
+          <div className="rounded-xl p-6 shadow-sm border bg-card border-border">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1" style={{ color: colors.text }}>
-                    Nombre *
-                  </label>
+                  <label className="block text-sm font-medium mb-1 text-foreground">Nombre *</label>
                   <input
                     type="text"
                     name="name"
                     required
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 rounded-lg border"
-                    style={{
-                      backgroundColor: colors.background,
-                      borderColor: colors.border,
-                      color: colors.text,
-                    }}
+                    className="w-full px-4 py-2 rounded-lg border bg-background border-border text-foreground"
                     placeholder="Tu nombre"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1" style={{ color: colors.text }}>
-                    Email *
-                  </label>
+                  <label className="block text-sm font-medium mb-1 text-foreground">Email *</label>
                   <input
                     type="email"
                     name="email"
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 rounded-lg border"
-                    style={{
-                      backgroundColor: colors.background,
-                      borderColor: colors.border,
-                      color: colors.text,
-                    }}
+                    className="w-full px-4 py-2 rounded-lg border bg-background border-border text-foreground"
                     placeholder="tu@email.com"
                   />
                 </div>
@@ -221,7 +150,7 @@ export default function Contact() {
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1" style={{ color: colors.text }}>
+                  <label className="block text-sm font-medium mb-1 text-foreground">
                     Teléfono *
                   </label>
                   <input
@@ -230,17 +159,12 @@ export default function Contact() {
                     required
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 rounded-lg border"
-                    style={{
-                      backgroundColor: colors.background,
-                      borderColor: colors.border,
-                      color: colors.text,
-                    }}
+                    className="w-full px-4 py-2 rounded-lg border bg-background border-border text-foreground"
                     placeholder="618 123 4567"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1" style={{ color: colors.text }}>
+                  <label className="block text-sm font-medium mb-1 text-foreground">
                     Empresa (opcional)
                   </label>
                   <input
@@ -248,28 +172,18 @@ export default function Contact() {
                     name="company"
                     value={formData.company}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 rounded-lg border"
-                    style={{
-                      backgroundColor: colors.background,
-                      borderColor: colors.border,
-                      color: colors.text,
-                    }}
+                    className="w-full px-4 py-2 rounded-lg border bg-background border-border text-foreground"
                     placeholder="Nombre de tu empresa"
                   />
                 </div>
               </div>
 
-              <div className="border-t pt-4">
-                <h4 className="font-medium mb-4" style={{ color: colors.text }}>
-                  Detalles del viaje
-                </h4>
+              <div className="border-t border-border pt-4">
+                <h4 className="font-medium mb-4 text-foreground">Detalles del viaje</h4>
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label
-                      className="block text-sm font-medium mb-1"
-                      style={{ color: colors.text }}
-                    >
+                    <label className="block text-sm font-medium mb-1 text-foreground">
                       Origen *
                     </label>
                     <input
@@ -278,20 +192,12 @@ export default function Contact() {
                       required
                       value={formData.origin}
                       onChange={handleChange}
-                      className="w-full px-4 py-2 rounded-lg border"
-                      style={{
-                        backgroundColor: colors.background,
-                        borderColor: colors.border,
-                        color: colors.text,
-                      }}
+                      className="w-full px-4 py-2 rounded-lg border bg-background border-border text-foreground"
                       placeholder="Ciudad de origen"
                     />
                   </div>
                   <div>
-                    <label
-                      className="block text-sm font-medium mb-1"
-                      style={{ color: colors.text }}
-                    >
+                    <label className="block text-sm font-medium mb-1 text-foreground">
                       Destino *
                     </label>
                     <input
@@ -300,12 +206,7 @@ export default function Contact() {
                       required
                       value={formData.destination}
                       onChange={handleChange}
-                      className="w-full px-4 py-2 rounded-lg border"
-                      style={{
-                        backgroundColor: colors.background,
-                        borderColor: colors.border,
-                        color: colors.text,
-                      }}
+                      className="w-full px-4 py-2 rounded-lg border bg-background border-border text-foreground"
                       placeholder="Ciudad de destino"
                     />
                   </div>
@@ -313,22 +214,14 @@ export default function Contact() {
 
                 <div className="grid md:grid-cols-2 gap-4 mt-4">
                   <div>
-                    <label
-                      className="block text-sm font-medium mb-1"
-                      style={{ color: colors.text }}
-                    >
+                    <label className="block text-sm font-medium mb-1 text-foreground">
                       Pasajeros
                     </label>
                     <select
                       name="passengers"
                       value={formData.passengers}
                       onChange={handleChange}
-                      className="w-full px-4 py-2 rounded-lg border"
-                      style={{
-                        backgroundColor: colors.background,
-                        borderColor: colors.border,
-                        color: colors.text,
-                      }}
+                      className="w-full px-4 py-2 rounded-lg border bg-background border-border text-foreground"
                     >
                       <option value="1-10">1-10 pasajeros</option>
                       <option value="11-20">11-20 pasajeros</option>
@@ -337,22 +230,14 @@ export default function Contact() {
                     </select>
                   </div>
                   <div>
-                    <label
-                      className="block text-sm font-medium mb-1"
-                      style={{ color: colors.text }}
-                    >
+                    <label className="block text-sm font-medium mb-1 text-foreground">
                       Tipo de viaje
                     </label>
                     <select
                       name="tripType"
                       value={formData.tripType}
                       onChange={handleChange}
-                      className="w-full px-4 py-2 rounded-lg border"
-                      style={{
-                        backgroundColor: colors.background,
-                        borderColor: colors.border,
-                        color: colors.text,
-                      }}
+                      className="w-full px-4 py-2 rounded-lg border bg-background border-border text-foreground"
                     >
                       <option value="one-way">Solo ida</option>
                       <option value="round-trip">Ida y vuelta</option>
@@ -363,7 +248,7 @@ export default function Contact() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: colors.text }}>
+                <label className="block text-sm font-medium mb-1 text-foreground">
                   Mensaje adicional
                 </label>
                 <textarea
@@ -371,12 +256,7 @@ export default function Contact() {
                   rows={3}
                   value={formData.message}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-lg border"
-                  style={{
-                    backgroundColor: colors.background,
-                    borderColor: colors.border,
-                    color: colors.text,
-                  }}
+                  className="w-full px-4 py-2 rounded-lg border bg-background border-border text-foreground"
                   placeholder="Comentarios adicionales sobre tu viaje..."
                 />
               </div>
@@ -384,11 +264,9 @@ export default function Contact() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
-                style={{
-                  backgroundColor: isSubmitting ? colors.textMuted : colors.accent,
-                  color: colors.background,
-                }}
+                className={`w-full py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 text-background ${
+                  isSubmitting ? 'bg-muted' : 'bg-accent'
+                }`}
               >
                 {isSubmitting ? (
                   <>

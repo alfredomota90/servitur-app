@@ -1,4 +1,3 @@
-import { useTheme } from '@/lib/theme'
 import type { Invoice } from '@/features/invoices/api'
 import { Modal } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
@@ -28,32 +27,26 @@ export default function EditPaymentModal({
   onSave,
   onClose,
 }: EditPaymentModalProps) {
-  const { colors } = useTheme()
-
   return (
     <Modal open={open} title="Editar pago" onClose={onClose}>
       <div className="p-4 space-y-4">
-        <div className="p-3 rounded-lg" style={{ backgroundColor: colors.backgroundSecondary }}>
-          <p className="text-sm" style={{ color: colors.textMuted }}>
-            Factura
-          </p>
-          <p className="font-medium" style={{ color: colors.text }}>
+        <div className="p-3 rounded-lg bg-background-secondary">
+          <p className="text-sm text-muted">Factura</p>
+          <p className="font-medium text-foreground">
             {invoice?.serieFolio || invoice?.period || '—'}
           </p>
-          <p className="text-2xl font-bold" style={{ color: colors.success }}>
+          <p className="text-2xl font-bold text-success">
             ${(invoice?.totalMxn || invoice?.total || 0).toLocaleString()}
           </p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: colors.text }}>
-            Fecha de pago
-          </label>
+          <label className="block text-sm font-medium mb-1 text-foreground">Fecha de pago</label>
           <input
             type="date"
             value={editData.date}
             onChange={(e) => onEditDataChange({ ...editData, date: e.target.value })}
-            className="w-full px-3 py-2 border rounded-lg"
+            className="w-full px-3 py-2 border rounded-lg bg-background text-foreground border-border"
           />
         </div>
 
@@ -63,9 +56,7 @@ export default function EditPaymentModal({
         />
 
         <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: colors.text }}>
-            Referencia
-          </label>
+          <label className="block text-sm font-medium mb-1 text-foreground">Referencia</label>
           <input
             type="text"
             value={editData.reference}
@@ -75,7 +66,7 @@ export default function EditPaymentModal({
                 reference: e.target.value,
               })
             }
-            className="w-full px-3 py-2 border rounded-lg"
+            className="w-full px-3 py-2 border rounded-lg bg-background text-foreground border-border"
             placeholder="Número de transacción"
           />
         </div>

@@ -2,6 +2,60 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --background: #f3f4f6;
+    --background-secondary: #ffffff;
+    --card: #ffffff;
+    --card-hover: #f9fafb;
+    --border: #e5e7eb;
+    --foreground: #111827;
+    --muted: #4b5563;
+    --accent: #c59d5c;
+    --accent-hover: #b88d4c;
+    --accent-muted: rgba(197, 157, 92, 0.15);
+    --accent-text: #8b6b30;
+    --success: #047857;
+    --warning: #b45309;
+    --error: #b91c1c;
+    --admin-bg: #ffffff;
+    --admin-foreground: #111827;
+    --admin-accent: #c59d5c;
+    --focus-ring: #8b6b30;
+    --focus-ring-glow: rgba(139, 107, 48, 0.3);
+  }
+
+  .dark {
+    --background: #0d1c2f;
+    --background-secondary: #0f2238;
+    --card: #132841;
+    --card-hover: #1a314d;
+    --border: #1e3a5f;
+    --foreground: #cecdc9;
+    --muted: #8a9aab;
+    --accent: #c59d5c;
+    --accent-hover: #d4ad6c;
+    --accent-muted: rgba(197, 157, 92, 0.15);
+    --accent-text: #c59d5c;
+    --success: #4ade80;
+    --warning: #fbbf24;
+    --error: #f87171;
+    --admin-bg: #081220;
+    --admin-foreground: #cecdc9;
+    --admin-accent: #c59d5c;
+    --focus-ring: #818cf8;
+    --focus-ring-glow: rgba(129, 140, 248, 0.3);
+  }
+
+  *:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 1px var(--background-secondary),
+      0 0 0 2px var(--focus-ring),
+      0 0 8px 2px var(--focus-ring-glow);
+  }
+}
+
 * {
   box-sizing: border-box;
 }

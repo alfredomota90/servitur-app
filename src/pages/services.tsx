@@ -1,17 +1,13 @@
 import { Link } from 'react-router-dom'
 import { Bus, MapPin, Users, ArrowLeft, Building2 } from 'lucide-react'
-import { useTheme } from '@/lib/theme'
 
 export default function Services() {
-  const { colors } = useTheme()
-
   const services = [
     {
       id: 'mina',
       title: 'Transporte a Minas',
       subtitle: 'Servicio periódico de personal',
       icon: Building2,
-      color: 'from-amber-500 to-amber-700',
       features: [
         'Viajes regulares cada 10 días',
         'Transporte de personal operativo',
@@ -26,7 +22,6 @@ export default function Services() {
       title: 'Viajes Turísticos',
       subtitle: 'Durango - Puerto Vallarta y más',
       icon: MapPin,
-      color: 'from-blue-500 to-blue-700',
       features: [
         'Viajes esporádicos y tours',
         'Unidades para grupos grandes',
@@ -41,7 +36,6 @@ export default function Services() {
       title: 'Transporte Corporativo',
       subtitle: 'Para empresas y eventos',
       icon: Users,
-      color: 'from-green-500 to-green-700',
       features: [
         'Eventos empresariales',
         'Transporte de personal diario',
@@ -55,19 +49,9 @@ export default function Services() {
 
   return (
     <div className="pb-20 md:pb-0 min-h-screen">
-      <header
-        className="shadow-sm sticky top-0 z-40"
-        style={{
-          backgroundColor: colors.backgroundSecondary,
-          borderBottom: `1px solid ${colors.border}`,
-        }}
-      >
+      <header className="shadow-sm sticky top-0 z-40 bg-background-secondary border-b border-border">
         <div className="max-w-6xl mx-auto px-4 py-4">
-          <Link
-            to="/"
-            className="flex items-center gap-2 font-medium transition-colors"
-            style={{ color: colors.textMuted }}
-          >
+          <Link to="/" className="flex items-center gap-2 font-medium transition-colors text-muted">
             <ArrowLeft size={20} />
             <span>Volver</span>
           </Link>
@@ -75,10 +59,8 @@ export default function Services() {
       </header>
 
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <h1 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: colors.text }}>
-          Nuestros Servicios
-        </h1>
-        <p className="mb-10 max-w-2xl" style={{ color: colors.textMuted }}>
+        <h1 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Nuestros Servicios</h1>
+        <p className="mb-10 max-w-2xl text-muted">
           Ofrecemos soluciones de transporte adaptadas a las necesidades de tu empresa o negocio.
         </p>
 
@@ -86,43 +68,28 @@ export default function Services() {
           {services.map((service) => (
             <div
               key={service.id}
-              className="rounded-2xl overflow-hidden shadow-sm"
-              style={{ backgroundColor: colors.card, border: `1px solid ${colors.border}` }}
+              className="rounded-2xl overflow-hidden shadow-sm bg-card border border-border"
             >
-              <div
-                className="h-24 flex items-center justify-center"
-                style={{
-                  background: `linear-gradient(135deg, ${colors.accent} 0%, ${colors.accentHover} 100%)`,
-                }}
-              >
-                <service.icon size={48} style={{ opacity: 0.8, color: colors.background }} />
+              <div className="h-24 flex items-center justify-center bg-gradient-to-br from-accent to-accent-hover">
+                <service.icon size={48} className="opacity-80 text-background" />
               </div>
 
               <div className="p-6">
                 <div className="mb-4">
-                  <h2 className="text-2xl font-bold mb-1" style={{ color: colors.text }}>
-                    {service.title}
-                  </h2>
-                  <p style={{ color: colors.textMuted }}>{service.subtitle}</p>
+                  <h2 className="text-2xl font-bold mb-1 text-foreground">{service.title}</h2>
+                  <p className="text-muted">{service.subtitle}</p>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <h3
-                      className="font-semibold mb-3 flex items-center gap-2"
-                      style={{ color: colors.text }}
-                    >
-                      <Bus size={18} style={{ color: colors.accent }} />
+                    <h3 className="font-semibold mb-3 flex items-center gap-2 text-foreground">
+                      <Bus size={18} className="text-accent" />
                       Incluye
                     </h3>
                     <ul className="space-y-2">
                       {service.features.map((f, i) => (
-                        <li
-                          key={i}
-                          className="text-sm flex items-start gap-2"
-                          style={{ color: colors.textMuted }}
-                        >
-                          <span style={{ color: colors.success }}>✓</span>
+                        <li key={i} className="text-sm flex items-start gap-2 text-muted">
+                          <span className="text-success">✓</span>
                           {f}
                         </li>
                       ))}
@@ -130,21 +97,14 @@ export default function Services() {
                   </div>
 
                   <div>
-                    <h3
-                      className="font-semibold mb-3 flex items-center gap-2"
-                      style={{ color: colors.text }}
-                    >
-                      <MapPin size={18} style={{ color: colors.accent }} />
+                    <h3 className="font-semibold mb-3 flex items-center gap-2 text-foreground">
+                      <MapPin size={18} className="text-accent" />
                       Rutas principales
                     </h3>
                     <ul className="space-y-2">
                       {service.routes.map((r, i) => (
-                        <li
-                          key={i}
-                          className="text-sm flex items-start gap-2"
-                          style={{ color: colors.textMuted }}
-                        >
-                          <span style={{ color: colors.accent }}>•</span>
+                        <li key={i} className="text-sm flex items-start gap-2 text-muted">
+                          <span className="text-accent">•</span>
                           {r}
                         </li>
                       ))}
@@ -152,20 +112,14 @@ export default function Services() {
                   </div>
                 </div>
 
-                <div
-                  className="mt-6 pt-4 border-t flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
-                  style={{ borderColor: colors.border }}
-                >
+                <div className="mt-6 pt-4 border-t border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div className="text-sm">
-                    <span style={{ color: colors.textMuted }}>Precio: </span>
-                    <span className="font-medium" style={{ color: colors.text }}>
-                      {service.pricing}
-                    </span>
+                    <span className="text-muted">Precio: </span>
+                    <span className="font-medium text-foreground">{service.pricing}</span>
                   </div>
                   <Link
                     to="/contacto"
-                    className="px-6 py-2 rounded-lg font-medium transition-colors"
-                    style={{ backgroundColor: colors.accent, color: colors.background }}
+                    className="px-6 py-2 rounded-lg font-medium transition-colors bg-accent-text text-background"
                   >
                     Solicitar cotización
                   </Link>
@@ -175,21 +129,12 @@ export default function Services() {
           ))}
         </div>
 
-        <div
-          className="mt-12 rounded-xl p-6 border"
-          style={{ backgroundColor: colors.card, borderColor: colors.border }}
-        >
-          <h3 className="font-bold mb-4" style={{ color: colors.text }}>
-            ¿Tienes necesidades específicas?
-          </h3>
-          <p className="mb-4" style={{ color: colors.textMuted }}>
+        <div className="mt-12 rounded-xl p-6 border bg-card border-border">
+          <h3 className="font-bold mb-4 text-foreground">¿Tienes necesidades específicas?</h3>
+          <p className="mb-4 text-muted">
             Contáctanos y diseñamos un plan de transporte personalizado para tu empresa.
           </p>
-          <Link
-            to="/contacto"
-            className="font-medium hover:underline"
-            style={{ color: colors.accent }}
-          >
+          <Link to="/contacto" className="font-medium hover:underline text-accent-text">
             Hablemos de tu proyecto →
           </Link>
         </div>

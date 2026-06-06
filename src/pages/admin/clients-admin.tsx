@@ -24,7 +24,6 @@ import {
   AlertCircle,
   Image as ImageIcon,
 } from 'lucide-react'
-import { useTheme } from '@/lib/theme'
 import { getNextBillingDate, getDaysUntil, formatDate } from '@/lib/utils'
 import ConfirmModal from '@/components/confirm-modal'
 import { Button } from '@/components/ui/button'
@@ -51,7 +50,6 @@ const defaultClientValues: ClientFormValues = {
 
 export default function ClientsAdmin() {
   const navigate = useNavigate()
-  const { colors } = useTheme()
   const { data: clients = [] } = useClients()
   const { data: invoices = [] } = useInvoices()
   const createClient = useCreateClient()
@@ -133,12 +131,8 @@ export default function ClientsAdmin() {
     <div className="p-4 md:p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold" style={{ color: colors.text }}>
-            Clientes
-          </h1>
-          <p className="text-sm" style={{ color: colors.textMuted }}>
-            {clients.length} clientes registrados
-          </p>
+          <h1 className="text-2xl font-bold text-foreground">Clientes</h1>
+          <p className="text-sm text-muted">{clients.length} clientes registrados</p>
         </div>
         <Button onClick={() => setShowForm(true)}>
           <Plus size={18} />
@@ -148,12 +142,15 @@ export default function ClientsAdmin() {
 
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="rounded-xl max-w-lg w-full" style={{ backgroundColor: colors.card }}>
-            <div className="flex items-center justify-between p-4 border-b">
-              <h2 className="font-bold text-lg">
+          <div className="rounded-xl max-w-lg w-full bg-card">
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <h2 className="font-bold text-lg text-foreground">
                 {editingClient ? 'Editar cliente' : 'Nuevo cliente'}
               </h2>
-              <button onClick={resetForm} className="p-2 hover:bg-gray-100 rounded">
+              <button
+                onClick={resetForm}
+                className="p-2 hover:bg-card-hover rounded text-foreground"
+              >
                 <X size={20} />
               </button>
             </div>
@@ -181,37 +178,27 @@ export default function ClientsAdmin() {
               />
 
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: colors.text }}>
-                  Logo (URL)
-                </label>
+                <label className="block text-sm font-medium mb-1 text-foreground">Logo (URL)</label>
                 <div className="flex items-center gap-3">
                   {form.watch('logoUrl') ? (
                     <img
                       src={form.watch('logoUrl')}
                       alt="Logo"
-                      className="w-12 h-12 rounded-lg object-contain border bg-white p-1"
-                      style={{ borderColor: colors.border }}
+                      className="w-12 h-12 rounded-lg object-contain border bg-background p-1 border-border"
                       onError={(e) => {
                         ;(e.target as HTMLImageElement).style.display = 'none'
                       }}
                     />
                   ) : (
-                    <div
-                      className="w-12 h-12 rounded-lg flex items-center justify-center border"
-                      style={{
-                        borderColor: colors.border,
-                        backgroundColor: colors.backgroundSecondary,
-                      }}
-                    >
-                      <ImageIcon size={20} style={{ color: colors.textMuted }} />
+                    <div className="w-12 h-12 rounded-lg flex items-center justify-center border border-border bg-background-secondary">
+                      <ImageIcon size={20} className="text-muted" />
                     </div>
                   )}
                   <input
                     type="url"
                     {...form.register('logoUrl')}
-                    className="flex-1 px-3 py-2 border rounded-lg text-sm"
+                    className="flex-1 px-3 py-2 border rounded-lg text-sm bg-background text-foreground border-border"
                     placeholder="https://ejemplo.com/logo.png"
-                    style={{ borderColor: colors.border }}
                   />
                 </div>
               </div>
@@ -225,21 +212,15 @@ export default function ClientsAdmin() {
               />
 
               {nextBillingPreview && (
-                <div
-                  className="p-3 rounded-lg text-sm"
-                  style={{ backgroundColor: colors.backgroundSecondary, color: colors.text }}
-                >
+                <div className="p-3 rounded-lg text-sm bg-background-secondary text-foreground">
                   Próxima facturación:{' '}
                   <span className="font-bold">{formatDate(nextBillingPreview.date)}</span>
                   {nextBillingPreview.days > 0 ? (
-                    <span style={{ color: colors.success }}>
-                      {' '}
-                      (en {nextBillingPreview.days} días)
-                    </span>
+                    <span className="text-success"> (en {nextBillingPreview.days} días)</span>
                   ) : nextBillingPreview.days === 0 ? (
-                    <span style={{ color: colors.warning }}> (hoy)</span>
+                    <span className="text-warning"> (hoy)</span>
                   ) : (
-                    <span style={{ color: colors.error }}>
+                    <span className="text-error">
                       {' '}
                       (vencida hace {Math.abs(nextBillingPreview.days)} días)
                     </span>
@@ -273,8 +254,7 @@ export default function ClientsAdmin() {
           return (
             <div
               key={client.id}
-              className="rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer flex flex-col h-full"
-              style={{ backgroundColor: colors.card, border: `1px solid ${colors.border}` }}
+              className="rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer flex flex-col h-full bg-card border border-border"
               onClick={() => navigate(`/admin/clientes/${client.id}`)}
             >
               <div className="flex-1">
@@ -283,51 +263,43 @@ export default function ClientsAdmin() {
                     <img
                       src={client.logoUrl}
                       alt={client.name}
-                      className="w-24 h-12 rounded-lg object-contain border bg-white p-1"
-                      style={{ borderColor: colors.border }}
+                      className="w-24 h-12 rounded-lg object-contain border bg-background p-1 border-border"
                     />
                   ) : (
-                    <div
-                      className="w-12 h-12 rounded-lg flex items-center justify-center"
-                      style={{ backgroundColor: colors.accentMuted }}
-                    >
-                      <Building2 style={{ color: colors.accent }} size={24} />
+                    <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-accent-muted">
+                      <Building2 className="text-accent" size={24} />
                     </div>
                   )}
 
                   <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
                     <button
                       onClick={() => handleEdit(client)}
-                      className="p-1.5 rounded transition-colors"
-                      style={{ color: colors.accent, backgroundColor: colors.accentMuted }}
+                      className="p-1.5 rounded transition-colors text-accent bg-accent-muted"
                     >
                       <Edit2 size={16} />
                     </button>
                     <button
                       onClick={() => handleDelete(client.id)}
-                      className="p-1.5 rounded transition-colors"
-                      style={{ color: colors.error, backgroundColor: 'rgba(248, 113, 113, 0.1)' }}
+                      className="p-1.5 rounded transition-colors text-error bg-error/10"
                     >
                       <Trash2 size={16} />
                     </button>
                   </div>
                 </div>
 
-                <h3 className="font-bold text-lg mb-1" style={{ color: colors.text }}>
-                  {client.name}
-                </h3>
+                <h3 className="font-bold text-lg mb-1 text-foreground">{client.name}</h3>
 
                 <div className="space-y-2 text-sm mb-4">
                   {client.email && (
                     <div className="flex items-center gap-2">
-                      <Mail size={14} style={{ color: colors.textMuted }} />
-                      <span style={{ color: colors.textMuted }}>{client.email}</span>
+                      <Mail size={14} className="text-muted" />
+                      <span className="text-muted">{client.email}</span>
                     </div>
                   )}
                   {client.phone && (
                     <div className="flex items-center gap-2">
-                      <Phone size={14} style={{ color: colors.textMuted }} />
-                      <span style={{ color: colors.textMuted }}>{client.phone}</span>
+                      <Phone size={14} className="text-muted" />
+                      <span className="text-muted">{client.phone}</span>
                     </div>
                   )}
                   {(() => {
@@ -339,8 +311,8 @@ export default function ClientsAdmin() {
                     if (!nextDate) {
                       return (
                         <div className="flex items-center gap-2">
-                          <Calendar size={14} style={{ color: colors.textMuted }} />
-                          <span style={{ color: colors.textMuted }}>Sin programar</span>
+                          <Calendar size={14} className="text-muted" />
+                          <span className="text-muted">Sin programar</span>
                         </div>
                       )
                     }
@@ -348,8 +320,8 @@ export default function ClientsAdmin() {
                     if (days > 0) {
                       return (
                         <div className="flex items-center gap-2">
-                          <Calendar size={14} style={{ color: colors.success }} />
-                          <span style={{ color: colors.success }}>
+                          <Calendar size={14} className="text-success" />
+                          <span className="text-success">
                             Faltan {days} días para próxima facturación
                           </span>
                         </div>
@@ -357,15 +329,15 @@ export default function ClientsAdmin() {
                     } else if (days === 0) {
                       return (
                         <div className="flex items-center gap-2">
-                          <AlertCircle size={14} style={{ color: colors.warning }} />
-                          <span style={{ color: colors.warning }}>Facturación vence hoy</span>
+                          <AlertCircle size={14} className="text-warning" />
+                          <span className="text-warning">Facturación vence hoy</span>
                         </div>
                       )
                     } else {
                       return (
                         <div className="flex items-center gap-2">
-                          <AlertCircle size={14} style={{ color: colors.error }} />
-                          <span style={{ color: colors.error }}>
+                          <AlertCircle size={14} className="text-error" />
+                          <span className="text-error">
                             Facturación vencida hace {Math.abs(days)} días
                           </span>
                         </div>
@@ -375,30 +347,24 @@ export default function ClientsAdmin() {
                 </div>
 
                 {pendingInvoices > 0 && (
-                  <div
-                    className="mb-3 px-3 py-2 rounded-lg text-center"
-                    style={{ backgroundColor: colors.accentMuted }}
-                  >
-                    <span className="font-bold" style={{ color: colors.accent }}>
+                  <div className="mb-3 px-3 py-2 rounded-lg text-center bg-accent-muted">
+                    <span className="font-bold text-accent-text">
                       {pendingInvoices} factura{pendingInvoices > 1 ? 's' : ''} pendiente
                       {pendingInvoices > 1 ? 's' : ''}
                     </span>
                   </div>
                 )}
 
-                <div className="border-t pt-3" style={{ borderColor: colors.border }}>
+                <div className="border-t border-border pt-3">
                   <div className="flex items-center justify-between">
-                    <div
-                      className="flex items-center gap-1 text-xs"
-                      style={{ color: colors.textMuted }}
-                    >
+                    <div className="flex items-center gap-1 text-xs text-muted">
                       <FileText size={14} />
                       <span>Estado de cuenta</span>
                     </div>
                   </div>
                   <div className="text-right">
                     {pending > 0 ? (
-                      <span className="text-sm font-bold" style={{ color: colors.warning }}>
+                      <span className="text-sm font-bold text-warning">
                         $
                         {pending.toLocaleString('es-MX', {
                           minimumFractionDigits: 2,
@@ -407,9 +373,7 @@ export default function ClientsAdmin() {
                         pendiente
                       </span>
                     ) : (
-                      <span className="text-sm font-bold" style={{ color: colors.success }}>
-                        Al día
-                      </span>
+                      <span className="text-sm font-bold text-success">Al día</span>
                     )}
                   </div>
                 </div>
@@ -420,9 +384,7 @@ export default function ClientsAdmin() {
       </div>
 
       {clients.length === 0 && (
-        <div className="text-center py-12" style={{ color: colors.textMuted }}>
-          No hay clientes registrados
-        </div>
+        <div className="text-center py-12 text-muted">No hay clientes registrados</div>
       )}
 
       <ConfirmModal

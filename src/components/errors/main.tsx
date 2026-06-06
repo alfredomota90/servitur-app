@@ -1,4 +1,3 @@
-import { useTheme } from '@/lib/theme'
 import { AlertTriangle } from 'lucide-react'
 
 interface MainErrorFallbackProps {
@@ -7,34 +6,25 @@ interface MainErrorFallbackProps {
 }
 
 export function MainErrorFallback({ error, resetErrorBoundary }: MainErrorFallbackProps) {
-  const { colors } = useTheme()
-
   return (
-    <div
-      className="min-h-screen flex items-center justify-center p-4"
-      style={{ backgroundColor: colors.background }}
-    >
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <div className="text-center max-w-md">
-        <AlertTriangle size={48} className="mx-auto mb-4" style={{ color: colors.error }} />
-        <h1 className="text-xl font-bold mb-2" style={{ color: colors.text }}>
-          Algo salió mal
-        </h1>
-        <p className="text-sm mb-4" style={{ color: colors.textMuted }}>
+        <AlertTriangle size={48} className="mx-auto mb-4 text-error" />
+        <h1 className="text-xl font-bold mb-2 text-foreground">Algo salió mal</h1>
+        <p className="text-sm mb-4 text-muted">
           {error?.message || 'Ha ocurrido un error inesperado. Intenta recargar la página.'}
         </p>
         <div className="flex gap-3 justify-center">
           <button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 rounded-lg text-white text-sm font-medium"
-            style={{ backgroundColor: colors.accent }}
+            className="px-4 py-2 rounded-lg text-white text-sm font-medium bg-accent hover:bg-accent-hover"
           >
             Recargar página
           </button>
           {resetErrorBoundary && (
             <button
               onClick={resetErrorBoundary}
-              className="px-4 py-2 rounded-lg text-sm font-medium border"
-              style={{ borderColor: colors.border, color: colors.text }}
+              className="px-4 py-2 rounded-lg text-sm font-medium border border-border text-foreground hover:bg-card-hover"
             >
               Reintentar
             </button>

@@ -35,5 +35,5 @@ export function FormFieldError({ name }: FormFieldErrorProps) {
   const form = useFormContext()
   const error = form.formState.errors[name]
   if (!error?.message) return null
-  return <p className="text-xs text-red-600">{String(error.message)}</p>
+  return <p className="text-xs text-error">{String(error.message)}</p>
 }

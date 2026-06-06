@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { useTheme } from '@/lib/theme'
 import { useClients } from '@/features/clients/api'
 import {
   useInvoicesByClient,
@@ -31,7 +30,6 @@ import ViewAttachmentModal from '@/components/view-attachment-modal'
 import type { Payment } from '@/features/payments/api'
 
 export default function ClientDetail() {
-  const { colors } = useTheme()
   const { id } = useParams()
   const navigate = useNavigate()
   const { data: clients = [] } = useClients()
@@ -114,8 +112,8 @@ export default function ClientDetail() {
   if (!client) {
     return (
       <div className="p-6 text-center">
-        <p style={{ color: colors.textMuted }}>Cliente no encontrado</p>
-        <Link to="/admin/clientes" className="text-red-600 hover:underline">
+        <p className="text-muted">Cliente no encontrado</p>
+        <Link to="/admin/clientes" className="text-error hover:underline">
           Volver a clientes
         </Link>
       </div>
@@ -139,22 +137,22 @@ export default function ClientDetail() {
     {
       label: 'Pendiente',
       value: `$${totalPending.toLocaleString()}`,
-      color: colors.warning,
+      textClass: 'text-warning',
     },
     {
       label: 'Pagado',
       value: `$${totalPaid.toLocaleString()}`,
-      color: colors.success,
+      textClass: 'text-success',
     },
     {
       label: 'Total generado',
       value: `$${totalGenerated.toLocaleString()}`,
-      color: colors.text,
+      textClass: 'text-foreground',
     },
     {
       label: 'Facturas pendientes de pago',
       value: pendingInvoices.length.toString(),
-      color: colors.accent,
+      textClass: 'text-accent',
     },
   ]
 
@@ -162,8 +160,7 @@ export default function ClientDetail() {
     <div className="p-4 md:p-6">
       <button
         onClick={() => navigate('/admin/clientes')}
-        className="flex items-center gap-2 mb-4"
-        style={{ color: colors.textMuted }}
+        className="flex items-center gap-2 mb-4 text-muted"
       >
         <ArrowLeft size={20} />
         Volver a clientes
@@ -171,10 +168,8 @@ export default function ClientDetail() {
 
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold" style={{ color: colors.text }}>
-            {client.name}
-          </h1>
-          <p style={{ color: colors.textMuted }}>
+          <h1 className="text-2xl font-bold text-foreground">{client.name}</h1>
+          <p className="text-muted">
             {client.email && <>{client.email} • </>}
             {client.phone}
           </p>
@@ -183,7 +178,7 @@ export default function ClientDetail() {
               const nextDate = getNextBillingDate(clientInvoices, client.billingInterval)
               if (!nextDate) return null
               return (
-                <p className="text-sm mt-1" style={{ color: colors.textMuted }}>
+                <p className="text-sm mt-1 text-muted">
                   Intervalo de facturación:{' '}
                   <span className="font-medium">{client.billingInterval} días</span>
                   {' — '}
@@ -196,8 +191,7 @@ export default function ClientDetail() {
           <button
             onClick={generatePDF}
             disabled={pendingInvoices.length === 0}
-            className="flex items-center gap-1.5 px-1.5 py-0.5 rounded text-[11px] md:gap-2 md:px-4 md:py-2 md:rounded-lg md:text-sm disabled:opacity-50"
-            style={{ backgroundColor: colors.accent, color: colors.background }}
+            className="flex items-center gap-1.5 px-1.5 py-0.5 rounded text-[11px] md:gap-2 md:px-4 md:py-2 md:rounded-lg md:text-sm disabled:opacity-50 bg-accent text-background"
           >
             <Download size={12} className="md:hidden" />
             <Download size={16} className="hidden md:block" />
@@ -208,8 +202,7 @@ export default function ClientDetail() {
               setEditingInvoice(null)
               setShowForm(true)
             }}
-            className="flex items-center gap-1.5 px-1.5 py-0.5 rounded text-[11px] md:gap-2 md:px-4 md:py-2 md:rounded-lg md:text-sm"
-            style={{ backgroundColor: colors.success, color: '#fff' }}
+            className="flex items-center gap-1.5 px-1.5 py-0.5 rounded text-[11px] md:gap-2 md:px-4 md:py-2 md:rounded-lg md:text-sm bg-success text-white"
           >
             <Plus size={12} className="md:hidden" />
             <Plus size={18} className="md:block hidden" />
@@ -229,7 +222,6 @@ export default function ClientDetail() {
         selectedInvoiceIds={paymentsCtrl.selectedInvoiceIds}
         expandedDescId={expandedDescId}
         totalPending={totalPending}
-        colors={colors}
         onToggleSort={sort.toggleSort}
         onToggleSelect={paymentsCtrl.toggleSelectInvoice}
         onSelectAll={paymentsCtrl.handleSelectAll}
@@ -249,7 +241,6 @@ export default function ClientDetail() {
             (s, i) => s + (i.totalMxn || i.total),
             0,
           )}
-          colors={colors}
           onCancel={paymentsCtrl.cancelSelection}
           onContinue={paymentsCtrl.continueToPayment}
         />
@@ -258,7 +249,6 @@ export default function ClientDetail() {
       <PaidInvoicesTable
         paidInvoices={paidInvoices}
         payments={payments}
-        colors={colors}
         onPreview={previewInvoice}
         onViewAttachment={setViewingAttachment}
         onEditPayment={paymentsCtrl.openEditPayment}

@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Upload } from 'lucide-react'
-import { useTheme } from '@/lib/theme'
 import type { Invoice } from '@/features/invoices/api'
 import type { Client } from '@/features/clients/api'
 import { parseCFDIFromText, uploadXML } from '@/lib/xml-parser'
@@ -61,7 +60,6 @@ export default function InvoiceFormModal({
   onSave,
   onClose,
 }: InvoiceFormModalProps) {
-  const { colors } = useTheme()
   const addToast = useStore((s) => s.addToast)
   const [xmlFile, setXmlFile] = useState<File | null>(null)
   const [localClientId, setLocalClientId] = useState(propClientId)
@@ -195,8 +193,7 @@ export default function InvoiceFormModal({
         <div className="flex justify-end">
           <label
             htmlFor="xml-upload"
-            className="flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer"
-            style={{ borderColor: colors.border, color: colors.text }}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer border-border text-foreground"
           >
             <Upload size={16} />
             Cargar XML SAT
@@ -204,7 +201,7 @@ export default function InvoiceFormModal({
         </div>
 
         {xmlFile && (
-          <div className="p-2 rounded bg-green-50 text-green-700 text-xs">
+          <div className="p-2 rounded bg-success/10 text-success text-xs">
             ✅ Archivo XML seleccionado: {xmlFile.name}
           </div>
         )}
@@ -240,9 +237,7 @@ export default function InvoiceFormModal({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: colors.text }}>
-            Estado
-          </label>
+          <label className="block text-sm font-medium mb-1 text-foreground">Estado</label>
           <div className="grid grid-cols-2 gap-2">
             <Button
               type="button"
@@ -261,10 +256,8 @@ export default function InvoiceFormModal({
           </div>
         </div>
 
-        <div className="border-t pt-4" style={{ borderColor: colors.border }}>
-          <h3 className="text-sm font-semibold mb-3" style={{ color: colors.text }}>
-            Datos de Factura SAT
-          </h3>
+        <div className="border-t pt-4 border-border">
+          <h3 className="text-sm font-semibold mb-3 text-foreground">Datos de Factura SAT</h3>
 
           <div className="grid grid-cols-2 gap-3">
             <Input label="Serie/Folio" placeholder="A206" {...form.register('serieFolio')} />

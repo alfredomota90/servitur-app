@@ -1,5 +1,4 @@
 import { DollarSign, TrendingUp, FileText } from 'lucide-react'
-import { useTheme } from '@/lib/theme'
 import { useState, useMemo } from 'react'
 import { useClients } from '@/features/clients/api'
 import { useInvoices } from '@/features/invoices/api'
@@ -43,23 +42,13 @@ function CustomTooltip({
   payload?: Array<{ value: number; name: string }>
   label?: string
 }) {
-  const { colors } = useTheme()
   if (!active || !payload) return null
   return (
-    <div
-      className="rounded-lg p-3 shadow-lg text-sm"
-      style={{
-        backgroundColor: colors.card,
-        border: `1px solid ${colors.border}`,
-        color: colors.text,
-      }}
-    >
-      <p className="mb-2" style={{ color: colors.textMuted }}>
-        {label}
-      </p>
+    <div className="rounded-lg p-3 shadow-lg text-sm bg-card border border-border text-foreground">
+      <p className="mb-2 text-muted">{label}</p>
       {payload.map((entry, i) => (
         <p key={i} className="flex items-center gap-2">
-          <span style={{ color: entry.name === 'facturado' ? '#3b82f6' : '#22c55e' }}>
+          <span style={{ color: entry.name === 'facturado' ? 'var(--accent)' : 'var(--success)' }}>
             {entry.name === 'facturado' ? 'Facturado' : 'Pagado'}:
           </span>
           <span className="font-medium">{formatCurrency(entry.value)}</span>
@@ -70,7 +59,6 @@ function CustomTooltip({
 }
 
 export default function Dashboard() {
-  const { colors } = useTheme()
   const { data: invoices = [] } = useInvoices()
   const { data: clients = [] } = useClients()
   const [period, setPeriod] = useState<Period>('month')
@@ -161,43 +149,44 @@ export default function Dashboard() {
   }, [filteredInvoices])
 
   const stats = [
-    { label: 'Facturado', value: formatCurrency(totalIncome), icon: TrendingUp, color: '#3b82f6' },
-    { label: 'Pagado', value: formatCurrency(totalPaid), icon: DollarSign, color: '#22c55e' },
+    {
+      label: 'Facturado',
+      value: formatCurrency(totalIncome),
+      icon: TrendingUp,
+      color: 'var(--accent)',
+    },
+    {
+      label: 'Pagado',
+      value: formatCurrency(totalPaid),
+      icon: DollarSign,
+      color: 'var(--success)',
+    },
     {
       label: 'Pendiente',
       value: formatCurrency(pendingIncome),
       icon: FileText,
-      color: colors.warning,
+      color: 'var(--warning)',
     },
   ]
 
   return (
     <div className="p-4 md:p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold" style={{ color: colors.text }}>
-          Dashboard
-        </h1>
-        <p className="text-sm" style={{ color: colors.textMuted }}>
-          Resumen de tu negocio de transporte
-        </p>
+        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+        <p className="text-sm text-muted">Resumen de tu negocio de transporte</p>
       </div>
 
       <div className="flex flex-wrap items-center gap-3 mb-6">
-        <div
-          className="flex rounded-lg overflow-hidden border"
-          style={{ borderColor: colors.border }}
-        >
+        <div className="flex rounded-lg overflow-hidden border border-border">
           {PERIODS.map((p) => (
             <button
               key={p}
               onClick={() => setPeriod(p)}
-              className="px-4 py-2 text-sm font-medium transition-colors"
-              style={{
-                backgroundColor: period === p ? colors.accent : 'transparent',
-                color: period === p ? '#fff' : colors.textMuted,
-              }}
+              className={`px-4 py-2 text-sm font-medium transition-colors ${
+                period === p ? 'bg-accent text-background' : ''
+              }`}
             >
-              {PERIOD_LABELS[p]}
+              <span className={period !== p ? 'text-muted' : ''}>{PERIOD_LABELS[p]}</span>
             </button>
           ))}
         </div>
@@ -205,8 +194,7 @@ export default function Dashboard() {
         <select
           value={selectedClientId}
           onChange={(e) => setSelectedClientId(e.target.value)}
-          className="px-3 py-2 border rounded-lg text-sm"
-          style={{ backgroundColor: colors.card, borderColor: colors.border, color: colors.text }}
+          className="px-3 py-2 border rounded-lg text-sm bg-card border-border text-foreground"
         >
           <option value="">Todos los clientes</option>
           {clients.map((c) => (
@@ -217,21 +205,21 @@ export default function Dashboard() {
         </select>
       </div>
 
-      <div className="rounded-xl p-4 mb-6" style={{ backgroundColor: colors.card }}>
+      <div className="rounded-xl p-4 mb-6 bg-card">
         {chartData.some((d) => d.facturado > 0 || d.pagado > 0) ? (
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke={colors.border} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis
                 dataKey="date"
-                tick={{ fill: colors.textMuted, fontSize: 12 }}
-                axisLine={{ stroke: colors.border }}
+                tick={{ fill: 'var(--muted)', fontSize: 12 }}
+                axisLine={{ stroke: 'var(--border)' }}
                 tickLine={false}
                 interval="preserveStartEnd"
               />
               <YAxis
-                tick={{ fill: colors.textMuted, fontSize: 12 }}
-                axisLine={{ stroke: colors.border }}
+                tick={{ fill: 'var(--muted)', fontSize: 12 }}
+                axisLine={{ stroke: 'var(--border)' }}
                 tickLine={false}
                 tickFormatter={(v) => formatCurrency(v)}
               />
@@ -239,7 +227,7 @@ export default function Dashboard() {
               <Line
                 type="monotone"
                 dataKey="facturado"
-                stroke="#3b82f6"
+                stroke="var(--accent)"
                 strokeWidth={2}
                 dot={false}
                 name="facturado"
@@ -247,7 +235,7 @@ export default function Dashboard() {
               <Line
                 type="monotone"
                 dataKey="pagado"
-                stroke="#22c55e"
+                stroke="var(--success)"
                 strokeWidth={2}
                 dot={false}
                 name="pagado"
@@ -255,10 +243,7 @@ export default function Dashboard() {
             </LineChart>
           </ResponsiveContainer>
         ) : (
-          <div
-            className="flex items-center justify-center h-[300px] text-sm"
-            style={{ color: colors.textMuted }}
-          >
+          <div className="flex items-center justify-center h-[300px] text-sm text-muted">
             No hay datos en este período
           </div>
         )}
@@ -266,11 +251,9 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-3 gap-4 mb-6">
         {stats.map((stat, i) => (
-          <div key={i} className="rounded-xl p-4" style={{ backgroundColor: colors.card }}>
+          <div key={i} className="rounded-xl p-4 bg-card">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs" style={{ color: colors.textMuted }}>
-                {stat.label}
-              </span>
+              <span className="text-xs text-muted">{stat.label}</span>
               <stat.icon size={16} style={{ color: stat.color }} />
             </div>
             <p className="text-xl font-bold" style={{ color: stat.color }}>
@@ -280,49 +263,29 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <div
-        className="rounded-xl overflow-hidden shadow-sm mb-6"
-        style={{ backgroundColor: colors.card }}
-      >
-        <div className="p-4 border-b" style={{ borderColor: colors.border }}>
-          <h2 className="font-semibold" style={{ color: colors.text }}>
-            Últimas Facturas
-          </h2>
+      <div className="rounded-xl overflow-hidden shadow-sm mb-6 bg-card">
+        <div className="p-4 border-b border-border">
+          <h2 className="font-semibold text-foreground">Últimas Facturas</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead style={{ backgroundColor: colors.backgroundSecondary }}>
+            <thead className="bg-background-secondary">
               <tr>
-                <th className="px-4 py-2 text-left" style={{ color: colors.textMuted }}>
-                  Cliente
-                </th>
-                <th className="px-4 py-2 text-left" style={{ color: colors.textMuted }}>
-                  Folio
-                </th>
-                <th className="px-4 py-2 text-left" style={{ color: colors.textMuted }}>
-                  Fecha
-                </th>
-                <th className="px-4 py-2 text-right" style={{ color: colors.textMuted }}>
-                  Monto
-                </th>
+                <th className="px-4 py-2 text-left text-muted">Cliente</th>
+                <th className="px-4 py-2 text-left text-muted">Folio</th>
+                <th className="px-4 py-2 text-left text-muted">Fecha</th>
+                <th className="px-4 py-2 text-right text-muted">Monto</th>
               </tr>
             </thead>
             <tbody>
               {lastInvoices.map((inv) => (
-                <tr key={inv.id} className="border-t" style={{ borderColor: colors.border }}>
-                  <td className="px-4 py-2" style={{ color: colors.text }}>
-                    {inv.clientName}
-                  </td>
-                  <td className="px-4 py-2" style={{ color: colors.textMuted }}>
-                    {inv.serieFolio || '-'}
-                  </td>
-                  <td className="px-4 py-2" style={{ color: colors.textMuted }}>
+                <tr key={inv.id} className="border-t border-border">
+                  <td className="px-4 py-2 text-foreground">{inv.clientName}</td>
+                  <td className="px-4 py-2 text-muted">{inv.serieFolio || '-'}</td>
+                  <td className="px-4 py-2 text-muted">
                     {new Date(inv.createdAt).toLocaleDateString('es-MX')}
                   </td>
-                  <td
-                    className="px-4 py-2 text-right font-medium"
-                    style={{ color: colors.success }}
-                  >
+                  <td className="px-4 py-2 text-right font-medium text-success">
                     $
                     {(inv.totalMxn || inv.total).toLocaleString('es-MX', {
                       minimumFractionDigits: 2,
@@ -333,11 +296,7 @@ export default function Dashboard() {
               ))}
               {lastInvoices.length === 0 && (
                 <tr>
-                  <td
-                    colSpan={4}
-                    className="px-4 py-8 text-center"
-                    style={{ color: colors.textMuted }}
-                  >
+                  <td colSpan={4} className="px-4 py-8 text-center text-muted">
                     No hay facturas registradas
                   </td>
                 </tr>

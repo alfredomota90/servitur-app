@@ -1,6 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Home, Users, Car, X, LogOut } from 'lucide-react'
-import { useTheme } from '@/lib/theme'
 import { useAuth } from '@/lib/auth'
 
 const SIDEBAR_WIDTH = 260
@@ -13,7 +12,6 @@ export default function AdminSidebar({
   onClose: () => void
 }) {
   const location = useLocation()
-  const { colors } = useTheme()
   const { signOut, user } = useAuth()
   const navigate = useNavigate()
 
@@ -43,18 +41,10 @@ export default function AdminSidebar({
     <>
       {isOpen && <div className="fixed inset-0 z-40 bg-black/50 md:hidden" onClick={onClose} />}
       <aside
-        className={`fixed top-0 left-0 h-full z-50 flex flex-col transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
-        style={{
-          width: SIDEBAR_WIDTH,
-          backgroundColor: colors.adminBg,
-          color: colors.adminText,
-          borderRight: `1px solid ${colors.border}`,
-        }}
+        className={`fixed top-0 left-0 h-full z-50 flex flex-col transition-transform duration-300 bg-admin-bg text-admin-foreground border-r border-border ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
+        style={{ width: SIDEBAR_WIDTH }}
       >
-        <div
-          className="flex items-center justify-between px-4 py-5 border-b"
-          style={{ borderColor: colors.border }}
-        >
+        <div className="flex items-center justify-between px-4 py-5 border-b border-border">
           <Link to="/admin" className="flex items-center gap-2" onClick={closeMobile}>
             <img
               src={`${import.meta.env.BASE_URL}serviturlogo.png`}
@@ -67,11 +57,7 @@ export default function AdminSidebar({
               className="h-6"
             />
           </Link>
-          <button
-            onClick={onClose}
-            className="p-1 rounded md:hidden"
-            style={{ color: colors.textMuted }}
-          >
+          <button onClick={onClose} className="p-1 rounded md:hidden text-muted">
             <X size={24} />
           </button>
         </div>
@@ -82,12 +68,11 @@ export default function AdminSidebar({
               key={item.path}
               to={item.path}
               onClick={closeMobile}
-              className="flex items-center gap-3 px-5 py-3 transition-colors"
-              style={{
-                backgroundColor: isActive(item) ? colors.accent + '20' : 'transparent',
-                borderLeft: isActive(item) ? `3px solid ${colors.accent}` : '3px solid transparent',
-                color: isActive(item) ? colors.accent : colors.adminText,
-              }}
+              className={`flex items-center gap-3 px-5 py-3 transition-colors border-l-[3px] ${
+                isActive(item)
+                  ? 'bg-accent-muted text-accent-text border-l-accent-text'
+                  : 'border-l-transparent'
+              }`}
             >
               <item.icon size={20} />
               <span className="text-sm font-medium">{item.label}</span>
@@ -95,15 +80,14 @@ export default function AdminSidebar({
           ))}
         </nav>
 
-        <div className="border-t py-4" style={{ borderColor: colors.border }}>
+        <div className="border-t border-border py-4">
           {user && (
             <button
               onClick={() => {
                 handleLogout()
                 closeMobile()
               }}
-              className="flex items-center gap-3 w-full px-5 py-3 transition-colors"
-              style={{ color: colors.error }}
+              className="flex items-center gap-3 w-full px-5 py-3 transition-colors text-error"
             >
               <LogOut size={20} />
               <span className="text-sm font-medium">Cerrar sesión</span>
@@ -112,8 +96,7 @@ export default function AdminSidebar({
           <Link
             to="/"
             onClick={closeMobile}
-            className="flex items-center gap-3 w-full px-5 py-3 transition-colors"
-            style={{ color: colors.textMuted }}
+            className="flex items-center gap-3 w-full px-5 py-3 transition-colors text-muted"
           >
             <Home size={20} />
             <span className="text-sm font-medium">Ver sitio</span>

@@ -1,4 +1,3 @@
-import { useTheme } from '@/lib/theme'
 import type { Invoice } from '@/features/invoices/api'
 
 interface PaymentMethodSelectorProps {
@@ -9,23 +8,19 @@ interface PaymentMethodSelectorProps {
 const METHODS: Invoice['paymentMethod'][] = ['transferencia', 'efectivo', 'cheque']
 
 export default function PaymentMethodSelector({ value, onChange }: PaymentMethodSelectorProps) {
-  const { colors } = useTheme()
-
   return (
     <div>
-      <label className="block text-sm font-medium mb-1" style={{ color: colors.text }}>
-        Método
-      </label>
+      <label className="block text-sm font-medium mb-1 text-foreground">Método</label>
       <div className="grid grid-cols-3 gap-2">
         {METHODS.map((method) => (
           <button
             key={method}
             type="button"
             onClick={() => onChange(method)}
-            className={`p-2 rounded-lg border text-sm capitalize ${
+            className={`p-2 rounded-lg border text-sm capitalize transition-colors ${
               value === method
-                ? 'border-green-500 bg-green-50 text-green-700'
-                : 'border-gray-200 hover:bg-gray-50'
+                ? 'border-success bg-success/10 text-success'
+                : 'border-border bg-card text-foreground hover:bg-card-hover'
             }`}
           >
             {method}

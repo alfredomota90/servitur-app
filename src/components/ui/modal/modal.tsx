@@ -45,15 +45,19 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
         <div
           ref={ref}
           className={cn(
-            'rounded-xl w-full max-h-[90vh] overflow-y-auto bg-white',
+            'rounded-xl w-full max-h-[90vh] overflow-y-auto bg-card',
             maxWidth,
             className,
           )}
           {...props}
         >
-          <div className="flex items-center justify-between p-4 border-b">
-            <h2 className="font-bold text-lg">{title}</h2>
-            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded" type="button">
+          <div className="flex items-center justify-between p-4 border-b border-border">
+            <h2 className="font-bold text-lg text-foreground">{title}</h2>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-card-hover rounded text-foreground"
+              type="button"
+            >
               <X size={20} />
             </button>
           </div>
