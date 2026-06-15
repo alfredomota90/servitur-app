@@ -1,5 +1,5 @@
-export function formatCurrency(value: number): string {
-  return value.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })
+export function fmtAmount(n: number): string {
+  return n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
 const MONTHS_ES: Record<string, number> = {

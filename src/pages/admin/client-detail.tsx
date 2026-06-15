@@ -21,7 +21,7 @@ import {
   generatePendingComplementsReport,
   generatePaymentHistoryReport,
 } from '@/lib/pdf-service'
-import { getNextBillingDate, formatDate } from '@/lib/utils'
+import { getNextBillingDate, formatDate, fmtAmount } from '@/lib/utils'
 import { previewXMLAsPDF, previewPDFFromInvoiceData } from '@/lib/xml-parser'
 import { useSort } from '@/hooks/use-sort'
 import { usePayments } from '@/hooks/use-payments'
@@ -159,17 +159,17 @@ export default function ClientDetail() {
   const stats = [
     {
       label: 'Pendiente',
-      value: `$${totalPending.toLocaleString()}`,
+      value: `$${fmtAmount(totalPending)}`,
       textClass: 'text-warning',
     },
     {
       label: 'Pagado',
-      value: `$${totalPaid.toLocaleString()}`,
+      value: `$${fmtAmount(totalPaid)}`,
       textClass: 'text-success',
     },
     {
       label: 'Total generado',
-      value: `$${totalGenerated.toLocaleString()}`,
+      value: `$${fmtAmount(totalGenerated)}`,
       textClass: 'text-foreground',
     },
     {

@@ -10,6 +10,7 @@ import {
   Plus,
 } from 'lucide-react'
 import type { Invoice } from '@/features/invoices/api'
+import { fmtAmount } from '@/lib/utils'
 import ExpandableTextCell from '@/components/expandable-text-cell'
 import { getInvoiceDate } from '@/lib/invoice-utils'
 import { getPaymentAttachmentUrl } from '@/lib/storage'
@@ -190,7 +191,7 @@ export default function PendingInvoicesTable({
                     )}
                   </td>
                   <td className="px-4 py-3 text-right font-medium text-success">
-                    ${(inv.totalMxn || inv.total).toLocaleString()}
+                    ${fmtAmount(inv.totalMxn || inv.total)}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-center gap-1">
@@ -277,7 +278,7 @@ export default function PendingInvoicesTable({
                 TOTAL
               </td>
               <td className="px-4 py-3 text-right font-bold text-success">
-                ${totalPending.toLocaleString()}
+                ${fmtAmount(totalPending)}
               </td>
               <td />
             </tr>

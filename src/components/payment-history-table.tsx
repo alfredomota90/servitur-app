@@ -2,6 +2,7 @@ import { Eye, Edit2, Download } from 'lucide-react'
 import type { Payment } from '@/features/payments/api'
 import type { Invoice } from '@/features/invoices/api'
 import { getPaymentAttachmentUrl } from '@/lib/storage'
+import { fmtAmount } from '@/lib/utils'
 
 interface Props {
   payments: Payment[]
@@ -15,10 +16,6 @@ function fmtDate(iso?: string): string {
   if (!iso) return '-'
   const d = new Date(iso)
   return d.toLocaleDateString('es-MX')
-}
-
-function fmtAmount(n: number): string {
-  return n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
 export default function PaymentHistoryTable({

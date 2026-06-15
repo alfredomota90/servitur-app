@@ -5,6 +5,7 @@ import type { Payment } from '@/features/payments/api'
 import { Modal } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Select } from '@/components/ui/select'
+import { fmtAmount } from '@/lib/utils'
 import PaymentMethodSelector from '@/components/payment-method-selector'
 import AttachmentField from '@/components/attachment-field'
 import ConfirmModal from '@/components/confirm-modal'
@@ -71,7 +72,7 @@ export default function EditPaymentModal({
                   ? `Referencia: ${payment.reference}`
                   : `${linkedInvoices.length} factura(s) vinculada(s)`}
               </p>
-              <p className="text-2xl font-bold text-success">${totalAmount.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-success">${fmtAmount(totalAmount)}</p>
               <p className="text-xs text-muted">{linkedInvoices.length} factura(s) vinculada(s)</p>
             </div>
           ) : (
@@ -81,7 +82,7 @@ export default function EditPaymentModal({
                 {invoice?.serieFolio || invoice?.period || '—'}
               </p>
               <p className="text-2xl font-bold text-success">
-                ${(invoice?.totalMxn || invoice?.total || 0).toLocaleString()}
+                ${fmtAmount(invoice?.totalMxn || invoice?.total || 0)}
               </p>
             </div>
           )}
@@ -149,7 +150,7 @@ export default function EditPaymentModal({
                           {inv.serieFolio || '—'}
                         </p>
                         <p className="text-xs text-muted">
-                          ${(inv.totalMxn || inv.total).toLocaleString()}
+                          ${fmtAmount(inv.totalMxn || inv.total)}
                         </p>
                       </div>
                       <button
@@ -181,7 +182,7 @@ export default function EditPaymentModal({
                   >
                     {availableInvoices.map((inv) => (
                       <option key={inv.id} value={inv.id}>
-                        {inv.serieFolio || '—'} — ${(inv.totalMxn || inv.total).toLocaleString()}
+                        {inv.serieFolio || '—'} — ${fmtAmount(inv.totalMxn || inv.total)}
                       </option>
                     ))}
                   </Select>

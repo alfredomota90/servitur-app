@@ -2,6 +2,7 @@ import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { setupPDFHeader } from '@/lib/pdf-utils'
 import { sortInvoices, getInvoiceDate } from '@/lib/invoice-utils'
+import { fmtAmount } from '@/lib/utils'
 import type { Invoice } from '@/features/invoices/api'
 import type { Payment } from '@/features/payments/api'
 
@@ -22,9 +23,9 @@ export async function generatePendingReport(
       getInvoiceDate(inv),
       inv.serieFolio || '-',
       inv.invoiceDescription || inv.period || '-',
-      `$${(inv.totalMxn || inv.total).toLocaleString()}`,
+      `$${fmtAmount(inv.totalMxn || inv.total)}`,
     ]),
-    foot: [['', '', 'TOTAL:', `$${totalPending.toLocaleString()}`]],
+    foot: [['', '', 'TOTAL:', `$${fmtAmount(totalPending)}`]],
     styles: { fontSize: 9, cellPadding: 3 },
     headStyles: { fillColor: [13, 28, 47], textColor: 255 },
     footStyles: {
@@ -76,9 +77,9 @@ export async function generatePendingComplementsReport(
       inv.serieFolio || '-',
       inv.paymentDate || '-',
       inv.invoiceDescription || inv.period || '-',
-      `$${(inv.totalMxn || inv.total).toLocaleString()}`,
+      `$${fmtAmount(inv.totalMxn || inv.total)}`,
     ]),
-    foot: [['', '', 'TOTAL:', `$${totalPaid.toLocaleString()}`]],
+    foot: [['', '', 'TOTAL:', `$${fmtAmount(totalPaid)}`]],
     styles: { fontSize: 9, cellPadding: 3 },
     headStyles: { fillColor: [13, 28, 47], textColor: 255 },
     footStyles: {
@@ -142,9 +143,9 @@ export async function generatePaymentHistoryReport(
         .map((i) => i.serieFolio)
         .filter(Boolean)
         .join(', ') || '—',
-      `$${p.amount.toLocaleString()}`,
+      `$${fmtAmount(p.amount)}`,
     ]),
-    foot: [['', '', '', 'TOTAL:', `$${total.toLocaleString()}`]],
+    foot: [['', '', '', 'TOTAL:', `$${fmtAmount(total)}`]],
     styles: { fontSize: 9, cellPadding: 3 },
     headStyles: { fillColor: [13, 28, 47], textColor: 255 },
     footStyles: {

@@ -1,6 +1,7 @@
 import { Download, FileText, Eye, Edit2 } from 'lucide-react'
 import type { Invoice } from '@/features/invoices/api'
 import { getPaymentAttachmentUrl } from '@/lib/storage'
+import { fmtAmount } from '@/lib/utils'
 
 interface Props {
   paidInvoices: Invoice[]
@@ -66,7 +67,7 @@ export default function PaidInvoicesTable({
                       '-'}
                   </td>
                   <td className="px-4 py-3 text-right font-medium text-success">
-                    ${(inv.totalMxn || inv.total).toLocaleString()}
+                    ${fmtAmount(inv.totalMxn || inv.total)}
                   </td>
                   <td className="px-4 py-3 text-center">
                     <div className="flex items-center justify-center gap-1">
@@ -115,7 +116,7 @@ export default function PaidInvoicesTable({
                 TOTAL
               </td>
               <td className="px-4 py-3 text-right font-bold text-success">
-                ${totalPaid.toLocaleString()}
+                ${fmtAmount(totalPaid)}
               </td>
               <td />
             </tr>
