@@ -1,4 +1,14 @@
-import { FileText, Wallet, Eye, Edit2, Trash2, CheckCircle, Clock } from 'lucide-react'
+import {
+  FileText,
+  Wallet,
+  Eye,
+  Edit2,
+  Trash2,
+  CheckCircle,
+  Clock,
+  Download,
+  Plus,
+} from 'lucide-react'
 import type { Invoice } from '@/features/invoices/api'
 import ExpandableTextCell from '@/components/expandable-text-cell'
 import { getInvoiceDate } from '@/lib/invoice-utils'
@@ -23,6 +33,8 @@ interface Props {
   onViewAttachment: (path: string) => void
   onEditPayment: (invoice: Invoice) => void
   onToggleExpandDesc: (id: string | null) => void
+  onGeneratePDF?: () => void
+  onAddInvoice?: () => void
 }
 
 function SortIcon({
@@ -57,14 +69,33 @@ export default function PendingInvoicesTable({
   onViewAttachment,
   onEditPayment,
   onToggleExpandDesc,
+  onGeneratePDF,
+  onAddInvoice,
 }: Props) {
   return (
     <div className="rounded-xl shadow-sm overflow-hidden mb-6 bg-card">
-      <div className="p-4 border-b border-border">
+      <div className="p-4 border-b border-border flex items-center justify-between">
         <h2 className="font-semibold flex items-center gap-2 text-foreground">
           <FileText size={18} />
           Facturas pendientes ({invoices.length})
         </h2>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onGeneratePDF}
+            disabled={invoices.length === 0}
+            className="flex items-center gap-2 bg-accent text-background px-4 py-2 rounded-lg hover:opacity-90 disabled:opacity-50 transition-colors text-sm"
+          >
+            <Download size={16} />
+            Estado de Cuenta
+          </button>
+          <button
+            onClick={onAddInvoice}
+            className="flex items-center gap-2 bg-success text-white px-4 py-2 rounded-lg hover:opacity-90 transition-colors text-sm"
+          >
+            <Plus size={16} />
+            Agregar
+          </button>
+        </div>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
@@ -91,15 +122,15 @@ export default function PendingInvoicesTable({
               </th>
               <th
                 className="px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted"
-                onClick={() => onToggleSort('description')}
-              >
-                Descripción <SortIcon col="description" sortKey={sortKey} sortDir={sortDir} />
-              </th>
-              <th
-                className="px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted"
                 onClick={() => onToggleSort('date')}
               >
                 Fecha <SortIcon col="date" sortKey={sortKey} sortDir={sortDir} />
+              </th>
+              <th
+                className="px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted"
+                onClick={() => onToggleSort('description')}
+              >
+                Descripción <SortIcon col="description" sortKey={sortKey} sortDir={sortDir} />
               </th>
               <th
                 className="px-4 py-3 text-center cursor-pointer select-none hover:opacity-80 text-muted"
@@ -137,6 +168,7 @@ export default function PendingInvoicesTable({
                     </td>
                   )}
                   <td className="px-4 py-3 font-medium text-foreground">{inv.serieFolio || '-'}</td>
+                  <td className="px-4 py-3 text-muted">{getInvoiceDate(inv)}</td>
                   <td className="px-4 py-3 text-muted">
                     <ExpandableTextCell
                       text={inv.invoiceDescription || inv.period || '-'}
@@ -144,7 +176,6 @@ export default function PendingInvoicesTable({
                       onToggle={() => onToggleExpandDesc(expandedDescId === inv.id ? null : inv.id)}
                     />
                   </td>
-                  <td className="px-4 py-3 text-muted">{getInvoiceDate(inv)}</td>
                   <td className="px-4 py-3 text-center">
                     {inv.status === 'pagado' ? (
                       <span className="inline-flex items-center gap-1 text-success">

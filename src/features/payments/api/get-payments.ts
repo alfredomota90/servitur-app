@@ -70,6 +70,7 @@ export const updatePayment = async (id: string, payment: Partial<Payment>): Prom
   const { error } = await supabase
     .from('payments')
     .update({
+      amount: payment.amount,
       method: payment.method,
       reference: payment.reference || null,
       attachment_path: payment.attachmentPath || null,

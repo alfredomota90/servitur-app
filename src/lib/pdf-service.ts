@@ -3,6 +3,7 @@ import autoTable from 'jspdf-autotable'
 import { setupPDFHeader } from '@/lib/pdf-utils'
 import { sortInvoices, getInvoiceDate } from '@/lib/invoice-utils'
 import type { Invoice } from '@/features/invoices/api'
+import type { Payment } from '@/features/payments/api'
 
 export async function generatePendingReport(
   pendingInvoices: Invoice[],
@@ -97,5 +98,63 @@ export async function generatePendingComplementsReport(
     finalY,
   )
   const fileName = `ComplementosPendientes_${clientName}_${new Date().toISOString().split('T')[0]}.pdf`
+  doc.save(fileName)
+}
+
+export async function generatePaymentHistoryReport(
+  payments: Payment[],
+  invoices: Invoice[],
+  clientName: string,
+) {
+  if (payments.length === 0) return
+
+  const doc = new jsPDF()
+  const startY = await setupPDFHeader(doc, 'HISTORIAL DE PAGOS', clientName)
+
+  const paymentsWithInvoices = payments
+    .map((p) => ({
+      ...p,
+      affectedInvoices: invoices.filter((inv) => inv.paymentId === p.id),
+    }))
+    .filter((p) => p.affectedInvoices.length > 0)
+    .sort((a, b) => {
+      const dateA = a.affectedInvoices[0]?.paymentDate || a.createdAt || ''
+      const dateB = b.affectedInvoices[0]?.paymentDate || b.createdAt || ''
+      return dateB.localeCompare(dateA)
+    })
+
+  const total = paymentsWithInvoices.reduce((s, p) => s + p.amount, 0)
+
+  autoTable(doc, {
+    startY,
+    head: [['Fecha', 'Método', 'Referencia', 'Folios afectados', 'Monto']],
+    body: paymentsWithInvoices.map((p) => [
+      p.affectedInvoices[0]?.paymentDate || p.createdAt || '-',
+      p.method === 'transferencia'
+        ? 'Transferencia'
+        : p.method === 'efectivo'
+          ? 'Efectivo'
+          : p.method === 'cheque'
+            ? 'Cheque'
+            : p.method || '-',
+      p.reference || '—',
+      p.affectedInvoices
+        .map((i) => i.serieFolio)
+        .filter(Boolean)
+        .join(', ') || '—',
+      `$${p.amount.toLocaleString()}`,
+    ]),
+    foot: [['', '', '', 'TOTAL:', `$${total.toLocaleString()}`]],
+    styles: { fontSize: 9, cellPadding: 3 },
+    headStyles: { fillColor: [13, 28, 47], textColor: 255 },
+    footStyles: {
+      fillColor: [240, 240, 240],
+      fontStyle: 'bold',
+      textColor: [0, 0, 0],
+    },
+    columnStyles: { 4: { halign: 'right' } },
+  })
+
+  const fileName = `HistorialPagos_${clientName}_${new Date().toISOString().split('T')[0]}.pdf`
   doc.save(fileName)
 }

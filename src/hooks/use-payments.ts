@@ -19,10 +19,19 @@ interface EditPaymentFormData {
   date: string
 }
 
+function toInputDate(value?: string | null): string {
+  if (!value) return ''
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value
+  const m = value.match(/^(\d{4}-\d{2}-\d{2})/)
+  return m ? m[1] : ''
+}
+
 interface StoreActions {
   addPayment: (payment: Payment) => Promise<Payment | null>
   updateInvoice: (id: string, data: Partial<Invoice>) => void
   updatePayment: (id: string, payment: Partial<Payment>) => Promise<void>
+  deletePayment: (id: string) => Promise<void>
+  batchUpdatePaymentDate: (paymentId: string, paymentDate: string) => void
 }
 
 export function usePayments(
@@ -52,6 +61,10 @@ export function usePayments(
     attachmentName: '',
     date: '',
   })
+  const [editingPayment, setEditingPayment] = useState<Payment | null>(null)
+  const [editingLinkedInvoices, setEditingLinkedInvoices] = useState<Invoice[]>([])
+  const [prevLinkedInvoiceIds, setPrevLinkedInvoiceIds] = useState<string[]>([])
+  const [showDeletePaymentConfirm, setShowDeletePaymentConfirm] = useState(false)
 
   const selectedInvoices = useMemo(
     () => invoices.filter((inv) => selectedInvoiceIds.includes(inv.id)),
@@ -66,7 +79,7 @@ export function usePayments(
       notes: '',
       attachment: '',
       attachmentName: '',
-      date: invoice.paymentDate || new Date().toISOString().split('T')[0],
+      date: toInputDate(invoice.paymentDate) || new Date().toISOString().split('T')[0],
     })
     setShowPaymentModal(true)
   }
@@ -143,14 +156,33 @@ export function usePayments(
     const linkedPayment = invoice.paymentId
       ? payments.find((p) => p.id === invoice.paymentId)
       : undefined
-    setEditingPaymentInvoice(invoice)
-    setEditPaymentData({
-      method: invoice.paymentMethod || linkedPayment?.method || 'transferencia',
-      reference: invoice.paymentReference || linkedPayment?.reference || '',
-      attachment: invoice.paymentAttachmentPath || linkedPayment?.attachmentPath || '',
-      attachmentName: '',
-      date: invoice.paymentDate || '',
-    })
+
+    if (linkedPayment) {
+      const linkedInvs = invoices.filter((i) => i.paymentId === linkedPayment.id)
+      setEditingPayment(linkedPayment)
+      setEditingLinkedInvoices(linkedInvs)
+      setPrevLinkedInvoiceIds(linkedInvs.map((i) => i.id))
+      setEditPaymentData({
+        method: linkedPayment.method || 'transferencia',
+        reference: linkedPayment.reference || '',
+        attachment: linkedPayment.attachmentPath || '',
+        attachmentName: '',
+        date: toInputDate(invoice.paymentDate),
+      })
+      setEditingPaymentInvoice(invoice)
+    } else {
+      setEditingPayment(null)
+      setEditingLinkedInvoices([invoice])
+      setPrevLinkedInvoiceIds([invoice.id])
+      setEditPaymentData({
+        method: invoice.paymentMethod || 'transferencia',
+        reference: invoice.paymentReference || '',
+        attachment: invoice.paymentAttachmentPath || '',
+        attachmentName: '',
+        date: toInputDate(invoice.paymentDate),
+      })
+      setEditingPaymentInvoice(invoice)
+    }
     setShowEditPayment(true)
   }
 
@@ -162,33 +194,94 @@ export function usePayments(
   const closeEditPayment = () => {
     setShowEditPayment(false)
     setEditingPaymentInvoice(null)
+    setEditingPayment(null)
+    setEditingLinkedInvoices([])
+    setPrevLinkedInvoiceIds([])
+    setShowDeletePaymentConfirm(false)
+  }
+
+  const addInvoiceToEdit = (invoiceId: string) => {
+    const inv = invoices.find((i) => i.id === invoiceId)
+    if (inv && !editingLinkedInvoices.some((l) => l.id === invoiceId)) {
+      setEditingLinkedInvoices((prev) => [...prev, inv])
+    }
+  }
+
+  const removeInvoiceFromEdit = (invoiceId: string) => {
+    setEditingLinkedInvoices((prev) => prev.filter((i) => i.id !== invoiceId))
+  }
+
+  const confirmDeleteOrphanPayment = () => {
+    if (!editingPayment) return
+    prevLinkedInvoiceIds.forEach((id) => {
+      actions.updateInvoice(id, { paymentId: null })
+    })
+    actions.deletePayment(editingPayment.id)
+    closeEditPayment()
+  }
+
+  const cancelDeleteOrphanPayment = () => {
+    setShowDeletePaymentConfirm(false)
   }
 
   const saveEditPayment = () => {
     if (!editingPaymentInvoice) return
 
-    const invoiceUpdates: Partial<Invoice> = {
-      paymentDate: editPaymentData.date || undefined,
-    }
+    if (editingPayment) {
+      if (editingLinkedInvoices.length === 0) {
+        setShowDeletePaymentConfirm(true)
+        return
+      }
 
-    if (editingPaymentInvoice.paymentId) {
-      actions.updatePayment(editingPaymentInvoice.paymentId, {
+      actions.updatePayment(editingPayment.id, {
         method: editPaymentData.method,
         reference: editPaymentData.reference || undefined,
         attachmentPath: editPaymentData.attachment || undefined,
+        amount: editingLinkedInvoices.reduce((sum, i) => sum + (i.totalMxn || i.total), 0),
       })
-      actions.updateInvoice(editingPaymentInvoice.id, invoiceUpdates)
+
+      const currentIds = editingLinkedInvoices.map((i) => i.id)
+
+      prevLinkedInvoiceIds.forEach((id) => {
+        if (!currentIds.includes(id)) {
+          actions.updateInvoice(id, { paymentId: null })
+        }
+      })
+
+      currentIds.forEach((id) => {
+        if (!prevLinkedInvoiceIds.includes(id)) {
+          actions.updateInvoice(id, {
+            paymentId: editingPayment.id,
+          })
+        }
+      })
+
+      if (editPaymentData.date) {
+        actions.batchUpdatePaymentDate(editingPayment.id, editPaymentData.date)
+      }
     } else {
-      actions.updateInvoice(editingPaymentInvoice.id, {
-        ...invoiceUpdates,
-        paymentMethod: editPaymentData.method,
-        paymentReference: editPaymentData.reference || undefined,
-        paymentAttachmentPath: editPaymentData.attachment || undefined,
-      })
+      const invoiceUpdates: Partial<Invoice> = {
+        paymentDate: editPaymentData.date || undefined,
+      }
+
+      if (editingPaymentInvoice.paymentId) {
+        actions.updatePayment(editingPaymentInvoice.paymentId, {
+          method: editPaymentData.method,
+          reference: editPaymentData.reference || undefined,
+          attachmentPath: editPaymentData.attachment || undefined,
+        })
+        actions.updateInvoice(editingPaymentInvoice.id, invoiceUpdates)
+      } else {
+        actions.updateInvoice(editingPaymentInvoice.id, {
+          ...invoiceUpdates,
+          paymentMethod: editPaymentData.method,
+          paymentReference: editPaymentData.reference || undefined,
+          paymentAttachmentPath: editPaymentData.attachment || undefined,
+        })
+      }
     }
 
-    setShowEditPayment(false)
-    setEditingPaymentInvoice(null)
+    closeEditPayment()
   }
 
   return {
@@ -201,6 +294,10 @@ export function usePayments(
     editingPaymentInvoice,
     editPaymentData,
     setEditPaymentData,
+    editingPayment,
+    editingLinkedInvoices,
+    prevLinkedInvoiceIds,
+    showDeletePaymentConfirm,
     selectedInvoices,
     openPaymentModal,
     addMoreInvoices,
@@ -213,5 +310,9 @@ export function usePayments(
     saveEditPayment,
     closePaymentModal,
     closeEditPayment,
+    addInvoiceToEdit,
+    removeInvoiceFromEdit,
+    confirmDeleteOrphanPayment,
+    cancelDeleteOrphanPayment,
   }
 }

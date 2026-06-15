@@ -5,6 +5,7 @@ import { getPaymentAttachmentUrl } from '@/lib/storage'
 interface Props {
   paidInvoices: Invoice[]
   payments: { id: string; method?: string; attachmentPath?: string }[]
+  totalPaid: number
   onPreview: (invoice: Invoice) => void
   onViewAttachment: (path: string) => void
   onEditPayment: (invoice: Invoice) => void
@@ -14,6 +15,7 @@ interface Props {
 export default function PaidInvoicesTable({
   paidInvoices,
   payments,
+  totalPaid,
   onPreview,
   onViewAttachment,
   onEditPayment,
@@ -24,11 +26,11 @@ export default function PaidInvoicesTable({
   return (
     <div className="rounded-xl p-4 shadow-sm bg-card">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-semibold text-foreground">Historial de pagos</h2>
+        <h2 className="font-semibold text-foreground">Facturas Pagadas</h2>
         <button
           onClick={onGenerateComplementsPDF}
           disabled={paidInvoices.length === 0}
-          className="flex items-center gap-2 bg-admin-bg text-admin-foreground px-4 py-2 rounded-lg hover:opacity-90 disabled:opacity-50 transition-colors text-sm"
+          className="flex items-center gap-2 bg-accent text-background px-4 py-2 rounded-lg hover:opacity-90 disabled:opacity-50 transition-colors text-sm"
         >
           <Download size={16} />
           Complementos pendientes
@@ -40,8 +42,8 @@ export default function PaidInvoicesTable({
             <tr>
               <th className="px-4 py-3 text-left text-muted">Serie/Folio</th>
               <th className="px-4 py-3 text-left text-muted">Fecha pago</th>
-              <th className="px-4 py-3 text-right text-muted">Monto</th>
               <th className="px-4 py-3 text-center text-muted">Método</th>
+              <th className="px-4 py-3 text-right text-muted">Monto</th>
               <th className="px-4 py-3 text-center text-muted">Acciones</th>
             </tr>
           </thead>
@@ -56,15 +58,15 @@ export default function PaidInvoicesTable({
                 <tr key={inv.id} className="border-t border-border">
                   <td className="px-4 py-3 text-foreground">{inv.serieFolio || '-'}</td>
                   <td className="px-4 py-3 text-muted">{inv.paymentDate || '-'}</td>
-                  <td className="px-4 py-3 text-right font-medium text-success">
-                    ${(inv.totalMxn || inv.total).toLocaleString()}
-                  </td>
                   <td className="px-4 py-3 text-center text-muted">
                     {inv.paymentMethod ||
                       (inv.paymentId
                         ? payments.find((p) => p.id === inv.paymentId)?.method
                         : undefined) ||
                       '-'}
+                  </td>
+                  <td className="px-4 py-3 text-right font-medium text-success">
+                    ${(inv.totalMxn || inv.total).toLocaleString()}
                   </td>
                   <td className="px-4 py-3 text-center">
                     <div className="flex items-center justify-center gap-1">
@@ -107,6 +109,17 @@ export default function PaidInvoicesTable({
                 </tr>
               ))}
           </tbody>
+          <tfoot className="bg-background-secondary">
+            <tr>
+              <td colSpan={3} className="px-4 py-3 font-semibold text-right text-foreground">
+                TOTAL
+              </td>
+              <td className="px-4 py-3 text-right font-bold text-success">
+                ${totalPaid.toLocaleString()}
+              </td>
+              <td />
+            </tr>
+          </tfoot>
         </table>
       </div>
     </div>
