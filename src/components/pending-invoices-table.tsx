@@ -100,6 +100,15 @@ export default function PendingInvoicesTable({
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
+          <colgroup>
+            {selectingMode && <col className="w-10" />}
+            <col />
+            <col />
+            <col />
+            <col />
+            <col className="w-28" />
+            <col className="w-44" />
+          </colgroup>
           <thead className="bg-background-secondary">
             <tr>
               {selectingMode && (
@@ -122,13 +131,13 @@ export default function PendingInvoicesTable({
                 Serie/Folio <SortIcon col="serieFolio" sortKey={sortKey} sortDir={sortDir} />
               </th>
               <th
-                className="px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted"
+                className="px-4 py-3 text-center cursor-pointer select-none hover:opacity-80 text-muted"
                 onClick={() => onToggleSort('date')}
               >
                 Fecha <SortIcon col="date" sortKey={sortKey} sortDir={sortDir} />
               </th>
               <th
-                className="px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted"
+                className="px-4 py-3 text-center cursor-pointer select-none hover:opacity-80 text-muted"
                 onClick={() => onToggleSort('description')}
               >
                 Descripción <SortIcon col="description" sortKey={sortKey} sortDir={sortDir} />
@@ -145,7 +154,7 @@ export default function PendingInvoicesTable({
               >
                 Monto <SortIcon col="total" sortKey={sortKey} sortDir={sortDir} />
               </th>
-              <th className="px-4 py-3 text-center text-muted">Acciones</th>
+              <th className="px-4 py-3 text-right text-muted">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -169,8 +178,8 @@ export default function PendingInvoicesTable({
                     </td>
                   )}
                   <td className="px-4 py-3 font-medium text-foreground">{inv.serieFolio || '-'}</td>
-                  <td className="px-4 py-3 text-muted">{getInvoiceDate(inv)}</td>
-                  <td className="px-4 py-3 text-muted">
+                  <td className="px-4 py-3 text-center text-muted">{getInvoiceDate(inv)}</td>
+                  <td className="px-4 py-3 text-center text-muted">
                     <ExpandableTextCell
                       text={inv.invoiceDescription || inv.period || '-'}
                       expanded={expandedDescId === inv.id}
@@ -193,15 +202,15 @@ export default function PendingInvoicesTable({
                   <td className="px-4 py-3 text-right font-medium text-success">
                     ${fmtAmount(inv.totalMxn || inv.total)}
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-center gap-1">
+                  <td className="px-4 py-3 text-right whitespace-nowrap">
+                    <div className="flex items-center justify-end gap-1">
                       {inv.status === 'pendiente' ? (
                         <button
                           onClick={() => onPayment(inv)}
                           className="p-1.5 rounded text-success"
                           title="Pagar"
                         >
-                          <Wallet size={16} />
+                          <Wallet size={14} />
                         </button>
                       ) : (
                         (() => {
@@ -242,14 +251,14 @@ export default function PendingInvoicesTable({
                         className="p-1.5 rounded text-accent-text"
                         title="Editar"
                       >
-                        <Edit2 size={16} />
+                        <Edit2 size={14} />
                       </button>
                       <button
                         onClick={() => onPreview(inv)}
                         className="p-1.5 rounded text-accent-text"
                         title="Ver factura"
                       >
-                        <FileText size={16} />
+                        <FileText size={14} />
                       </button>
                       {inv.xmlPath && (
                         <span className="text-[10px] px-1 py-0.5 rounded font-bold bg-success/15 text-success">
@@ -261,7 +270,7 @@ export default function PendingInvoicesTable({
                         className="p-1.5 rounded text-error"
                         title="Eliminar"
                       >
-                        <Trash2 size={16} />
+                        <Trash2 size={14} />
                       </button>
                     </div>
                   </td>

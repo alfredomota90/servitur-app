@@ -127,6 +127,7 @@ export default function ClientDetail() {
     },
   })
   const del = useDeleteConfirm((id: string) => deleteInvoice.mutate(id))
+  const delPayment = useDeleteConfirm((id: string) => deletePayment.mutate(id))
 
   if (!client) {
     return (
@@ -260,6 +261,7 @@ export default function ClientDetail() {
         onPreview={previewInvoice}
         onViewAttachment={setViewingAttachment}
         onEditPayment={paymentsCtrl.openEditPayment}
+        onDelete={del.handleDelete}
         onGenerateComplementsPDF={generateComplementsPDF}
       />
 
@@ -271,6 +273,7 @@ export default function ClientDetail() {
           const inv = clientInvoices.find((i) => i.paymentId === payment.id)
           if (inv) paymentsCtrl.openEditPayment(inv)
         }}
+        onDelete={delPayment.handleDelete}
         onGeneratePaymentHistoryPDF={generatePaymentHistoryPDF}
       />
 
@@ -336,6 +339,16 @@ export default function ClientDetail() {
         cancelLabel="Cancelar"
         onConfirm={del.confirmDelete}
         onCancel={del.cancelDelete}
+        danger={true}
+      />
+      <ConfirmModal
+        open={delPayment.deleteModal.open}
+        title="Eliminar pago"
+        message="¿Estás seguro de que deseas eliminar este pago? Esta acción no se puede revertir."
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        onConfirm={delPayment.confirmDelete}
+        onCancel={delPayment.cancelDelete}
         danger={true}
       />
     </div>
