@@ -6,6 +6,7 @@ import ExpandableTextCell from '@/components/expandable-text-cell'
 import ConfirmModal from '@/components/confirm-modal'
 import { useDeleteConfirm } from '@/hooks/use-delete-confirm'
 import { sortInvoices, type SortKey } from '@/lib/invoice-utils'
+import { fmtDate } from '@/lib/utils'
 
 export default function Trips() {
   const { data: invoices = [] } = useInvoices()
@@ -116,9 +117,7 @@ export default function Trips() {
                     </td>
                     <td className="px-4 py-3 text-muted">{inv.serieFolio || '-'}</td>
                     <td className="px-4 py-3 text-muted">
-                      {inv.tripDate ||
-                        inv.certificationDate?.split('T')[0] ||
-                        inv.createdAt?.split('T')[0]}
+                      {fmtDate(inv.tripDate || inv.certificationDate || inv.createdAt)}
                     </td>
                     <td className="px-4 py-3 text-center">
                       <span

@@ -1,7 +1,7 @@
 import { Download, FileText, Eye, Edit2, Trash2 } from 'lucide-react'
 import type { Invoice } from '@/features/invoices/api'
 import { getPaymentAttachmentUrl } from '@/lib/storage'
-import { fmtAmount } from '@/lib/utils'
+import { fmtAmount, fmtDate } from '@/lib/utils'
 
 interface Props {
   paidInvoices: Invoice[]
@@ -70,7 +70,7 @@ export default function PaidInvoicesTable({
               .map((inv) => (
                 <tr key={inv.id} className="border-t border-border">
                   <td className="px-4 py-3 text-foreground">{inv.serieFolio || '-'}</td>
-                  <td className="px-4 py-3 text-center text-muted">{inv.paymentDate || '-'}</td>
+                  <td className="px-4 py-3 text-center text-muted">{fmtDate(inv.paymentDate)}</td>
                   <td className="px-4 py-3 text-center text-muted">
                     {inv.paymentMethod ||
                       (inv.paymentId

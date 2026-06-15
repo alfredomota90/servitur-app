@@ -63,6 +63,19 @@ export function getDaysUntil(target: Date): number {
   return Math.ceil((t.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
 }
 
+const dateFormatter = new Intl.DateTimeFormat('es-MX', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+})
+
 export function formatDate(date: Date): string {
-  return date.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' })
+  return dateFormatter.format(date)
+}
+
+export function fmtDate(iso?: string | null): string {
+  if (!iso) return '-'
+  const d = new Date(iso)
+  if (isNaN(d.getTime())) return '-'
+  return formatDate(d)
 }
