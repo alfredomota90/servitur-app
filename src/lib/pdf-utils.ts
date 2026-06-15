@@ -1,4 +1,5 @@
 import { jsPDF } from 'jspdf'
+import { formatDate } from '@/lib/utils'
 
 export const svgToPng = async (url: string): Promise<string> => {
   const img = new Image()
@@ -39,7 +40,7 @@ export const setupPDFHeader = async (doc: jsPDF, titulo: string, clientName: str
   doc.setFontSize(12)
   const cliente = `Cliente: ${clientName}`
   doc.text(cliente, 14, 52)
-  const fecha = `Fecha de emisión: ${new Date().toLocaleDateString('es-MX')}`
+  const fecha = `Fecha de emisión: ${formatDate(new Date())}`
   doc.text(fecha, 210 - 14 - doc.getTextWidth(fecha), 52)
 
   return 62
