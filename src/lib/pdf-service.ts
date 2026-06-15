@@ -1,8 +1,8 @@
 import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { setupPDFHeader } from '@/lib/pdf-utils'
-import { sortInvoices, getInvoiceDate } from '@/lib/invoice-utils'
-import { fmtAmount } from '@/lib/utils'
+import { sortInvoices } from '@/lib/invoice-utils'
+import { fmtAmount, fmtDate } from '@/lib/utils'
 import type { Invoice } from '@/features/invoices/api'
 import type { Payment } from '@/features/payments/api'
 
@@ -20,7 +20,7 @@ export async function generatePendingReport(
     startY,
     head: [['Fecha', 'Serie/Folio', 'Descripción', 'Monto']],
     body: sortInvoices(pendingInvoices, 'date', 'asc').map((inv) => [
-      getInvoiceDate(inv),
+      fmtDate(inv.tripDate || inv.certificationDate || inv.createdAt),
       inv.serieFolio || '-',
       inv.invoiceDescription || inv.period || '-',
       `$${fmtAmount(inv.totalMxn || inv.total)}`,
@@ -75,7 +75,7 @@ export async function generatePendingComplementsReport(
     head: [['Serie/Folio', 'Fecha pago', 'Descripción', 'Monto']],
     body: sortedPaid.map((inv) => [
       inv.serieFolio || '-',
-      inv.paymentDate || '-',
+      fmtDate(inv.paymentDate),
       inv.invoiceDescription || inv.period || '-',
       `$${fmtAmount(inv.totalMxn || inv.total)}`,
     ]),

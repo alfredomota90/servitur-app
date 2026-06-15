@@ -1,3 +1,4 @@
+import { fmtDate } from '@/lib/utils'
 import type { Invoice } from '@/features/invoices/api'
 
 export interface InvoiceFormFields {
@@ -109,9 +110,9 @@ export function sortInvoices(invoices: Invoice[], sortKey: SortKey, sortDir: Sor
 
 export function getInvoiceDate(invoice: Invoice): string {
   return (
-    invoice.tripDate ||
-    invoice.certificationDate?.split('T')[0] ||
-    invoice.createdAt?.split('T')[0] ||
-    ''
+    fmtDate(invoice.tripDate) ||
+    fmtDate(invoice.certificationDate) ||
+    fmtDate(invoice.createdAt) ||
+    '-'
   )
 }

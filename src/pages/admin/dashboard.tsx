@@ -2,6 +2,7 @@ import { DollarSign, TrendingUp, FileText } from 'lucide-react'
 import { useState, useMemo } from 'react'
 import { useClients } from '@/features/clients/api'
 import { useInvoices } from '@/features/invoices/api'
+import { fmtDate } from '@/lib/utils'
 import {
   LineChart,
   Line,
@@ -282,9 +283,7 @@ export default function Dashboard() {
                 <tr key={inv.id} className="border-t border-border">
                   <td className="px-4 py-2 text-foreground">{inv.clientName}</td>
                   <td className="px-4 py-2 text-muted">{inv.serieFolio || '-'}</td>
-                  <td className="px-4 py-2 text-muted">
-                    {new Date(inv.createdAt).toLocaleDateString('es-MX')}
-                  </td>
+                  <td className="px-4 py-2 text-muted">{fmtDate(inv.createdAt)}</td>
                   <td className="px-4 py-2 text-right font-medium text-success">
                     $
                     {(inv.totalMxn || inv.total).toLocaleString('es-MX', {
