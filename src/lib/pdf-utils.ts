@@ -18,7 +18,7 @@ export const svgToPng = async (url: string): Promise<string> => {
 }
 
 export const setupPDFHeader = async (doc: jsPDF, titulo: string, clientName: string) => {
-  const logo = await svgToPng('/serviturlogo.png')
+  const logo = await svgToPng(`${import.meta.env.BASE_URL}serviturlogo.png`)
   doc.addImage(logo, 'PNG', 14, 8, 35, 29)
 
   doc.setFontSize(22)

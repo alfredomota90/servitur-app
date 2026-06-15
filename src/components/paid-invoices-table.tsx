@@ -1,34 +1,42 @@
-import { Download, FileText, Eye, Edit2 } from 'lucide-react'
+import { Download, FileText, Eye, Edit2, Trash2 } from 'lucide-react'
 import type { Invoice } from '@/features/invoices/api'
 import { getPaymentAttachmentUrl } from '@/lib/storage'
+import { fmtAmount } from '@/lib/utils'
 
 interface Props {
   paidInvoices: Invoice[]
   payments: { id: string; method?: string; attachmentPath?: string }[]
+  totalPaid: number
   onPreview: (invoice: Invoice) => void
   onViewAttachment: (path: string) => void
   onEditPayment: (invoice: Invoice) => void
+  onDelete: (id: string) => void
   onGenerateComplementsPDF: () => void
 }
 
 export default function PaidInvoicesTable({
   paidInvoices,
   payments,
+  totalPaid,
   onPreview,
   onViewAttachment,
   onEditPayment,
+  onDelete,
   onGenerateComplementsPDF,
 }: Props) {
   if (paidInvoices.length === 0) return null
 
   return (
-    <div className="rounded-xl p-4 shadow-sm bg-card">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="font-semibold text-foreground">Historial de pagos</h2>
+    <div className="rounded-xl shadow-sm overflow-hidden mb-6 bg-card">
+      <div className="p-4 border-b border-border flex items-center justify-between">
+        <h2 className="font-semibold flex items-center gap-2 text-foreground">
+          <FileText size={18} />
+          Facturas Pagadas ({paidInvoices.length})
+        </h2>
         <button
           onClick={onGenerateComplementsPDF}
           disabled={paidInvoices.length === 0}
-          className="flex items-center gap-2 bg-admin-bg text-admin-foreground px-4 py-2 rounded-lg hover:opacity-90 disabled:opacity-50 transition-colors text-sm"
+          className="flex items-center gap-2 bg-accent text-background px-4 py-2 rounded-lg hover:opacity-90 disabled:opacity-50 transition-colors text-sm"
         >
           <Download size={16} />
           Complementos pendientes
@@ -36,13 +44,20 @@ export default function PaidInvoicesTable({
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
+          <colgroup>
+            <col />
+            <col />
+            <col />
+            <col className="w-28" />
+            <col className="w-44" />
+          </colgroup>
           <thead className="bg-background-secondary">
             <tr>
               <th className="px-4 py-3 text-left text-muted">Serie/Folio</th>
-              <th className="px-4 py-3 text-left text-muted">Fecha pago</th>
-              <th className="px-4 py-3 text-right text-muted">Monto</th>
+              <th className="px-4 py-3 text-center text-muted">Fecha pago</th>
               <th className="px-4 py-3 text-center text-muted">Método</th>
-              <th className="px-4 py-3 text-center text-muted">Acciones</th>
+              <th className="px-4 py-3 text-right text-muted">Monto</th>
+              <th className="px-4 py-3 text-right text-muted">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -55,10 +70,7 @@ export default function PaidInvoicesTable({
               .map((inv) => (
                 <tr key={inv.id} className="border-t border-border">
                   <td className="px-4 py-3 text-foreground">{inv.serieFolio || '-'}</td>
-                  <td className="px-4 py-3 text-muted">{inv.paymentDate || '-'}</td>
-                  <td className="px-4 py-3 text-right font-medium text-success">
-                    ${(inv.totalMxn || inv.total).toLocaleString()}
-                  </td>
+                  <td className="px-4 py-3 text-center text-muted">{inv.paymentDate || '-'}</td>
                   <td className="px-4 py-3 text-center text-muted">
                     {inv.paymentMethod ||
                       (inv.paymentId
@@ -66,8 +78,11 @@ export default function PaidInvoicesTable({
                         : undefined) ||
                       '-'}
                   </td>
-                  <td className="px-4 py-3 text-center">
-                    <div className="flex items-center justify-center gap-1">
+                  <td className="px-4 py-3 text-right font-medium text-success">
+                    ${fmtAmount(inv.totalMxn || inv.total)}
+                  </td>
+                  <td className="px-4 py-3 text-right whitespace-nowrap">
+                    <div className="flex items-center justify-end gap-1">
                       <button
                         onClick={() => onPreview(inv)}
                         className="p-1.5 rounded text-accent-text"
@@ -102,11 +117,29 @@ export default function PaidInvoicesTable({
                       >
                         <Edit2 size={14} />
                       </button>
+                      <button
+                        onClick={() => onDelete(inv.id)}
+                        className="p-1.5 rounded text-error"
+                        title="Eliminar factura"
+                      >
+                        <Trash2 size={14} />
+                      </button>
                     </div>
                   </td>
                 </tr>
               ))}
           </tbody>
+          <tfoot className="bg-background-secondary">
+            <tr>
+              <td colSpan={3} className="px-4 py-3 font-semibold text-right text-foreground">
+                TOTAL
+              </td>
+              <td className="px-4 py-3 text-right font-bold text-success">
+                ${fmtAmount(totalPaid)}
+              </td>
+              <td />
+            </tr>
+          </tfoot>
         </table>
       </div>
     </div>

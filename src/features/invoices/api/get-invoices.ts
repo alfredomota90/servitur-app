@@ -34,7 +34,7 @@ export const invoiceSchema = z.object({
   totalMxn: z.number().optional(),
   certificationDate: z.string().optional(),
   xmlPath: z.string().optional(),
-  paymentId: z.string().optional(),
+  paymentId: z.string().optional().nullable(),
 })
 
 export type Invoice = z.infer<typeof invoiceSchema>
@@ -185,6 +185,26 @@ export const useUpdateInvoice = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Invoice> }) => updateInvoice(id, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['invoices'] }),
+  })
+}
+
+export const batchUpdateInvoicesPaymentDate = async (
+  paymentId: string,
+  paymentDate: string,
+): Promise<void> => {
+  const { error } = await supabase
+    .from('invoices')
+    .update({ payment_date: paymentDate, updated_at: new Date().toISOString() })
+    .eq('payment_id', paymentId)
+  if (error) throw error
+}
+
+export const useBatchUpdateInvoicesPaymentDate = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ paymentId, paymentDate }: { paymentId: string; paymentDate: string }) =>
+      batchUpdateInvoicesPaymentDate(paymentId, paymentDate),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['invoices'] }),
   })
 }

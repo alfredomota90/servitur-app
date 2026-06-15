@@ -1,6 +1,7 @@
 import type { Invoice } from '@/features/invoices/api'
 import { Modal } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
+import { fmtAmount } from '@/lib/utils'
 import PaymentMethodSelector from '@/components/payment-method-selector'
 import AttachmentField from '@/components/attachment-field'
 
@@ -56,13 +57,13 @@ export default function PaymentModal({
             <div key={inv.id} className="flex items-center justify-between">
               <span className="text-muted">{inv.serieFolio || inv.period || '—'}</span>
               <span className="font-medium text-foreground">
-                ${(inv.totalMxn || inv.total).toLocaleString()}
+                ${fmtAmount(inv.totalMxn || inv.total)}
               </span>
             </div>
           ))}
           <div className="border-t border-border pt-2 flex items-center justify-between font-bold">
             <span className="text-foreground">Total</span>
-            <span className="text-success">${totalAmount.toLocaleString()}</span>
+            <span className="text-success">${fmtAmount(totalAmount)}</span>
           </div>
         </div>
 

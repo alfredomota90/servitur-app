@@ -6,12 +6,22 @@ import {
   useCreateInvoice,
   useUpdateInvoice,
   useDeleteInvoice,
+  useBatchUpdateInvoicesPaymentDate,
 } from '@/features/invoices/api'
-import { usePaymentsTQ, useCreatePayment, useUpdatePayment } from '@/features/payments/api'
+import {
+  usePaymentsTQ,
+  useCreatePayment,
+  useUpdatePayment,
+  useDeletePayment,
+} from '@/features/payments/api'
 import type { Invoice } from '@/features/invoices/api'
-import { ArrowLeft, Download, Plus } from 'lucide-react'
-import { generatePendingReport, generatePendingComplementsReport } from '@/lib/pdf-service'
-import { getNextBillingDate, formatDate } from '@/lib/utils'
+import { ArrowLeft } from 'lucide-react'
+import {
+  generatePendingReport,
+  generatePendingComplementsReport,
+  generatePaymentHistoryReport,
+} from '@/lib/pdf-service'
+import { getNextBillingDate, formatDate, fmtAmount } from '@/lib/utils'
 import { previewXMLAsPDF, previewPDFFromInvoiceData } from '@/lib/xml-parser'
 import { useSort } from '@/hooks/use-sort'
 import { usePayments } from '@/hooks/use-payments'
@@ -20,6 +30,7 @@ import { useStore } from '@/store/use-store'
 import StatsCards from '@/components/stats-cards'
 import PendingInvoicesTable from '@/components/pending-invoices-table'
 import PaidInvoicesTable from '@/components/paid-invoices-table'
+import PaymentHistoryTable from '@/components/payment-history-table'
 import SelectionBar from '@/components/selection-bar'
 import InvoicePreviewModal from '@/components/invoice-preview-modal'
 import ConfirmModal from '@/components/confirm-modal'
@@ -40,6 +51,8 @@ export default function ClientDetail() {
   const deleteInvoice = useDeleteInvoice()
   const createPayment = useCreatePayment()
   const updatePayment = useUpdatePayment()
+  const deletePayment = useDeletePayment()
+  const batchUpdatePaymentDate = useBatchUpdateInvoicesPaymentDate()
 
   const [showForm, setShowForm] = useState(false)
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null)
@@ -106,8 +119,15 @@ export default function ClientDetail() {
     updatePayment: async (id: string, data: Partial<Payment>) => {
       updatePayment.mutate({ id, data })
     },
+    deletePayment: async (id: string) => {
+      deletePayment.mutate(id)
+    },
+    batchUpdatePaymentDate: (paymentId: string, paymentDate: string) => {
+      batchUpdatePaymentDate.mutate({ paymentId, paymentDate })
+    },
   })
   const del = useDeleteConfirm((id: string) => deleteInvoice.mutate(id))
+  const delPayment = useDeleteConfirm((id: string) => deletePayment.mutate(id))
 
   if (!client) {
     return (
@@ -133,20 +153,24 @@ export default function ClientDetail() {
     await generatePendingComplementsReport(paidInvoices, client.name, totalPaid)
   }
 
+  const generatePaymentHistoryPDF = async () => {
+    await generatePaymentHistoryReport(payments, clientInvoices, client.name)
+  }
+
   const stats = [
     {
       label: 'Pendiente',
-      value: `$${totalPending.toLocaleString()}`,
+      value: `$${fmtAmount(totalPending)}`,
       textClass: 'text-warning',
     },
     {
       label: 'Pagado',
-      value: `$${totalPaid.toLocaleString()}`,
+      value: `$${fmtAmount(totalPaid)}`,
       textClass: 'text-success',
     },
     {
       label: 'Total generado',
-      value: `$${totalGenerated.toLocaleString()}`,
+      value: `$${fmtAmount(totalGenerated)}`,
       textClass: 'text-foreground',
     },
     {
@@ -187,28 +211,7 @@ export default function ClientDetail() {
               )
             })()}
         </div>
-        <div className="flex gap-1.5">
-          <button
-            onClick={generatePDF}
-            disabled={pendingInvoices.length === 0}
-            className="flex items-center gap-1.5 px-1.5 py-0.5 rounded text-[11px] md:gap-2 md:px-4 md:py-2 md:rounded-lg md:text-sm disabled:opacity-50 bg-accent text-background"
-          >
-            <Download size={12} className="md:hidden" />
-            <Download size={16} className="hidden md:block" />
-            Estado de Cuenta
-          </button>
-          <button
-            onClick={() => {
-              setEditingInvoice(null)
-              setShowForm(true)
-            }}
-            className="flex items-center gap-1.5 px-1.5 py-0.5 rounded text-[11px] md:gap-2 md:px-4 md:py-2 md:rounded-lg md:text-sm bg-success text-white"
-          >
-            <Plus size={12} className="md:hidden" />
-            <Plus size={18} className="md:block hidden" />
-            Agregar
-          </button>
-        </div>
+        <div className="flex gap-1.5" />
       </div>
 
       <StatsCards stats={stats} />
@@ -232,6 +235,11 @@ export default function ClientDetail() {
         onViewAttachment={setViewingAttachment}
         onEditPayment={paymentsCtrl.openEditPayment}
         onToggleExpandDesc={setExpandedDescId}
+        onGeneratePDF={generatePDF}
+        onAddInvoice={() => {
+          setEditingInvoice(null)
+          setShowForm(true)
+        }}
       />
 
       {paymentsCtrl.selectingMode && (
@@ -249,10 +257,24 @@ export default function ClientDetail() {
       <PaidInvoicesTable
         paidInvoices={paidInvoices}
         payments={payments}
+        totalPaid={totalPaid}
         onPreview={previewInvoice}
         onViewAttachment={setViewingAttachment}
         onEditPayment={paymentsCtrl.openEditPayment}
+        onDelete={del.handleDelete}
         onGenerateComplementsPDF={generateComplementsPDF}
+      />
+
+      <PaymentHistoryTable
+        payments={payments}
+        invoices={clientInvoices}
+        onViewAttachment={setViewingAttachment}
+        onEditPayment={(payment) => {
+          const inv = clientInvoices.find((i) => i.paymentId === payment.id)
+          if (inv) paymentsCtrl.openEditPayment(inv)
+        }}
+        onDelete={delPayment.handleDelete}
+        onGeneratePaymentHistoryPDF={generatePaymentHistoryPDF}
       />
 
       <InvoiceFormModal
@@ -285,11 +307,21 @@ export default function ClientDetail() {
 
       <EditPaymentModal
         open={paymentsCtrl.showEditPayment}
+        payment={paymentsCtrl.editingPayment}
         invoice={paymentsCtrl.editingPaymentInvoice}
+        linkedInvoices={paymentsCtrl.editingLinkedInvoices}
+        availableInvoices={paidInvoices.filter(
+          (inv) => !paymentsCtrl.editingLinkedInvoices.some((l) => l.id === inv.id),
+        )}
         editData={paymentsCtrl.editPaymentData}
         onEditDataChange={paymentsCtrl.setEditPaymentData}
+        onAddInvoice={paymentsCtrl.addInvoiceToEdit}
+        onRemoveInvoice={paymentsCtrl.removeInvoiceFromEdit}
         onSave={paymentsCtrl.saveEditPayment}
         onClose={paymentsCtrl.closeEditPayment}
+        showDeletePaymentConfirm={paymentsCtrl.showDeletePaymentConfirm}
+        onConfirmDeletePayment={paymentsCtrl.confirmDeleteOrphanPayment}
+        onCancelDeletePayment={paymentsCtrl.cancelDeleteOrphanPayment}
       />
 
       <InvoicePreviewModal url={invoicePreviewUrl} onClose={closePreview} />
@@ -307,6 +339,16 @@ export default function ClientDetail() {
         cancelLabel="Cancelar"
         onConfirm={del.confirmDelete}
         onCancel={del.cancelDelete}
+        danger={true}
+      />
+      <ConfirmModal
+        open={delPayment.deleteModal.open}
+        title="Eliminar pago"
+        message="¿Estás seguro de que deseas eliminar este pago? Esta acción no se puede revertir."
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        onConfirm={delPayment.confirmDelete}
+        onCancel={delPayment.cancelDelete}
         danger={true}
       />
     </div>

@@ -1,3 +1,5 @@
+import { fmtAmount } from '@/lib/utils'
+
 interface Props {
   count: number
   totalAmount: number
@@ -11,7 +13,7 @@ export default function SelectionBar({ count, totalAmount, onCancel, onContinue 
       <div className="flex items-center justify-between max-w-4xl mx-auto">
         <p className="text-foreground">
           <span className="font-bold">{count}</span> factura(s) seleccionada(s) — Total:{' '}
-          <span className="font-bold text-success">${totalAmount.toLocaleString()}</span>
+          <span className="font-bold text-success">${fmtAmount(totalAmount)}</span>
         </p>
         <div className="flex gap-2">
           <button
