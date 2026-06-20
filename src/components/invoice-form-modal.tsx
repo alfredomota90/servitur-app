@@ -264,6 +264,7 @@ export default function InvoiceFormModal({
             <Input
               label="Total MXN"
               type="number"
+              step="0.01"
               placeholder="0.00"
               {...form.register('totalMxn')}
             />
