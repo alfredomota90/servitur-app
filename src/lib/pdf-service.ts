@@ -130,7 +130,7 @@ export async function generatePaymentHistoryReport(
     startY,
     head: [['Fecha', 'Método', 'Referencia', 'Folios afectados', 'Monto']],
     body: paymentsWithInvoices.map((p) => [
-      p.affectedInvoices[0]?.paymentDate || p.createdAt || '-',
+      fmtDate(p.affectedInvoices[0]?.paymentDate || p.createdAt),
       p.method === 'transferencia'
         ? 'Transferencia'
         : p.method === 'efectivo'
