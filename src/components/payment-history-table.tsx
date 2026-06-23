@@ -2,7 +2,7 @@ import { Eye, Edit2, Download, FileText, Trash2 } from 'lucide-react'
 import type { Payment } from '@/features/payments/api'
 import type { Invoice } from '@/features/invoices/api'
 import { getPaymentAttachmentUrl } from '@/lib/storage'
-import { fmtAmount } from '@/lib/utils'
+import { fmtAmount, fmtDate } from '@/lib/utils'
 
 interface Props {
   payments: Payment[]
@@ -11,12 +11,6 @@ interface Props {
   onEditPayment?: (payment: Payment) => void
   onDelete: (id: string) => void
   onGeneratePaymentHistoryPDF?: () => void
-}
-
-function fmtDate(iso?: string): string {
-  if (!iso) return '-'
-  const d = new Date(iso)
-  return d.toLocaleDateString('es-MX')
 }
 
 export default function PaymentHistoryTable({
