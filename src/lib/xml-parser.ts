@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import { jsPDF } from 'jspdf'
+import { fmtDate } from '@/lib/utils'
 
 export interface ConceptoDetalle {
   claveProdServ: string
@@ -146,13 +147,6 @@ function lookup(val: string | undefined, map: Record<string, string>): string {
 function fmt(n: number | undefined): string {
   if (n === undefined || isNaN(n)) return '-'
   return n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 6 })
-}
-
-function fmtDate(d: string | undefined): string {
-  if (!d) return '-'
-  const parts = d.split('T')[0]?.split('-')
-  if (parts?.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`
-  return d
 }
 
 export function parseCFDIFromText(xmlText: string): ExtractedInvoiceData | null {

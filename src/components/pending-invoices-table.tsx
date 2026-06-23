@@ -102,7 +102,7 @@ export default function PendingInvoicesTable({
         <table className="w-full text-sm">
           <colgroup>
             {selectingMode && <col className="w-10" />}
-            <col />
+            <col className="w-24" />
             <col />
             <col />
             <col />
@@ -131,30 +131,30 @@ export default function PendingInvoicesTable({
                 Serie/Folio <SortIcon col="serieFolio" sortKey={sortKey} sortDir={sortDir} />
               </th>
               <th
-                className="px-4 py-3 text-center cursor-pointer select-none hover:opacity-80 text-muted"
+                className="sticky left-0 px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted"
                 onClick={() => onToggleSort('date')}
               >
                 Fecha <SortIcon col="date" sortKey={sortKey} sortDir={sortDir} />
               </th>
               <th
-                className="px-4 py-3 text-center cursor-pointer select-none hover:opacity-80 text-muted"
+                className="sticky left-0 px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted"
                 onClick={() => onToggleSort('description')}
               >
                 Descripción <SortIcon col="description" sortKey={sortKey} sortDir={sortDir} />
               </th>
               <th
-                className="px-4 py-3 text-center cursor-pointer select-none hover:opacity-80 text-muted"
+                className="sticky left-0 px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted"
                 onClick={() => onToggleSort('status')}
               >
                 Estado <SortIcon col="status" sortKey={sortKey} sortDir={sortDir} />
               </th>
               <th
-                className="px-4 py-3 text-right cursor-pointer select-none hover:opacity-80 text-muted"
+                className="sticky left-0 px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted"
                 onClick={() => onToggleSort('total')}
               >
                 Monto <SortIcon col="total" sortKey={sortKey} sortDir={sortDir} />
               </th>
-              <th className="px-4 py-3 text-right text-muted">Acciones</th>
+              <th className="px-4 py-3 text-center text-muted">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -178,7 +178,7 @@ export default function PendingInvoicesTable({
                     </td>
                   )}
                   <td className="px-4 py-3 font-medium text-foreground">{inv.serieFolio || '-'}</td>
-                  <td className="px-4 py-3 text-center text-muted">{getInvoiceDate(inv)}</td>
+                  <td className="px-4 py-3 text-left text-muted">{getInvoiceDate(inv)}</td>
                   <td className="px-4 py-3 text-center text-muted">
                     <ExpandableTextCell
                       text={inv.invoiceDescription || inv.period || '-'}
@@ -199,10 +199,10 @@ export default function PendingInvoicesTable({
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-right font-medium text-success">
+                  <td className="px-4 py-3 text-center font-medium text-success">
                     ${fmtAmount(inv.totalMxn || inv.total)}
                   </td>
-                  <td className="px-4 py-3 text-right whitespace-nowrap">
+                  <td className="px-4 py-3 text-center whitespace-nowrap">
                     <div className="flex items-center justify-end gap-1">
                       {inv.status === 'pendiente' ? (
                         <button
@@ -282,11 +282,11 @@ export default function PendingInvoicesTable({
             <tr>
               <td
                 colSpan={selectingMode ? 5 : 4}
-                className="px-4 py-3 font-semibold text-right text-foreground"
+                className="px-4 py-3 font-semibold text-center text-foreground"
               >
                 TOTAL
               </td>
-              <td className="px-4 py-3 text-right font-bold text-success">
+              <td className="px-4 py-3 text-center font-bold text-success">
                 ${fmtAmount(totalPending)}
               </td>
               <td />

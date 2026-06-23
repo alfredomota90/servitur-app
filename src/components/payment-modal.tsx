@@ -1,6 +1,7 @@
 import type { Invoice } from '@/features/invoices/api'
 import { Modal } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { fmtAmount } from '@/lib/utils'
 import PaymentMethodSelector from '@/components/payment-method-selector'
 import AttachmentField from '@/components/attachment-field'
@@ -67,41 +68,35 @@ export default function PaymentModal({
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1 text-foreground">Fecha de pago</label>
-          <input
-            type="date"
-            value={paymentData.date}
-            onChange={(e) =>
-              onPaymentDataChange({
-                ...paymentData,
-                date: e.target.value,
-              })
-            }
-            className="w-full px-3 py-2 border rounded-lg bg-background text-foreground border-border"
-          />
-        </div>
+        <Input
+          label="Fecha de pago"
+          type="date"
+          value={paymentData.date}
+          onChange={(e) =>
+            onPaymentDataChange({
+              ...paymentData,
+              date: (e as React.ChangeEvent<HTMLInputElement>).target.value,
+            })
+          }
+        />
 
         <PaymentMethodSelector
           value={paymentData.method}
           onChange={(method) => onPaymentDataChange({ ...paymentData, method })}
         />
 
-        <div>
-          <label className="block text-sm font-medium mb-1 text-foreground">Referencia</label>
-          <input
-            type="text"
-            value={paymentData.reference}
-            onChange={(e) =>
-              onPaymentDataChange({
-                ...paymentData,
-                reference: e.target.value,
-              })
-            }
-            className="w-full px-3 py-2 border rounded-lg bg-background text-foreground border-border"
-            placeholder="Número de transacción"
-          />
-        </div>
+        <Input
+          label="Referencia"
+          type="text"
+          value={paymentData.reference}
+          onChange={(e) =>
+            onPaymentDataChange({
+              ...paymentData,
+              reference: (e as React.ChangeEvent<HTMLInputElement>).target.value,
+            })
+          }
+          placeholder="Número de transacción"
+        />
 
         <AttachmentField
           value={paymentData.attachment}

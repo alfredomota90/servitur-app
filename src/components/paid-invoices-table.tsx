@@ -45,7 +45,7 @@ export default function PaidInvoicesTable({
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <colgroup>
-            <col />
+            <col className="w-24" />
             <col />
             <col />
             <col className="w-28" />
@@ -54,10 +54,12 @@ export default function PaidInvoicesTable({
           <thead className="bg-background-secondary">
             <tr>
               <th className="px-4 py-3 text-left text-muted">Serie/Folio</th>
-              <th className="px-4 py-3 text-center text-muted">Fecha pago</th>
+              <th className="sticky left-0 px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted">
+                Fecha pago
+              </th>
               <th className="px-4 py-3 text-center text-muted">Método</th>
-              <th className="px-4 py-3 text-right text-muted">Monto</th>
-              <th className="px-4 py-3 text-right text-muted">Acciones</th>
+              <th className="px-4 py-3 text-center text-muted">Monto</th>
+              <th className="px-4 py-3 text-center text-muted">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -78,10 +80,10 @@ export default function PaidInvoicesTable({
                         : undefined) ||
                       '-'}
                   </td>
-                  <td className="px-4 py-3 text-right font-medium text-success">
+                  <td className="px-4 py-3 text-center font-medium text-success">
                     ${fmtAmount(inv.totalMxn || inv.total)}
                   </td>
-                  <td className="px-4 py-3 text-right whitespace-nowrap">
+                  <td className="px-4 py-3 text-center whitespace-nowrap">
                     <div className="flex items-center justify-end gap-1">
                       <button
                         onClick={() => onPreview(inv)}
@@ -131,10 +133,10 @@ export default function PaidInvoicesTable({
           </tbody>
           <tfoot className="bg-background-secondary">
             <tr>
-              <td colSpan={3} className="px-4 py-3 font-semibold text-right text-foreground">
+              <td colSpan={3} className="px-4 py-3 font-semibold text-center text-foreground">
                 TOTAL
               </td>
-              <td className="px-4 py-3 text-right font-bold text-success">
+              <td className="px-4 py-3 text-center font-bold text-success">
                 ${fmtAmount(totalPaid)}
               </td>
               <td />

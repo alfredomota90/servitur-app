@@ -75,6 +75,13 @@ export function formatDate(date: Date): string {
 
 export function fmtDate(iso?: string | null): string {
   if (!iso) return '-'
+
+  const match = iso.match(/^(\d{4}-\d{2}-\d{2})/)
+  if (match) {
+    const [y, m, d] = match[1].split('-').map(Number)
+    return formatDate(new Date(y, m - 1, d))
+  }
+
   const d = new Date(iso)
   if (isNaN(d.getTime())) return '-'
   return formatDate(d)

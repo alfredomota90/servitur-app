@@ -84,7 +84,7 @@ export default function InvoiceFormModal({
         receptorName: editingInvoice?.receptorName || '',
         invoiceDescription: editingInvoice?.invoiceDescription || '',
         totalMxn: editingInvoice?.totalMxn?.toString() || '',
-        certificationDate: editingInvoice?.certificationDate || '',
+        certificationDate: editingInvoice?.certificationDate?.split('T')[0] || '',
       })
     }
   }, [open, propClientId, propClientName, editingInvoice, form])
@@ -118,7 +118,7 @@ export default function InvoiceFormModal({
       form.setValue('receptorName', data.receptor_name)
       form.setValue('invoiceDescription', data.invoice_description)
       form.setValue('totalMxn', data.total_mxn.toString())
-      form.setValue('certificationDate', data.certification_date)
+      form.setValue('certificationDate', data.certification_date.split('T')[0])
     } else {
       addToast({
         type: 'error',
@@ -274,7 +274,7 @@ export default function InvoiceFormModal({
             <Input label="RFC Receptor" placeholder="RFC" {...form.register('rfcReceptor')} />
             <Input
               label="Fecha Certificación"
-              type="datetime-local"
+              type="date"
               {...form.register('certificationDate')}
             />
           </div>

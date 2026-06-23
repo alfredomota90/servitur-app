@@ -2,7 +2,7 @@ import { Eye, Edit2, Download, FileText, Trash2 } from 'lucide-react'
 import type { Payment } from '@/features/payments/api'
 import type { Invoice } from '@/features/invoices/api'
 import { getPaymentAttachmentUrl } from '@/lib/storage'
-import { fmtAmount } from '@/lib/utils'
+import { fmtAmount, fmtDate } from '@/lib/utils'
 
 interface Props {
   payments: Payment[]
@@ -11,12 +11,6 @@ interface Props {
   onEditPayment?: (payment: Payment) => void
   onDelete: (id: string) => void
   onGeneratePaymentHistoryPDF?: () => void
-}
-
-function fmtDate(iso?: string): string {
-  if (!iso) return '-'
-  const d = new Date(iso)
-  return d.toLocaleDateString('es-MX')
 }
 
 export default function PaymentHistoryTable({
@@ -69,20 +63,26 @@ export default function PaymentHistoryTable({
           <thead className="bg-background-secondary">
             <tr>
               <th className="px-4 py-3 text-left text-muted">Referencia</th>
-              <th className="px-4 py-3 text-center text-muted">Fecha</th>
-              <th className="px-4 py-3 text-center text-muted">Folios afectados</th>
+              <th className="sticky left-0 px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted">
+                Fecha
+              </th>
+              <th className="sticky left-0 px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted">
+                Folios afectados
+              </th>
               <th className="px-4 py-3 text-right text-muted">Monto</th>
-              <th className="px-4 py-3 text-right text-muted">Acciones</th>
+              <th className="sticky left-0 px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted">
+                Acciones
+              </th>
             </tr>
           </thead>
           <tbody>
             {paymentsWithInvoices.map((p) => (
               <tr key={p.id} className="border-t border-border">
                 <td className="px-4 py-3 text-muted">{p.reference || '—'}</td>
-                <td className="px-4 py-3 text-center text-muted">
+                <td className="sticky left-0 px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted">
                   {fmtDate(p.affectedInvoices[0]?.paymentDate || p.createdAt)}
                 </td>
-                <td className="px-4 py-3 text-center text-muted">
+                <td className="sticky left-0 px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted">
                   {p.affectedInvoices
                     .map((inv) => inv.serieFolio)
                     .filter(Boolean)
