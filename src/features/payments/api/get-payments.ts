@@ -88,6 +88,20 @@ export const useUpdatePayment = () => {
 }
 
 export const deletePayment = async (id: string): Promise<void> => {
+  const { error: updateError } = await supabase
+    .from('invoices')
+    .update({
+      status: 'pendiente',
+      payment_id: null,
+      payment_date: null,
+      payment_method: null,
+      payment_reference: null,
+      payment_attachment_path: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('payment_id', id)
+  if (updateError) throw updateError
+
   const { error } = await supabase.from('payments').delete().eq('id', id)
   if (error) throw error
 }
