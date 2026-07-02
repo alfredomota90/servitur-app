@@ -17,7 +17,7 @@ export default function AdminSidebar({
 
   const navItems = [
     { path: '/admin', icon: Home, label: 'Dashboard', exact: true },
-    { path: '/admin/viajes', icon: Car, label: 'Viajes/Facturas' },
+    { path: '/admin/viajes', icon: Car, label: 'Facturas' },
     { path: '/admin/clientes', icon: Users, label: 'Clientes' },
   ]
 
