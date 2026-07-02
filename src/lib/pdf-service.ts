@@ -22,7 +22,7 @@ export async function generatePendingReport(
     body: sortInvoices(pendingInvoices, 'date', 'asc').map((inv) => [
       fmtDate(inv.tripDate || inv.certificationDate || inv.createdAt),
       inv.serieFolio || '-',
-      inv.invoiceDescription || inv.period || '-',
+      inv.invoiceDescription || '-',
       `$${fmtAmount(inv.totalMxn || inv.total)}`,
     ]),
     foot: [['', '', 'TOTAL:', `$${fmtAmount(totalPending)}`]],
@@ -76,7 +76,7 @@ export async function generatePendingComplementsReport(
     body: sortedPaid.map((inv) => [
       inv.serieFolio || '-',
       fmtDate(inv.paymentDate),
-      inv.invoiceDescription || inv.period || '-',
+      inv.invoiceDescription || '-',
       `$${fmtAmount(inv.totalMxn || inv.total)}`,
     ]),
     foot: [['', '', 'TOTAL:', `$${fmtAmount(totalPaid)}`]],

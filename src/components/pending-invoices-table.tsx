@@ -181,7 +181,7 @@ export default function PendingInvoicesTable({
                   <td className="px-4 py-3 text-left text-muted">{getInvoiceDate(inv)}</td>
                   <td className="px-4 py-3 text-center text-muted">
                     <ExpandableTextCell
-                      text={inv.invoiceDescription || inv.period || '-'}
+                      text={inv.invoiceDescription || '-'}
                       expanded={expandedDescId === inv.id}
                       onToggle={() => onToggleExpandDesc(expandedDescId === inv.id ? null : inv.id)}
                     />

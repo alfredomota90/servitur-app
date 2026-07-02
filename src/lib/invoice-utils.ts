@@ -3,8 +3,6 @@ import type { Invoice } from '@/features/invoices/api'
 
 export interface InvoiceFormFields {
   status: 'pendiente' | 'pagado'
-  from: string
-  to: string
   date: string
   serie_folio: string
   rfc_receptor: string
@@ -19,13 +17,10 @@ export interface InvoiceFormData {
   id: string
   clientId: string
   clientName: string
-  period: string
   total: number
   status: 'pendiente' | 'pagado'
   createdAt: string
   tripDate: string
-  fromLocation: string
-  toLocation: string
   serieFolio: string
   rfcReceptor: string
   receptorName: string
@@ -33,7 +28,6 @@ export interface InvoiceFormData {
   totalMxn: number | undefined
   certificationDate: string
   xmlPath: string
-  notes?: string
 }
 
 export function buildInvoiceData(
@@ -47,7 +41,6 @@ export function buildInvoiceData(
     id: editingInvoice?.id || Date.now().toString(),
     clientId,
     clientName,
-    period: formData.invoice_description?.split('\n')[0] || 'Viaje',
     total: formData.total_mxn ? parseFloat(formData.total_mxn) : 0,
     status: formData.status || 'pendiente',
     createdAt: editingInvoice?.createdAt || new Date().toISOString(),
@@ -55,9 +48,6 @@ export function buildInvoiceData(
       formData.certification_date?.split('T')[0] ||
       formData.date ||
       new Date().toISOString().split('T')[0],
-    fromLocation: formData.from || '',
-    toLocation: formData.to || '',
-    notes: formData.invoice_description || '',
     serieFolio: formData.serie_folio,
     rfcReceptor: formData.rfc_receptor,
     receptorName: formData.receptor_name,

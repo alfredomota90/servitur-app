@@ -27,8 +27,6 @@ interface InvoiceFormModalProps {
 
 const invoiceFormSchema = z.object({
   status: z.enum(['pendiente', 'pagado']),
-  from: z.string().min(1, 'El origen es obligatorio'),
-  to: z.string().min(1, 'El destino es obligatorio'),
   serieFolio: z.string().optional(),
   rfcReceptor: z.string().optional(),
   receptorName: z.string().optional(),
@@ -41,8 +39,6 @@ type InvoiceFormValues = z.infer<typeof invoiceFormSchema>
 
 const defaultValues: InvoiceFormValues = {
   status: 'pendiente',
-  from: '',
-  to: '',
   serieFolio: '',
   rfcReceptor: '',
   receptorName: '',
@@ -77,8 +73,6 @@ export default function InvoiceFormModal({
       setLocalClientName(propClientName)
       form.reset({
         status: editingInvoice?.status || 'pendiente',
-        from: editingInvoice?.fromLocation || '',
-        to: editingInvoice?.toLocation || '',
         serieFolio: editingInvoice?.serieFolio || '',
         rfcReceptor: editingInvoice?.rfcReceptor || '',
         receptorName: editingInvoice?.receptorName || '',
@@ -146,8 +140,6 @@ export default function InvoiceFormModal({
 
     const formFields = {
       status: values.status,
-      from: values.from,
-      to: values.to,
       date: values.certificationDate?.split('T')[0] || '',
       serie_folio: values.serieFolio || '',
       rfc_receptor: values.rfcReceptor || '',
@@ -220,21 +212,6 @@ export default function InvoiceFormModal({
             ))}
           </Select>
         )}
-
-        <div className="grid grid-cols-2 gap-3">
-          <Input
-            label="Origen"
-            placeholder="Lugar de origen"
-            {...form.register('from')}
-            error={form.formState.errors.from?.message}
-          />
-          <Input
-            label="Destino"
-            placeholder="Lugar de destino"
-            {...form.register('to')}
-            error={form.formState.errors.to?.message}
-          />
-        </div>
 
         <div>
           <label className="block text-sm font-medium mb-1 text-foreground">Estado</label>
