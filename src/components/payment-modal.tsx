@@ -56,7 +56,7 @@ export default function PaymentModal({
           <p className="text-sm font-medium text-foreground">Facturas ({invoices.length})</p>
           {invoices.map((inv) => (
             <div key={inv.id} className="flex items-center justify-between">
-              <span className="text-muted">{inv.serieFolio || inv.period || '—'}</span>
+              <span className="text-muted">{inv.serieFolio || '—'}</span>
               <span className="font-medium text-foreground">
                 ${fmtAmount(inv.totalMxn || inv.total)}
               </span>

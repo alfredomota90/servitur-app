@@ -214,7 +214,13 @@ export function usePayments(
   const confirmDeleteOrphanPayment = () => {
     if (!editingPayment) return
     prevLinkedInvoiceIds.forEach((id) => {
-      actions.updateInvoice(id, { paymentId: null })
+      actions.updateInvoice(id, {
+        status: 'pendiente',
+        paymentId: null,
+        paymentDate: undefined,
+        paymentMethod: undefined,
+        paymentReference: undefined,
+      })
     })
     actions.deletePayment(editingPayment.id)
     closeEditPayment()
@@ -244,7 +250,13 @@ export function usePayments(
 
       prevLinkedInvoiceIds.forEach((id) => {
         if (!currentIds.includes(id)) {
-          actions.updateInvoice(id, { paymentId: null })
+          actions.updateInvoice(id, {
+            status: 'pendiente',
+            paymentId: null,
+            paymentDate: undefined,
+            paymentMethod: undefined,
+            paymentReference: undefined,
+          })
         }
       })
 

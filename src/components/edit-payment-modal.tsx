@@ -79,9 +79,7 @@ export default function EditPaymentModal({
           ) : (
             <div className="p-3 rounded-lg bg-background-secondary">
               <p className="text-sm text-muted">Factura</p>
-              <p className="font-medium text-foreground">
-                {invoice?.serieFolio || invoice?.period || '—'}
-              </p>
+              <p className="font-medium text-foreground">{invoice?.serieFolio || '—'}</p>
               <p className="text-2xl font-bold text-success">
                 ${fmtAmount(invoice?.totalMxn || invoice?.total || 0)}
               </p>

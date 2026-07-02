@@ -13,7 +13,7 @@ export const invoiceSchema = z.object({
   id: z.string(),
   clientId: z.string(),
   clientName: z.string(),
-  period: z.string(),
+  period: z.string().optional(),
   total: z.number(),
   status: invoiceStatusSchema,
   createdAt: z.string(),
@@ -111,7 +111,6 @@ export const createInvoice = async (input: CreateInvoiceInput): Promise<Invoice>
     .from('invoices')
     .insert({
       client_id: input.clientId,
-      period: input.period,
       total: input.total,
       status: input.status,
       created_at: input.createdAt,
@@ -145,7 +144,6 @@ export const useCreateInvoice = () => {
     mutationFn: createInvoice,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] })
-      queryClient.invalidateQueries({ queryKey: ['trips'] })
     },
   })
 }
@@ -155,7 +153,6 @@ export const updateInvoice = async (id: string, invoice: Partial<Invoice>): Prom
     .from('invoices')
     .update({
       client_id: invoice.clientId,
-      period: invoice.period,
       total: invoice.total,
       status: invoice.status,
       payment_date: invoice.paymentDate,

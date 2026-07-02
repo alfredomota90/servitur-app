@@ -39,7 +39,7 @@ export default function Trips() {
     <div className="p-4 md:p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Viajes / Facturas</h1>
+          <h1 className="text-2xl font-bold text-foreground">Facturas</h1>
           <p className="text-sm text-muted">
             {totalInvoices} registros • $
             {totalIncome.toLocaleString('es-MX', {
@@ -108,7 +108,7 @@ export default function Trips() {
                     <td className="px-4 py-3 font-medium text-foreground">{inv.clientName}</td>
                     <td className="px-4 py-3 text-muted">
                       <ExpandableTextCell
-                        text={inv.invoiceDescription || inv.period || ''}
+                        text={inv.invoiceDescription || ''}
                         expanded={expandedDescId === inv.id}
                         onToggle={() =>
                           setExpandedDescId(expandedDescId === inv.id ? null : inv.id)
