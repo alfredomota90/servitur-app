@@ -191,6 +191,7 @@ export type Database = {
           code: string
           name: string
           description: string | null
+          category: string | null
           applies_to: string
           entity_type: string
           has_expiry: boolean
@@ -203,6 +204,7 @@ export type Database = {
           code: string
           name: string
           description?: string | null
+          category?: string | null
           applies_to: string
           entity_type?: string
           has_expiry?: boolean
@@ -214,6 +216,7 @@ export type Database = {
           code?: string
           name?: string
           description?: string | null
+          category?: string | null
           applies_to?: string
           entity_type?: string
           has_expiry?: boolean

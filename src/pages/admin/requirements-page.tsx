@@ -464,111 +464,142 @@ export default function RequirementsPage() {
         )}
       </section>
 
-      {/* Client-level documents */}
-      <section className="mb-8">
-        <h2 className="text-lg font-bold text-foreground flex items-center gap-2 mb-4">
-          <FileText size={20} className="text-muted" />
-          Documentos generales
-        </h2>
-        <div className="space-y-2">
-          {clientItems.map((item) => {
-            const na = isItemNa(item.id)
-            const count = countDocs(item.id)
-            return (
-              <div
-                key={item.id}
-                className={`flex items-center justify-between p-3 rounded-lg border ${
-                  na ? 'bg-card/50 border-border/50 opacity-50' : 'bg-card border-border'
-                }`}
-              >
-                <div>
-                  <p className="text-sm font-medium text-foreground">{item.name}</p>
-                  {item.description && <p className="text-xs text-muted">{item.description}</p>}
-                </div>
-                <div className="flex items-center gap-2 shrink-0 ml-4">
-                  <button
-                    type="button"
-                    className="p-1.5 rounded transition-colors text-muted hover:text-error hover:bg-error/10"
-                    title={na ? 'Reactivar requisito' : 'Marcar como no aplica'}
-                    onClick={() => toggleNa(item.id)}
+      {/* Client-level documents by category */}
+      {(
+        ['sat', 'imss_infonavit', 'persona_moral', 'personal', 'formatos_cliente', 'repse'] as const
+      ).map((cat) => {
+        const categoryItems = clientItems.filter((i) => i.category === cat)
+        if (categoryItems.length === 0) return null
+        const categoryConfig: Record<string, { label: string; icon: React.ReactNode }> = {
+          sat: { label: 'Documentación SAT', icon: <FileText size={20} className="text-muted" /> },
+          imss_infonavit: {
+            label: 'IMSS e INFONAVIT',
+            icon: <FileText size={20} className="text-muted" />,
+          },
+          persona_moral: {
+            label: 'Documentación Persona Moral',
+            icon: <FileText size={20} className="text-muted" />,
+          },
+          personal: {
+            label: 'Documentación personal',
+            icon: <FileText size={20} className="text-muted" />,
+          },
+          formatos_cliente: {
+            label: 'Formatos del cliente',
+            icon: <FileText size={20} className="text-muted" />,
+          },
+          repse: { label: 'REPSE', icon: <FileText size={20} className="text-muted" /> },
+        }
+        const cfg = categoryConfig[cat]
+        const categoryDone = categoryItems.filter((i) => {
+          if (isItemNa(i.id)) return true
+          return countDocs(i.id) > 0
+        }).length
+        return (
+          <section key={cat} className="mb-8">
+            <h2 className="text-lg font-bold text-foreground flex items-center gap-2 mb-4">
+              {cfg.icon}
+              {cfg.label}
+              <span className="text-sm font-normal text-muted ml-auto">
+                {categoryDone}/{categoryItems.length}
+              </span>
+            </h2>
+            <div className="space-y-2">
+              {categoryItems.map((item) => {
+                const na = isItemNa(item.id)
+                const count = countDocs(item.id)
+                return (
+                  <div
+                    key={item.id}
+                    className={`flex items-center justify-between p-3 rounded-lg border ${
+                      na ? 'bg-card/50 border-border/50 opacity-50' : 'bg-card border-border'
+                    }`}
                   >
-                    <Ban size={14} />
-                  </button>
-                  {!na && (
-                    <>
-                      {count > 0 && (
-                        <button
-                          type="button"
-                          className="p-1.5 rounded transition-colors text-foreground hover:bg-card-hover"
-                          title="Ver documentos"
-                          onClick={() => setViewDocsItem(item)}
-                        >
-                          <Eye size={14} />
-                        </button>
-                      )}
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{item.name}</p>
+                      {item.description && <p className="text-xs text-muted">{item.description}</p>}
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0 ml-4">
                       <button
                         type="button"
-                        className="p-1.5 rounded transition-colors text-accent bg-accent-muted"
-                        title="Agregar documento"
-                        onClick={() => setDocumentModalItem(item)}
+                        className="p-1.5 rounded transition-colors text-muted hover:text-error hover:bg-error/10"
+                        title={na ? 'Reactivar requisito' : 'Marcar como no aplica'}
+                        onClick={() => toggleNa(item.id)}
                       >
-                        <Upload size={14} />
+                        <Ban size={14} />
                       </button>
-                      {(() => {
-                        if (!item.hasExpiry) {
-                          return (
-                            <span
-                              className={`text-xs font-medium px-2 py-1 rounded ${
-                                count > 0
-                                  ? 'bg-success/10 text-success'
-                                  : 'bg-warning/10 text-warning'
-                              }`}
+                      {!na && (
+                        <>
+                          {count > 0 && (
+                            <button
+                              type="button"
+                              className="p-1.5 rounded transition-colors text-foreground hover:bg-card-hover"
+                              title="Ver documentos"
+                              onClick={() => setViewDocsItem(item)}
                             >
-                              {count > 0 ? 'Completo' : 'Pendiente'}
-                            </span>
-                          )
-                        }
-                        const itemDocs = docsFor(item.id)
-                        if (itemDocs.length === 0) {
-                          return (
-                            <span className="text-xs font-medium px-2 py-1 rounded bg-warning/10 text-warning">
-                              Pendiente
-                            </span>
-                          )
-                        }
-                        const latest = itemDocs.sort(
-                          (a, b) =>
-                            new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime(),
-                        )[0]
-                        const expired = latest.expiryDate
-                          ? new Date(latest.expiryDate) < new Date()
-                          : false
-                        if (expired) {
-                          return (
-                            <span className="text-xs font-medium px-2 py-1 rounded bg-error/10 text-error whitespace-nowrap">
-                              Documento vencido
-                            </span>
-                          )
-                        }
-                        return (
-                          <span className="text-xs font-medium px-2 py-1 rounded bg-success/10 text-success">
-                            Vigente
-                          </span>
-                        )
-                      })()}
-                    </>
-                  )}
-                  {na && (
-                    <span className="text-xs font-medium px-2 py-1 rounded bg-muted/10 text-muted">
-                      N/A
-                    </span>
-                  )}
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </section>
+                              <Eye size={14} />
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            className="p-1.5 rounded transition-colors text-accent bg-accent-muted"
+                            title="Agregar documento"
+                            onClick={() => setDocumentModalItem(item)}
+                          >
+                            <Upload size={14} />
+                          </button>
+                          {(() => {
+                            if (!item.hasExpiry) {
+                              return (
+                                <span
+                                  className={`text-xs font-medium px-2 py-1 rounded ${
+                                    count > 0
+                                      ? 'bg-success/10 text-success'
+                                      : 'bg-warning/10 text-warning'
+                                  }`}
+                                >
+                                  {count > 0 ? 'Completo' : 'Pendiente'}
+                                </span>
+                              )
+                            }
+                            const itemDocs = docsFor(item.id)
+                            if (itemDocs.length === 0) {
+                              return (
+                                <span className="text-xs font-medium px-2 py-1 rounded bg-warning/10 text-warning">
+                                  Pendiente
+                                </span>
+                              )
+                            }
+                            const latest = itemDocs.sort(
+                              (a, b) =>
+                                new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime(),
+                            )[0]
+                            const expired = latest.expiryDate
+                              ? new Date(latest.expiryDate) < new Date()
+                              : false
+                            if (expired) {
+                              return (
+                                <span className="text-xs font-medium px-2 py-1 rounded bg-error/10 text-error whitespace-nowrap">
+                                  Documento vencido
+                                </span>
+                              )
+                            }
+                            return (
+                              <span className="text-xs font-medium px-2 py-1 rounded bg-success/10 text-success">
+                                Vigente
+                              </span>
+                            )
+                          })()}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </section>
+        )
+      })}
 
       {/* Modals */}
       <VehicleFormModal
