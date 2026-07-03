@@ -79,6 +79,7 @@ export default function RequirementsPage() {
   const [viewDocsItem, setViewDocsItem] = useState<RequirementItem | null>(null)
   const [viewSubitemDocs, setViewSubitemDocs] = useState<RequirementSubitem | null>(null)
   const [selectedVehicleForDocs, setSelectedVehicleForDocs] = useState<Vehicle | null>(null)
+  const [selectedDriverForDocs, setSelectedDriverForDocs] = useState<Driver | null>(null)
 
   const createDocument = useCreateDocument()
   const deleteDocument = useDeleteDocument()
@@ -437,12 +438,44 @@ export default function RequirementsPage() {
                         return (
                           <div
                             key={item.id}
-                            className={`flex items-center justify-between text-xs py-0.5 ${
-                              count > 0 ? 'text-success' : 'text-muted'
-                            }`}
+                            className="flex items-center justify-between text-xs py-0.5"
                           >
-                            <span className="truncate mr-2">{item.name}</span>
-                            <span className="shrink-0 font-medium">{count > 0 ? '✓' : '—'}</span>
+                            <div className="flex items-center gap-1 min-w-0">
+                              {count > 0 && (
+                                <button
+                                  type="button"
+                                  className="p-1 rounded transition-colors text-foreground hover:bg-card-hover shrink-0"
+                                  title="Ver documentos"
+                                  onClick={() => {
+                                    setViewDocsItem(item)
+                                    setSelectedDriverForDocs(d)
+                                  }}
+                                >
+                                  <Eye size={12} />
+                                </button>
+                              )}
+                              <span className="truncate">{item.name}</span>
+                            </div>
+                            <div className="flex items-center gap-1 shrink-0">
+                              <button
+                                type="button"
+                                className="p-1 rounded transition-colors text-accent bg-accent-muted"
+                                title="Agregar documento"
+                                onClick={() => {
+                                  setDocumentModalItem(item)
+                                  setSelectedDriverForDocs(d)
+                                }}
+                              >
+                                <Upload size={12} />
+                              </button>
+                              <span
+                                className={`font-medium ${
+                                  count > 0 ? 'text-success' : 'text-warning'
+                                }`}
+                              >
+                                {count > 0 ? '✓' : '—'}
+                              </span>
+                            </div>
                           </div>
                         )
                       })}
@@ -614,7 +647,9 @@ export default function RequirementsPage() {
       />
 
       <DocumentListModal
-        open={viewDocsItem !== null && selectedVehicleForDocs === null}
+        open={
+          viewDocsItem !== null && selectedVehicleForDocs === null && selectedDriverForDocs === null
+        }
         itemName={viewDocsItem?.name || ''}
         documents={
           viewDocsItem
@@ -622,7 +657,10 @@ export default function RequirementsPage() {
             : []
         }
         onDelete={(docId) => deleteDocument.mutate(docId)}
-        onClose={() => setViewDocsItem(null)}
+        onClose={() => {
+          setViewDocsItem(null)
+          setSelectedDriverForDocs(null)
+        }}
       />
 
       {/* Vehicle documents modal */}
@@ -770,6 +808,24 @@ export default function RequirementsPage() {
         onClose={() => setViewSubitemDocs(null)}
       />
 
+      {/* View Docs modal for driver context */}
+      <DocumentListModal
+        open={viewDocsItem !== null && selectedDriverForDocs !== null}
+        itemName={viewDocsItem?.name || ''}
+        documents={
+          viewDocsItem && selectedDriverForDocs
+            ? documents.filter(
+                (d) => d.itemId === viewDocsItem.id && d.driverId === selectedDriverForDocs.id,
+              )
+            : []
+        }
+        onDelete={(docId) => deleteDocument.mutate(docId)}
+        onClose={() => {
+          setViewDocsItem(null)
+          setSelectedDriverForDocs(null)
+        }}
+      />
+
       <DocumentFormModal
         open={documentModalItem !== null}
         itemName={documentModalSubitem ? documentModalSubitem.name : documentModalItem?.name || ''}
@@ -782,6 +838,7 @@ export default function RequirementsPage() {
             itemId: documentModalItem.id,
             subitemId: documentModalSubitem?.id || null,
             vehicleId: selectedVehicleForDocs?.id || null,
+            driverId: selectedDriverForDocs?.id || null,
             fileUrl: data.fileUrl || null,
             notes: data.notes || null,
             expiryDate: data.expiryDate || null,
@@ -790,6 +847,7 @@ export default function RequirementsPage() {
         onClose={() => {
           setDocumentModalItem(null)
           setDocumentModalSubitem(null)
+          setSelectedDriverForDocs(null)
         }}
       />
     </div>
