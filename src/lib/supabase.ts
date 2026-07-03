@@ -17,6 +17,8 @@ export type Database = {
           billing_interval: number | null
           last_trip_date: string | null
           logo_url: string | null
+          requires_papeleria: boolean
+          entity_type: string
           created_at: string
           updated_at: string
         }
@@ -28,6 +30,8 @@ export type Database = {
           billing_interval?: number | null
           last_trip_date?: string | null
           logo_url?: string | null
+          requires_papeleria?: boolean
+          entity_type?: string
         }
         Update: {
           id?: string
@@ -37,6 +41,8 @@ export type Database = {
           billing_interval?: number | null
           last_trip_date?: string | null
           logo_url?: string | null
+          requires_papeleria?: boolean
+          entity_type?: string
         }
       }
       trips: {
@@ -177,6 +183,192 @@ export type Database = {
           total_mxn?: number | null
           certification_date?: string | null
           xml_path?: string | null
+        }
+      }
+      requirement_items: {
+        Row: {
+          id: string
+          code: string
+          name: string
+          description: string | null
+          applies_to: string
+          entity_type: string
+          has_expiry: boolean
+          has_file: boolean
+          sort_order: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          code: string
+          name: string
+          description?: string | null
+          applies_to: string
+          entity_type?: string
+          has_expiry?: boolean
+          has_file?: boolean
+          sort_order?: number
+        }
+        Update: {
+          id?: string
+          code?: string
+          name?: string
+          description?: string | null
+          applies_to?: string
+          entity_type?: string
+          has_expiry?: boolean
+          has_file?: boolean
+          sort_order?: number
+        }
+      }
+      requirement_subitems: {
+        Row: {
+          id: string
+          item_id: string
+          code: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          id?: string
+          item_id: string
+          code: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          id?: string
+          item_id?: string
+          code?: string
+          name?: string
+          sort_order?: number
+        }
+      }
+      client_vehicles: {
+        Row: {
+          id: string
+          client_id: string
+          brand: string
+          model: string
+          year: number | null
+          plate: string | null
+          serial_number: string | null
+          policy_number: string | null
+          seats: number | null
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          client_id: string
+          brand: string
+          model: string
+          year?: number | null
+          plate?: string | null
+          serial_number?: string | null
+          policy_number?: string | null
+          seats?: number | null
+          notes?: string | null
+        }
+        Update: {
+          id?: string
+          client_id?: string
+          brand?: string
+          model?: string
+          year?: number | null
+          plate?: string | null
+          serial_number?: string | null
+          policy_number?: string | null
+          seats?: number | null
+          notes?: string | null
+        }
+      }
+      client_drivers: {
+        Row: {
+          id: string
+          client_id: string
+          name: string
+          license_number: string | null
+          license_expiry: string | null
+          phone: string | null
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          client_id: string
+          name: string
+          license_number?: string | null
+          license_expiry?: string | null
+          phone?: string | null
+          notes?: string | null
+        }
+        Update: {
+          id?: string
+          client_id?: string
+          name?: string
+          license_number?: string | null
+          license_expiry?: string | null
+          phone?: string | null
+          notes?: string | null
+        }
+      }
+      client_documents: {
+        Row: {
+          id: string
+          client_id: string
+          item_id: string
+          subitem_id: string | null
+          vehicle_id: string | null
+          driver_id: string | null
+          file_url: string | null
+          notes: string | null
+          expiry_date: string | null
+          uploaded_at: string
+        }
+        Insert: {
+          id?: string
+          client_id: string
+          item_id: string
+          subitem_id?: string | null
+          vehicle_id?: string | null
+          driver_id?: string | null
+          file_url?: string | null
+          notes?: string | null
+          expiry_date?: string | null
+        }
+        Update: {
+          id?: string
+          client_id?: string
+          item_id?: string
+          subitem_id?: string | null
+          vehicle_id?: string | null
+          driver_id?: string | null
+          file_url?: string | null
+          notes?: string | null
+          expiry_date?: string | null
+        }
+      }
+      client_item_overrides: {
+        Row: {
+          id: string
+          client_id: string
+          item_id: string
+          is_na: boolean
+        }
+        Insert: {
+          id?: string
+          client_id: string
+          item_id: string
+          is_na?: boolean
+        }
+        Update: {
+          id?: string
+          client_id?: string
+          item_id?: string
+          is_na?: boolean
         }
       }
     }

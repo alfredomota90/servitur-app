@@ -15,7 +15,7 @@ import {
   useDeletePayment,
 } from '@/features/payments/api'
 import type { Invoice } from '@/features/invoices/api'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, ClipboardCheck } from 'lucide-react'
 import {
   generatePendingReport,
   generatePendingComplementsReport,
@@ -215,6 +215,19 @@ export default function ClientDetail() {
       </div>
 
       <StatsCards stats={stats} />
+
+      {client.requiresPapeleria && (
+        <button
+          onClick={() => navigate(`/admin/clientes/${id}/requisitos`)}
+          className="w-full mb-6 p-4 rounded-xl border-2 border-dashed border-accent/40 bg-accent/5 hover:bg-accent/10 transition-colors flex items-center justify-center gap-3"
+        >
+          <ClipboardCheck size={24} className="text-accent" />
+          <div className="text-left">
+            <p className="font-semibold text-accent-text">Gestión de requisitos</p>
+            <p className="text-sm text-muted">Administrar papelería y documentos</p>
+          </div>
+        </button>
+      )}
 
       <PendingInvoicesTable
         invoices={sort.sortedPendingInvoices}

@@ -23,6 +23,7 @@ import {
   Calendar,
   AlertCircle,
   Image as ImageIcon,
+  ClipboardCheck,
 } from 'lucide-react'
 import { getNextBillingDate, getDaysUntil, formatDate } from '@/lib/utils'
 import ConfirmModal from '@/components/confirm-modal'
@@ -36,6 +37,8 @@ const clientFormSchema = z.object({
   phone: z.string().optional().or(z.literal('')),
   billingInterval: z.number().min(0),
   logoUrl: z.string().optional().or(z.literal('')),
+  requiresPapeleria: z.boolean(),
+  entityType: z.enum(['moral', 'fisica']),
 })
 
 type ClientFormValues = z.infer<typeof clientFormSchema>
@@ -46,6 +49,8 @@ const defaultClientValues: ClientFormValues = {
   phone: '',
   billingInterval: 0,
   logoUrl: '',
+  requiresPapeleria: false,
+  entityType: 'moral',
 }
 
 export default function ClientsAdmin() {
@@ -74,6 +79,8 @@ export default function ClientsAdmin() {
         phone: editingClient.phone || '',
         billingInterval: editingClient.billingInterval,
         logoUrl: editingClient.logoUrl || '',
+        requiresPapeleria: editingClient.requiresPapeleria,
+        entityType: editingClient.entityType,
       })
     } else {
       form.reset(defaultClientValues)
@@ -94,6 +101,8 @@ export default function ClientsAdmin() {
       billingInterval: values.billingInterval,
       lastTripDate: undefined,
       logoUrl: values.logoUrl || undefined,
+      requiresPapeleria: values.requiresPapeleria,
+      entityType: values.entityType,
     }
 
     if (editingClient) {
@@ -227,6 +236,42 @@ export default function ClientsAdmin() {
                   )}
                 </div>
               )}
+
+              <div>
+                <label className="block text-sm font-medium mb-1 text-foreground">
+                  Tipo de persona
+                </label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      value="moral"
+                      className="w-4 h-4 text-accent border-border focus:ring-accent/20"
+                      {...form.register('entityType')}
+                    />
+                    <span className="text-sm text-foreground">Moral</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      value="fisica"
+                      className="w-4 h-4 text-accent border-border focus:ring-accent/20"
+                      {...form.register('entityType')}
+                    />
+                    <span className="text-sm text-foreground">Física</span>
+                  </label>
+                </div>
+              </div>
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 rounded border-border text-accent focus:ring-accent/20"
+                  {...form.register('requiresPapeleria')}
+                />
+                <ClipboardCheck size={16} className="text-muted" />
+                <span className="text-sm text-foreground">Requiere papelería/requisitos</span>
+              </label>
 
               <div className="flex gap-2 pt-2">
                 <Button type="submit" className="flex-1">

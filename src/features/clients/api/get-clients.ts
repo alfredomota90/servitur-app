@@ -13,6 +13,8 @@ export const clientSchema = z.object({
   billingInterval: z.number().min(0).default(0),
   lastTripDate: z.string().optional(),
   logoUrl: z.string().optional().or(z.literal('')),
+  requiresPapeleria: z.boolean().default(false),
+  entityType: z.enum(['moral', 'fisica']).default('moral'),
 })
 
 export type Client = z.infer<typeof clientSchema>
@@ -25,6 +27,8 @@ const rowToClient = (row: ClientRow): Client => ({
   billingInterval: row.billing_interval || 0,
   lastTripDate: row.last_trip_date || undefined,
   logoUrl: row.logo_url || undefined,
+  requiresPapeleria: row.requires_papeleria ?? false,
+  entityType: (row.entity_type as 'moral' | 'fisica') || 'moral',
 })
 
 export const getClients = async (): Promise<Client[]> => {
@@ -48,6 +52,8 @@ export const createClient = async (client: Omit<Client, 'id'>): Promise<Client> 
       billing_interval: client.billingInterval,
       last_trip_date: client.lastTripDate || null,
       logo_url: client.logoUrl || null,
+      requires_papeleria: client.requiresPapeleria,
+      entity_type: client.entityType,
     })
     .select()
     .single()
@@ -73,6 +79,8 @@ export const updateClient = async (id: string, client: Partial<Client>): Promise
       billing_interval: client.billingInterval,
       last_trip_date: client.lastTripDate || null,
       logo_url: client.logoUrl || null,
+      requires_papeleria: client.requiresPapeleria,
+      entity_type: client.entityType,
       updated_at: new Date().toISOString(),
     })
     .eq('id', id)
