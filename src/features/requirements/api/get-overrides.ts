@@ -52,10 +52,34 @@ export const upsertOverride = async (
 
 export const useUpsertOverride = () => {
   const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: ({ clientId, itemId, isNa }: { clientId: string; itemId: string; isNa: boolean }) =>
       upsertOverride(clientId, itemId, isNa),
-    onSuccess: (_data, variables) => {
+    onMutate: async ({ clientId, itemId, isNa }) => {
+      await queryClient.cancelQueries({ queryKey: ['requirements', 'overrides', clientId] })
+      const previous = queryClient.getQueryData<ItemOverride[]>([
+        'requirements',
+        'overrides',
+        clientId,
+      ])
+      queryClient.setQueryData<ItemOverride[]>(['requirements', 'overrides', clientId], (old) => {
+        const existing = (old || []).findIndex((o) => o.itemId === itemId)
+        if (existing >= 0) {
+          const updated = [...(old || [])]
+          updated[existing] = { ...updated[existing], isNa }
+          return updated
+        }
+        return [...(old || []), { id: '', clientId, itemId, isNa }]
+      })
+      return { previous, clientId }
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['requirements', 'overrides', context.clientId], context.previous)
+      }
+    },
+    onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({ queryKey: ['requirements', 'overrides', variables.clientId] })
     },
   })
