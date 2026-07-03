@@ -45,13 +45,13 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
         <div
           ref={ref}
           className={cn(
-            'rounded-xl w-full max-h-[90vh] overflow-y-auto bg-card',
+            'rounded-xl bg-card w-full flex flex-col overflow-hidden max-h-[90vh]',
             maxWidth,
             className,
           )}
           {...props}
         >
-          <div className="flex items-center justify-between p-4 border-b border-border">
+          <div className="flex items-center justify-between p-4 border-b border-border shrink-0">
             <h2 className="font-bold text-lg text-foreground">{title}</h2>
             <button
               onClick={onClose}
@@ -61,7 +61,9 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
               <X size={20} />
             </button>
           </div>
-          {children}
+          <div className="overflow-y-auto min-h-0 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-track]:bg-transparent">
+            {children}
+          </div>
         </div>
       </div>
     )
