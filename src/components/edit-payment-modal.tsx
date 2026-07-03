@@ -142,7 +142,7 @@ export default function EditPaymentModal({
                 <label className="block text-sm font-medium mb-2 text-foreground">
                   Facturas vinculadas
                 </label>
-                <div className="space-y-2 max-h-48 overflow-y-auto">
+                <div className="space-y-2 max-h-48 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-track]:bg-transparent">
                   {linkedInvoices.map((inv) => (
                     <div
                       key={inv.id}
