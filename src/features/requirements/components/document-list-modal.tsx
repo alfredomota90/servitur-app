@@ -42,7 +42,7 @@ export function DocumentListModal({
         {documents.length === 0 ? (
           <p className="text-sm text-muted text-center py-4">Sin documentos subidos</p>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-track]:bg-transparent">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border">

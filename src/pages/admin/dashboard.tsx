@@ -268,7 +268,7 @@ export default function Dashboard() {
         <div className="p-4 border-b border-border">
           <h2 className="font-semibold text-foreground">Últimas Facturas</h2>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-track]:bg-transparent">
           <table className="w-full text-sm">
             <thead className="bg-background-secondary">
               <tr>
