@@ -7,6 +7,7 @@ import ConfirmModal from '@/components/confirm-modal'
 import { useDeleteConfirm } from '@/hooks/use-delete-confirm'
 import { sortInvoices, type SortKey } from '@/lib/invoice-utils'
 import { fmtDate } from '@/lib/utils'
+import BackHeader from '@/components/back-header'
 
 export default function Trips() {
   const { data: invoices = [] } = useInvoices()
@@ -37,6 +38,7 @@ export default function Trips() {
 
   return (
     <div className="p-4 md:p-6">
+      <BackHeader />
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Facturas</h1>

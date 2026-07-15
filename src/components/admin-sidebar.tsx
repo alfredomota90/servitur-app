@@ -1,6 +1,8 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Home, Users, Car, X, LogOut } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
+import ServiturLogo from '@/components/servitur-logo'
+import ServiturLetter from '@/components/servitur-letter'
 
 const SIDEBAR_WIDTH = 260
 
@@ -44,18 +46,10 @@ export default function AdminSidebar({
         className={`fixed top-0 left-0 h-full z-50 flex flex-col transition-transform duration-300 bg-admin-bg text-admin-foreground border-r border-border ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
         style={{ width: SIDEBAR_WIDTH }}
       >
-        <div className="flex items-center justify-between px-4 py-5 border-b border-border">
+        <div className="flex items-center justify-between px-2 py-1 border-b border-border">
           <Link to="/admin" className="flex items-center gap-2" onClick={closeMobile}>
-            <img
-              src={`${import.meta.env.BASE_URL}serviturlogo.png`}
-              alt="SERVITUR"
-              className="h-11 w-11 rounded-full object-cover"
-            />
-            <img
-              src={`${import.meta.env.BASE_URL}serviture_letter.svg`}
-              alt="SERVITUR"
-              className="h-6"
-            />
+            <ServiturLogo size="md" />
+            <ServiturLetter />
           </Link>
           <button onClick={onClose} className="p-1 rounded md:hidden text-muted">
             <X size={24} />

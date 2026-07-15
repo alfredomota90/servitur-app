@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
-import { Bus, MapPin, Users, ArrowLeft, Building2 } from 'lucide-react'
+import { Bus, MapPin, Users, Building2 } from 'lucide-react'
+import BackHeader from '@/components/back-header'
 
 export default function Services() {
   const services = [
@@ -49,14 +50,7 @@ export default function Services() {
 
   return (
     <div className="pb-20 md:pb-0 min-h-screen">
-      <header className="shadow-sm sticky top-0 z-40 bg-background-secondary border-b border-border">
-        <div className="max-w-6xl mx-auto px-4 py-4">
-          <Link to="/" className="flex items-center gap-2 font-medium transition-colors text-muted">
-            <ArrowLeft size={20} />
-            <span>Volver</span>
-          </Link>
-        </div>
-      </header>
+      <BackHeader />
 
       <div className="max-w-6xl mx-auto px-4 py-8">
         <h1 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Nuestros Servicios</h1>

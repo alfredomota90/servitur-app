@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, Users, Star, CheckCircle, Building2 } from 'lucide-react'
+import { Users, Star, CheckCircle, Building2 } from 'lucide-react'
+import BackHeader from '@/components/back-header'
 
 function ExpandableText({ text }: { text: string }) {
   const [expanded, setExpanded] = useState(false)
@@ -71,14 +72,7 @@ export default function Clients() {
 
   return (
     <div className="pb-20 md:pb-0 min-h-screen">
-      <header className="shadow-sm sticky top-0 z-40 bg-background-secondary border-b border-border">
-        <div className="max-w-6xl mx-auto px-4 py-4">
-          <Link to="/" className="flex items-center gap-2 font-medium transition-colors text-muted">
-            <ArrowLeft size={20} />
-            <span>Volver</span>
-          </Link>
-        </div>
-      </header>
+      <BackHeader />
 
       <div className="max-w-6xl mx-auto px-4 py-8">
         <h1 className="text-2xl md:text-4xl font-bold mb-4 leading-tight text-foreground">

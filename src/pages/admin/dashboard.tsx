@@ -3,6 +3,7 @@ import { useState, useMemo } from 'react'
 import { useClients } from '@/features/clients/api'
 import { useInvoices } from '@/features/invoices/api'
 import { fmtDate } from '@/lib/utils'
+import BackHeader from '@/components/back-header'
 import {
   LineChart,
   Line,
@@ -172,6 +173,7 @@ export default function Dashboard() {
 
   return (
     <div className="p-4 md:p-6">
+      <BackHeader />
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
         <p className="text-sm text-muted">Resumen de tu negocio de transporte</p>
@@ -206,19 +208,20 @@ export default function Dashboard() {
         </select>
       </div>
 
-      <div className="rounded-xl p-4 mb-6 bg-card">
+      <div className="pt-6 mb-6 bg-card overflow-visible">
         {chartData.some((d) => d.facturado > 0 || d.pagado > 0) ? (
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={chartData}>
+          <ResponsiveContainer width="100%" height={220}>
+            <LineChart data={chartData} margin={{ top: 20, right: 10, left: 10, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis
                 dataKey="date"
                 tick={{ fill: 'var(--muted)', fontSize: 12 }}
                 axisLine={{ stroke: 'var(--border)' }}
                 tickLine={false}
-                interval="preserveStartEnd"
+                interval={Math.floor(chartData.length / 6)}
               />
               <YAxis
+                width={90}
                 tick={{ fill: 'var(--muted)', fontSize: 12 }}
                 axisLine={{ stroke: 'var(--border)' }}
                 tickLine={false}
@@ -244,20 +247,20 @@ export default function Dashboard() {
             </LineChart>
           </ResponsiveContainer>
         ) : (
-          <div className="flex items-center justify-center h-[300px] text-sm text-muted">
+          <div className="flex items-center justify-center h-[220px] text-sm text-muted">
             No hay datos en este período
           </div>
         )}
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         {stats.map((stat, i) => (
-          <div key={i} className="rounded-xl p-4 bg-card">
+          <div key={i} className="rounded-xl p-4 bg-card min-w-0">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs text-muted">{stat.label}</span>
-              <stat.icon size={16} style={{ color: stat.color }} />
+              <span className="text-xs text-muted truncate">{stat.label}</span>
+              <stat.icon size={16} style={{ color: stat.color }} className="shrink-0" />
             </div>
-            <p className="text-xl font-bold" style={{ color: stat.color }}>
+            <p className="text-xl font-bold truncate" style={{ color: stat.color }}>
               {stat.value}
             </p>
           </div>

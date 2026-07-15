@@ -45,10 +45,10 @@ export default function PaymentHistoryTable({
         <button
           onClick={onGeneratePaymentHistoryPDF}
           disabled={payments.length === 0}
-          className="flex items-center gap-2 bg-accent text-background px-4 py-2 rounded-lg hover:opacity-90 disabled:opacity-50 transition-colors text-sm"
+          className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 rounded-full sm:rounded-lg bg-accent text-background hover:opacity-90 disabled:opacity-50 transition-colors text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_1px_2px_rgba(0,0,0,0.1)]"
         >
           <Download size={16} />
-          Historial de pagos
+          <span className="hidden sm:inline">Historial de pagos</span>
         </button>
       </div>
       <div className="overflow-x-auto [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-track]:bg-transparent">
@@ -62,27 +62,25 @@ export default function PaymentHistoryTable({
           </colgroup>
           <thead className="bg-background-secondary">
             <tr>
-              <th className="px-4 py-3 text-left text-muted">Referencia</th>
-              <th className="sticky left-0 px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted">
-                Fecha
+              <th className="sticky left-0 z-10 bg-background-secondary px-4 py-3 text-left text-muted">
+                Referencia
               </th>
-              <th className="sticky left-0 px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted">
-                Folios afectados
-              </th>
+              <th className="px-4 py-3 text-left text-muted">Fecha</th>
+              <th className="px-4 py-3 text-left text-muted">Folios afectados</th>
               <th className="px-4 py-3 text-right text-muted">Monto</th>
-              <th className="sticky left-0 px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted">
-                Acciones
-              </th>
+              <th className="px-4 py-3 text-left text-muted">Acciones</th>
             </tr>
           </thead>
           <tbody>
             {paymentsWithInvoices.map((p) => (
               <tr key={p.id} className="border-t border-border">
-                <td className="px-4 py-3 text-muted">{p.reference || '—'}</td>
-                <td className="sticky left-0 px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted">
+                <td className="sticky left-0 z-10 bg-card px-4 py-3 text-muted">
+                  {p.reference || '—'}
+                </td>
+                <td className="px-4 py-3 text-left text-muted">
                   {fmtDate(p.affectedInvoices[0]?.paymentDate || p.createdAt)}
                 </td>
-                <td className="sticky left-0 px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted">
+                <td className="px-4 py-3 text-left text-muted">
                   {p.affectedInvoices
                     .map((inv) => inv.serieFolio)
                     .filter(Boolean)

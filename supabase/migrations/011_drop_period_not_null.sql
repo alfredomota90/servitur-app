@@ -1,0 +1,1 @@
+ALTER TABLE invoices ALTER COLUMN period DROP NOT NULL;

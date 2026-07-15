@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import ServiturLogo from '@/components/servitur-logo'
 
 export function HeroSection() {
   return (
@@ -11,11 +13,7 @@ export function HeroSection() {
 
       <div className="relative max-w-6xl mx-auto px-4 py-16 md:py-24">
         <div className="flex items-center gap-3 mb-6">
-          <img
-            src={`${import.meta.env.BASE_URL}serviturlogo.png`}
-            alt="SERVITUR"
-            className="h-12 w-auto"
-          />
+          <ServiturLogo size="lg" />
         </div>
 
         <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight text-foreground">
@@ -30,19 +28,15 @@ export function HeroSection() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4">
-          <Link
-            to="/contacto"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold transition-colors bg-accent-text text-background"
-          >
-            Solicitar cotización
-            <ArrowRight size={20} />
-          </Link>
-          <Link
-            to="/servicios"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold transition-colors bg-accent-muted text-accent-text"
-          >
-            Ver servicios
-          </Link>
+          <Button asChild>
+            <Link to="/contacto">
+              Solicitar cotización
+              <ArrowRight size={20} />
+            </Link>
+          </Button>
+          <Button asChild variant="secondary">
+            <Link to="/servicios">Ver servicios</Link>
+          </Button>
         </div>
       </div>
     </section>

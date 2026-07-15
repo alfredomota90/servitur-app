@@ -1,5 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { Home, Settings, Phone, Car } from 'lucide-react'
+import ServiturLogo from '@/components/servitur-logo'
+import ServiturLetter from '@/components/servitur-letter'
 
 const PUBLIC_SIDEBAR_WIDTH = 220
 const navItems = [
@@ -19,16 +21,8 @@ export default function PublicSidebar() {
     >
       <div className="flex items-center justify-center py-6 border-b border-border">
         <Link to="/" className="flex items-center gap-2">
-          <img
-            src={`${import.meta.env.BASE_URL}serviturlogo.png`}
-            alt="SERVITUR"
-            className="h-11 w-11 rounded-full object-cover"
-          />
-          <img
-            src={`${import.meta.env.BASE_URL}serviture_letter.svg`}
-            alt="SERVITUR"
-            className="h-6"
-          />
+          <ServiturLogo size="md" />
+          <ServiturLetter />
         </Link>
       </div>
       <nav className="flex-1 py-6 px-3 space-y-1">

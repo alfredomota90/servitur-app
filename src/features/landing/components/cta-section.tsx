@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 export function CtaSection() {
   return (
@@ -11,13 +12,12 @@ export function CtaSection() {
         <p className="mb-6 text-muted">
           Contáctanos y te Cotizamos sin compromiso. Tenemos planes adaptados a tus necesidades.
         </p>
-        <Link
-          to="/contacto"
-          className="inline-flex items-center gap-2 px-8 py-4 rounded-lg font-semibold transition-colors bg-accent-text text-background"
-        >
-          Contactar ahora
-          <ArrowRight size={20} />
-        </Link>
+        <Button asChild size="lg">
+          <Link to="/contacto">
+            Contactar ahora
+            <ArrowRight size={20} />
+          </Link>
+        </Button>
       </div>
     </section>
   )

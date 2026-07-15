@@ -84,17 +84,17 @@ export default function PendingInvoicesTable({
           <button
             onClick={onGeneratePDF}
             disabled={invoices.length === 0}
-            className="flex items-center gap-2 bg-accent text-background px-4 py-2 rounded-lg hover:opacity-90 disabled:opacity-50 transition-colors text-sm"
+            className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 rounded-full sm:rounded-lg bg-accent text-background hover:opacity-90 disabled:opacity-50 transition-colors text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_1px_2px_rgba(0,0,0,0.1)]"
           >
             <Download size={16} />
-            Estado de Cuenta
+            <span className="hidden sm:inline">Estado de Cuenta</span>
           </button>
           <button
             onClick={onAddInvoice}
-            className="flex items-center gap-2 bg-success text-white px-4 py-2 rounded-lg hover:opacity-90 transition-colors text-sm"
+            className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 rounded-full sm:rounded-lg bg-success text-white hover:opacity-90 transition-colors text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_1px_2px_rgba(0,0,0,0.1)]"
           >
             <Plus size={16} />
-            Agregar
+            <span className="hidden sm:inline">Agregar</span>
           </button>
         </div>
       </div>
@@ -125,31 +125,31 @@ export default function PendingInvoicesTable({
                 </th>
               )}
               <th
-                className="px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted"
+                className="sticky left-0 z-10 bg-background-secondary px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted"
                 onClick={() => onToggleSort('serieFolio')}
               >
                 Serie/Folio <SortIcon col="serieFolio" sortKey={sortKey} sortDir={sortDir} />
               </th>
               <th
-                className="sticky left-0 px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted"
+                className="px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted"
                 onClick={() => onToggleSort('date')}
               >
                 Fecha <SortIcon col="date" sortKey={sortKey} sortDir={sortDir} />
               </th>
               <th
-                className="sticky left-0 px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted"
+                className="px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted"
                 onClick={() => onToggleSort('description')}
               >
                 Descripción <SortIcon col="description" sortKey={sortKey} sortDir={sortDir} />
               </th>
               <th
-                className="sticky left-0 px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted"
+                className="px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted"
                 onClick={() => onToggleSort('status')}
               >
                 Estado <SortIcon col="status" sortKey={sortKey} sortDir={sortDir} />
               </th>
               <th
-                className="sticky left-0 px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted"
+                className="px-4 py-3 text-left cursor-pointer select-none hover:opacity-80 text-muted"
                 onClick={() => onToggleSort('total')}
               >
                 Monto <SortIcon col="total" sortKey={sortKey} sortDir={sortDir} />
@@ -177,7 +177,9 @@ export default function PendingInvoicesTable({
                       />
                     </td>
                   )}
-                  <td className="px-4 py-3 font-medium text-foreground">{inv.serieFolio || '-'}</td>
+                  <td className="sticky left-0 z-10 bg-card px-4 py-3 font-medium text-foreground">
+                    {inv.serieFolio || '-'}
+                  </td>
                   <td className="px-4 py-3 text-left text-muted">{getInvoiceDate(inv)}</td>
                   <td className="px-4 py-3 text-center text-muted">
                     <ExpandableTextCell

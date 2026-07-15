@@ -15,7 +15,8 @@ import {
   useDeletePayment,
 } from '@/features/payments/api'
 import type { Invoice } from '@/features/invoices/api'
-import { ArrowLeft, ClipboardCheck } from 'lucide-react'
+import { ClipboardCheck } from 'lucide-react'
+import BackHeader from '@/components/back-header'
 import {
   generatePendingReport,
   generatePendingComplementsReport,
@@ -182,13 +183,7 @@ export default function ClientDetail() {
 
   return (
     <div className="p-4 md:p-6">
-      <button
-        onClick={() => navigate('/admin/clientes')}
-        className="flex items-center gap-2 mb-4 text-muted"
-      >
-        <ArrowLeft size={20} />
-        Volver a clientes
-      </button>
+      <BackHeader to="/admin/clientes" label="Volver a clientes" />
 
       <div className="mb-6 flex items-center justify-between">
         <div>
