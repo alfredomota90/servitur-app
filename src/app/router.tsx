@@ -11,6 +11,7 @@ const Dashboard = lazy(() => import('@/pages/admin/dashboard'))
 const Trips = lazy(() => import('@/pages/admin/trips'))
 const ClientsAdmin = lazy(() => import('@/pages/admin/clients-admin'))
 const ClientDetail = lazy(() => import('@/pages/admin/client-detail'))
+const ProjectDetail = lazy(() => import('@/pages/admin/project-detail'))
 const RequirementsPage = lazy(() => import('@/pages/admin/requirements-page'))
 const Login = lazy(() => import('@/pages/admin/login'))
 
@@ -43,6 +44,11 @@ export function AppRouter() {
           <Route path="viajes" element={<Trips />} errorElement={<ErrorElement />} />
           <Route path="clientes" element={<ClientsAdmin />} errorElement={<ErrorElement />} />
           <Route path="clientes/:id" element={<ClientDetail />} errorElement={<ErrorElement />} />
+          <Route
+            path="clientes/:clientId/proyectos/:projectId"
+            element={<ProjectDetail />}
+            errorElement={<ErrorElement />}
+          />
           <Route
             path="clientes/:id/requisitos"
             element={<RequirementsPage />}
