@@ -102,7 +102,7 @@ export default function Trips() {
                 {sortedInvoices.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="px-4 py-8 text-center text-muted">
-                      No hay viajes/facturas registrados
+                      No hay facturas registradas
                     </td>
                   </tr>
                 ) : (
