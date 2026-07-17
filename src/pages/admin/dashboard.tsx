@@ -172,141 +172,143 @@ export default function Dashboard() {
   ]
 
   return (
-    <div className="p-4 md:p-6">
+    <>
       <BackHeader />
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-sm text-muted">Resumen de tu negocio de transporte</p>
-      </div>
-
-      <div className="flex flex-wrap items-center gap-3 mb-6">
-        <div className="flex rounded-lg overflow-hidden border border-border">
-          {PERIODS.map((p) => (
-            <button
-              key={p}
-              onClick={() => setPeriod(p)}
-              className={`px-4 py-2 text-sm font-medium transition-colors ${
-                period === p ? 'bg-accent text-background' : ''
-              }`}
-            >
-              <span className={period !== p ? 'text-muted' : ''}>{PERIOD_LABELS[p]}</span>
-            </button>
-          ))}
+      <div className="p-4 md:p-6">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+          <p className="text-sm text-muted">Resumen de tu negocio de transporte</p>
         </div>
 
-        <select
-          value={selectedClientId}
-          onChange={(e) => setSelectedClientId(e.target.value)}
-          className="px-3 py-2 border rounded-lg text-sm bg-card border-border text-foreground"
-        >
-          <option value="">Todos los clientes</option>
-          {clients.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="pt-6 mb-6 bg-card overflow-visible">
-        {chartData.some((d) => d.facturado > 0 || d.pagado > 0) ? (
-          <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={chartData} margin={{ top: 20, right: 10, left: 10, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis
-                dataKey="date"
-                tick={{ fill: 'var(--muted)', fontSize: 12 }}
-                axisLine={{ stroke: 'var(--border)' }}
-                tickLine={false}
-                interval={Math.floor(chartData.length / 6)}
-              />
-              <YAxis
-                width={90}
-                tick={{ fill: 'var(--muted)', fontSize: 12 }}
-                axisLine={{ stroke: 'var(--border)' }}
-                tickLine={false}
-                tickFormatter={(v) => formatCurrency(v)}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              <Line
-                type="monotone"
-                dataKey="facturado"
-                stroke="var(--accent)"
-                strokeWidth={2}
-                dot={false}
-                name="facturado"
-              />
-              <Line
-                type="monotone"
-                dataKey="pagado"
-                stroke="var(--success)"
-                strokeWidth={2}
-                dot={false}
-                name="pagado"
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        ) : (
-          <div className="flex items-center justify-center h-[220px] text-sm text-muted">
-            No hay datos en este período
+        <div className="flex flex-wrap items-center gap-3 mb-6">
+          <div className="flex rounded-lg overflow-hidden border border-border">
+            {PERIODS.map((p) => (
+              <button
+                key={p}
+                onClick={() => setPeriod(p)}
+                className={`px-4 py-2 text-sm font-medium transition-colors ${
+                  period === p ? 'bg-accent text-background' : ''
+                }`}
+              >
+                <span className={period !== p ? 'text-muted' : ''}>{PERIOD_LABELS[p]}</span>
+              </button>
+            ))}
           </div>
-        )}
-      </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        {stats.map((stat, i) => (
-          <div key={i} className="rounded-xl p-4 bg-card min-w-0">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs text-muted truncate">{stat.label}</span>
-              <stat.icon size={16} style={{ color: stat.color }} className="shrink-0" />
+          <select
+            value={selectedClientId}
+            onChange={(e) => setSelectedClientId(e.target.value)}
+            className="px-3 py-2 border rounded-lg text-sm bg-card border-border text-foreground"
+          >
+            <option value="">Todos los clientes</option>
+            {clients.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="pt-6 mb-6 bg-card overflow-visible">
+          {chartData.some((d) => d.facturado > 0 || d.pagado > 0) ? (
+            <ResponsiveContainer width="100%" height={220}>
+              <LineChart data={chartData} margin={{ top: 20, right: 10, left: 10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                <XAxis
+                  dataKey="date"
+                  tick={{ fill: 'var(--muted)', fontSize: 12 }}
+                  axisLine={{ stroke: 'var(--border)' }}
+                  tickLine={false}
+                  interval={Math.floor(chartData.length / 6)}
+                />
+                <YAxis
+                  width={90}
+                  tick={{ fill: 'var(--muted)', fontSize: 12 }}
+                  axisLine={{ stroke: 'var(--border)' }}
+                  tickLine={false}
+                  tickFormatter={(v) => formatCurrency(v)}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Line
+                  type="monotone"
+                  dataKey="facturado"
+                  stroke="var(--accent)"
+                  strokeWidth={2}
+                  dot={false}
+                  name="facturado"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="pagado"
+                  stroke="var(--success)"
+                  strokeWidth={2}
+                  dot={false}
+                  name="pagado"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex items-center justify-center h-[220px] text-sm text-muted">
+              No hay datos en este período
             </div>
-            <p className="text-xl font-bold truncate" style={{ color: stat.color }}>
-              {stat.value}
-            </p>
-          </div>
-        ))}
-      </div>
+          )}
+        </div>
 
-      <div className="rounded-xl overflow-hidden shadow-sm mb-6 bg-card">
-        <div className="p-4 border-b border-border">
-          <h2 className="font-semibold text-foreground">Últimas Facturas</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          {stats.map((stat, i) => (
+            <div key={i} className="rounded-xl p-4 bg-card min-w-0">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-muted truncate">{stat.label}</span>
+                <stat.icon size={16} style={{ color: stat.color }} className="shrink-0" />
+              </div>
+              <p className="text-xl font-bold truncate" style={{ color: stat.color }}>
+                {stat.value}
+              </p>
+            </div>
+          ))}
         </div>
-        <div className="overflow-x-auto [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-track]:bg-transparent">
-          <table className="w-full text-sm">
-            <thead className="bg-background-secondary">
-              <tr>
-                <th className="px-4 py-2 text-left text-muted">Cliente</th>
-                <th className="px-4 py-2 text-left text-muted">Folio</th>
-                <th className="px-4 py-2 text-left text-muted">Fecha</th>
-                <th className="px-4 py-2 text-right text-muted">Monto</th>
-              </tr>
-            </thead>
-            <tbody>
-              {lastInvoices.map((inv) => (
-                <tr key={inv.id} className="border-t border-border">
-                  <td className="px-4 py-2 text-foreground">{inv.clientName}</td>
-                  <td className="px-4 py-2 text-muted">{inv.serieFolio || '-'}</td>
-                  <td className="px-4 py-2 text-muted">{fmtDate(inv.createdAt)}</td>
-                  <td className="px-4 py-2 text-right font-medium text-success">
-                    $
-                    {(inv.totalMxn || inv.total).toLocaleString('es-MX', {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </td>
-                </tr>
-              ))}
-              {lastInvoices.length === 0 && (
+
+        <div className="rounded-xl overflow-hidden shadow-sm mb-6 bg-card">
+          <div className="p-4 border-b border-border">
+            <h2 className="font-semibold text-foreground">Últimas Facturas</h2>
+          </div>
+          <div className="overflow-x-auto [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-track]:bg-transparent">
+            <table className="w-full text-sm">
+              <thead className="bg-background-secondary">
                 <tr>
-                  <td colSpan={4} className="px-4 py-8 text-center text-muted">
-                    No hay facturas registradas
-                  </td>
+                  <th className="px-4 py-2 text-left text-muted">Cliente</th>
+                  <th className="px-4 py-2 text-left text-muted">Folio</th>
+                  <th className="px-4 py-2 text-left text-muted">Fecha</th>
+                  <th className="px-4 py-2 text-right text-muted">Monto</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {lastInvoices.map((inv) => (
+                  <tr key={inv.id} className="border-t border-border">
+                    <td className="px-4 py-2 text-foreground">{inv.clientName}</td>
+                    <td className="px-4 py-2 text-muted">{inv.serieFolio || '-'}</td>
+                    <td className="px-4 py-2 text-muted">{fmtDate(inv.createdAt)}</td>
+                    <td className="px-4 py-2 text-right font-medium text-success">
+                      $
+                      {(inv.totalMxn || inv.total).toLocaleString('es-MX', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </td>
+                  </tr>
+                ))}
+                {lastInvoices.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="px-4 py-8 text-center text-muted">
+                      No hay facturas registradas
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }

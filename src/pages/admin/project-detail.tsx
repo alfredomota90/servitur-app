@@ -191,159 +191,160 @@ export default function ProjectDetail() {
   ]
 
   return (
-    <div className="p-4 md:p-6">
+    <>
       <BackHeader to={`/admin/clientes/${clientId}`} label="Volver a proyectos" />
-
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">{project.name}</h1>
-          <p className="text-muted">
-            {client.name}
-            {project.description && <> — {project.description}</>}
-          </p>
+      <div className="p-4 md:p-6">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">{project.name}</h1>
+            <p className="text-muted">
+              {client.name}
+              {project.description && <> — {project.description}</>}
+            </p>
+          </div>
+          <div className="flex gap-1.5" />
         </div>
-        <div className="flex gap-1.5" />
-      </div>
 
-      <StatsCards stats={stats} />
+        <StatsCards stats={stats} />
 
-      <PendingInvoicesTable
-        invoices={sort.sortedPendingInvoices}
-        payments={payments}
-        sortKey={sort.sortKey}
-        sortDir={sort.sortDir}
-        selectingMode={paymentsCtrl.selectingMode}
-        selectedInvoiceIds={paymentsCtrl.selectedInvoiceIds}
-        expandedDescId={expandedDescId}
-        totalPending={totalPending}
-        onToggleSort={sort.toggleSort}
-        onToggleSelect={paymentsCtrl.toggleSelectInvoice}
-        onSelectAll={paymentsCtrl.handleSelectAll}
-        onPayment={paymentsCtrl.openPaymentModal}
-        onEdit={handleEdit}
-        onPreview={previewInvoice}
-        onDelete={del.handleDelete}
-        onViewAttachment={setViewingAttachment}
-        onEditPayment={paymentsCtrl.openEditPayment}
-        onToggleExpandDesc={setExpandedDescId}
-        onGeneratePDF={generatePDF}
-        onAddInvoice={() => {
-          setEditingInvoice(null)
-          setShowForm(true)
-        }}
-      />
-
-      {paymentsCtrl.selectingMode && (
-        <SelectionBar
-          count={paymentsCtrl.selectedInvoiceIds.length}
-          totalAmount={paymentsCtrl.selectedInvoices.reduce(
-            (s, i) => s + (i.totalMxn || i.total),
-            0,
-          )}
-          onCancel={paymentsCtrl.cancelSelection}
-          onContinue={paymentsCtrl.continueToPayment}
+        <PendingInvoicesTable
+          invoices={sort.sortedPendingInvoices}
+          payments={payments}
+          sortKey={sort.sortKey}
+          sortDir={sort.sortDir}
+          selectingMode={paymentsCtrl.selectingMode}
+          selectedInvoiceIds={paymentsCtrl.selectedInvoiceIds}
+          expandedDescId={expandedDescId}
+          totalPending={totalPending}
+          onToggleSort={sort.toggleSort}
+          onToggleSelect={paymentsCtrl.toggleSelectInvoice}
+          onSelectAll={paymentsCtrl.handleSelectAll}
+          onPayment={paymentsCtrl.openPaymentModal}
+          onEdit={handleEdit}
+          onPreview={previewInvoice}
+          onDelete={del.handleDelete}
+          onViewAttachment={setViewingAttachment}
+          onEditPayment={paymentsCtrl.openEditPayment}
+          onToggleExpandDesc={setExpandedDescId}
+          onGeneratePDF={generatePDF}
+          onAddInvoice={() => {
+            setEditingInvoice(null)
+            setShowForm(true)
+          }}
         />
-      )}
 
-      <PaidInvoicesTable
-        paidInvoices={paidInvoices}
-        payments={payments}
-        totalPaid={totalPaid}
-        onPreview={previewInvoice}
-        onViewAttachment={setViewingAttachment}
-        onEditPayment={paymentsCtrl.openEditPayment}
-        onDelete={del.handleDelete}
-        onGenerateComplementsPDF={generateComplementsPDF}
-      />
-
-      <PaymentHistoryTable
-        payments={payments}
-        invoices={projectInvoices}
-        onViewAttachment={setViewingAttachment}
-        onEditPayment={(payment) => {
-          const inv = projectInvoices.find((i) => i.paymentId === payment.id)
-          if (inv) paymentsCtrl.openEditPayment(inv)
-        }}
-        onDelete={delPayment.handleDelete}
-        onGeneratePaymentHistoryPDF={generatePaymentHistoryPDF}
-      />
-
-      <InvoiceFormModal
-        open={showForm}
-        clientId={clientId || ''}
-        clientName={client.name}
-        projects={projects}
-        selectedProjectId={projectId}
-        editingInvoice={editingInvoice}
-        onSave={(data) => {
-          if (editingInvoice) {
-            updateInvoice.mutate({ id: editingInvoice.id, data })
-          } else {
-            createInvoice.mutate(data)
-          }
-        }}
-        onClose={() => {
-          setShowForm(false)
-          setEditingInvoice(null)
-        }}
-      />
-
-      <PaymentModal
-        open={paymentsCtrl.showPaymentModal && paymentsCtrl.selectedInvoiceIds.length > 0}
-        invoices={paymentsCtrl.selectedInvoices}
-        paymentData={paymentsCtrl.paymentData}
-        onPaymentDataChange={paymentsCtrl.setPaymentData}
-        onConfirm={paymentsCtrl.registerPayment}
-        onAddMore={paymentsCtrl.addMoreInvoices}
-        onClose={paymentsCtrl.closePaymentModal}
-      />
-
-      <EditPaymentModal
-        open={paymentsCtrl.showEditPayment}
-        payment={paymentsCtrl.editingPayment}
-        invoice={paymentsCtrl.editingPaymentInvoice}
-        linkedInvoices={paymentsCtrl.editingLinkedInvoices}
-        availableInvoices={paidInvoices.filter(
-          (inv) => !paymentsCtrl.editingLinkedInvoices.some((l) => l.id === inv.id),
+        {paymentsCtrl.selectingMode && (
+          <SelectionBar
+            count={paymentsCtrl.selectedInvoiceIds.length}
+            totalAmount={paymentsCtrl.selectedInvoices.reduce(
+              (s, i) => s + (i.totalMxn || i.total),
+              0,
+            )}
+            onCancel={paymentsCtrl.cancelSelection}
+            onContinue={paymentsCtrl.continueToPayment}
+          />
         )}
-        editData={paymentsCtrl.editPaymentData}
-        onEditDataChange={paymentsCtrl.setEditPaymentData}
-        onAddInvoice={paymentsCtrl.addInvoiceToEdit}
-        onRemoveInvoice={paymentsCtrl.removeInvoiceFromEdit}
-        onSave={paymentsCtrl.saveEditPayment}
-        onClose={paymentsCtrl.closeEditPayment}
-        showDeletePaymentConfirm={paymentsCtrl.showDeletePaymentConfirm}
-        onConfirmDeletePayment={paymentsCtrl.confirmDeleteOrphanPayment}
-        onCancelDeletePayment={paymentsCtrl.cancelDeleteOrphanPayment}
-      />
 
-      <InvoicePreviewModal url={invoicePreviewUrl} onClose={closePreview} />
+        <PaidInvoicesTable
+          paidInvoices={paidInvoices}
+          payments={payments}
+          totalPaid={totalPaid}
+          onPreview={previewInvoice}
+          onViewAttachment={setViewingAttachment}
+          onEditPayment={paymentsCtrl.openEditPayment}
+          onDelete={del.handleDelete}
+          onGenerateComplementsPDF={generateComplementsPDF}
+        />
 
-      <ViewAttachmentModal
-        attachment={viewingAttachment}
-        onClose={() => setViewingAttachment(null)}
-      />
+        <PaymentHistoryTable
+          payments={payments}
+          invoices={projectInvoices}
+          onViewAttachment={setViewingAttachment}
+          onEditPayment={(payment) => {
+            const inv = projectInvoices.find((i) => i.paymentId === payment.id)
+            if (inv) paymentsCtrl.openEditPayment(inv)
+          }}
+          onDelete={delPayment.handleDelete}
+          onGeneratePaymentHistoryPDF={generatePaymentHistoryPDF}
+        />
 
-      <ConfirmModal
-        open={del.deleteModal.open}
-        title="Eliminar viaje/factura"
-        message="¿Estás seguro de que deseas eliminar este registro? Esta acción no se puede revertir."
-        confirmLabel="Eliminar"
-        cancelLabel="Cancelar"
-        onConfirm={del.confirmDelete}
-        onCancel={del.cancelDelete}
-        danger={true}
-      />
-      <ConfirmModal
-        open={delPayment.deleteModal.open}
-        title="Eliminar pago"
-        message="¿Estás seguro de que deseas eliminar este pago? Esta acción no se puede revertir."
-        confirmLabel="Eliminar"
-        cancelLabel="Cancelar"
-        onConfirm={delPayment.confirmDelete}
-        onCancel={delPayment.cancelDelete}
-        danger={true}
-      />
-    </div>
+        <InvoiceFormModal
+          open={showForm}
+          clientId={clientId || ''}
+          clientName={client.name}
+          projects={projects}
+          selectedProjectId={projectId}
+          editingInvoice={editingInvoice}
+          onSave={(data) => {
+            if (editingInvoice) {
+              updateInvoice.mutate({ id: editingInvoice.id, data })
+            } else {
+              createInvoice.mutate(data)
+            }
+          }}
+          onClose={() => {
+            setShowForm(false)
+            setEditingInvoice(null)
+          }}
+        />
+
+        <PaymentModal
+          open={paymentsCtrl.showPaymentModal && paymentsCtrl.selectedInvoiceIds.length > 0}
+          invoices={paymentsCtrl.selectedInvoices}
+          paymentData={paymentsCtrl.paymentData}
+          onPaymentDataChange={paymentsCtrl.setPaymentData}
+          onConfirm={paymentsCtrl.registerPayment}
+          onAddMore={paymentsCtrl.addMoreInvoices}
+          onClose={paymentsCtrl.closePaymentModal}
+        />
+
+        <EditPaymentModal
+          open={paymentsCtrl.showEditPayment}
+          payment={paymentsCtrl.editingPayment}
+          invoice={paymentsCtrl.editingPaymentInvoice}
+          linkedInvoices={paymentsCtrl.editingLinkedInvoices}
+          availableInvoices={paidInvoices.filter(
+            (inv) => !paymentsCtrl.editingLinkedInvoices.some((l) => l.id === inv.id),
+          )}
+          editData={paymentsCtrl.editPaymentData}
+          onEditDataChange={paymentsCtrl.setEditPaymentData}
+          onAddInvoice={paymentsCtrl.addInvoiceToEdit}
+          onRemoveInvoice={paymentsCtrl.removeInvoiceFromEdit}
+          onSave={paymentsCtrl.saveEditPayment}
+          onClose={paymentsCtrl.closeEditPayment}
+          showDeletePaymentConfirm={paymentsCtrl.showDeletePaymentConfirm}
+          onConfirmDeletePayment={paymentsCtrl.confirmDeleteOrphanPayment}
+          onCancelDeletePayment={paymentsCtrl.cancelDeleteOrphanPayment}
+        />
+
+        <InvoicePreviewModal url={invoicePreviewUrl} onClose={closePreview} />
+
+        <ViewAttachmentModal
+          attachment={viewingAttachment}
+          onClose={() => setViewingAttachment(null)}
+        />
+
+        <ConfirmModal
+          open={del.deleteModal.open}
+          title="Eliminar viaje/factura"
+          message="¿Estás seguro de que deseas eliminar este registro? Esta acción no se puede revertir."
+          confirmLabel="Eliminar"
+          cancelLabel="Cancelar"
+          onConfirm={del.confirmDelete}
+          onCancel={del.cancelDelete}
+          danger={true}
+        />
+        <ConfirmModal
+          open={delPayment.deleteModal.open}
+          title="Eliminar pago"
+          message="¿Estás seguro de que deseas eliminar este pago? Esta acción no se puede revertir."
+          confirmLabel="Eliminar"
+          cancelLabel="Cancelar"
+          onConfirm={delPayment.confirmDelete}
+          onCancel={delPayment.cancelDelete}
+          danger={true}
+        />
+      </div>
+    </>
   )
 }
