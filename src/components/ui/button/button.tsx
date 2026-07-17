@@ -13,14 +13,14 @@ const buttonVariants = cva(
         secondary: 'border border-border bg-card text-foreground hover:bg-card-hover',
         danger: 'bg-error text-white hover:opacity-90',
         ghost: 'hover:bg-card-hover text-foreground',
-        accent: 'bg-accent text-background hover:bg-accent-hover',
-        accentMuted: 'bg-accent/10 text-accent-text hover:bg-accent/20',
+        accent: 'bg-accent-text text-background hover:opacity-90',
+        accentMuted: 'bg-accent-muted text-accent-text hover:opacity-90',
       },
       size: {
         sm: 'px-3 py-1.5 text-xs',
         md: 'px-4 py-2',
         lg: 'px-6 py-3 text-base',
-        xl: 'px-8 py-4 text-base',
+        xl: 'px-8 py-4 text-lg',
       },
     },
     defaultVariants: {
@@ -37,7 +37,7 @@ export interface ButtonProps
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, isLoading, asChild, children, disabled, ...props }, ref) => {
+  ({ className, variant, size, isLoading, asChild = false, children, disabled, ...props }, ref) => {
     if (asChild) {
       return (
         <Slot ref={ref} className={cn(buttonVariants({ variant, size }), className)} {...props}>
@@ -45,6 +45,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         </Slot>
       )
     }
+
     return (
       <button
         ref={ref}
