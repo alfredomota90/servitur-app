@@ -1,362 +1,282 @@
-import { useState, useMemo } from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { useClients } from '@/features/clients/api'
 import {
-  useInvoicesByClient,
-  useCreateInvoice,
-  useUpdateInvoice,
-  useDeleteInvoice,
-  useBatchUpdateInvoicesPaymentDate,
-} from '@/features/invoices/api'
-import {
-  usePaymentsTQ,
-  useCreatePayment,
-  useUpdatePayment,
-  useDeletePayment,
-} from '@/features/payments/api'
-import type { Invoice } from '@/features/invoices/api'
-import { ClipboardCheck } from 'lucide-react'
+  useProjectsByClient,
+  useCreateProject,
+  useUpdateProject,
+  useDeleteProject,
+} from '@/features/projects/api'
+import type { Project } from '@/features/projects/api'
+import { useInvoices } from '@/features/invoices/api'
 import BackHeader from '@/components/back-header'
-import {
-  generatePendingReport,
-  generatePendingComplementsReport,
-  generatePaymentHistoryReport,
-} from '@/lib/pdf-service'
-import { getNextBillingDate, formatDate, fmtAmount } from '@/lib/utils'
-import { previewXMLAsPDF, previewPDFFromInvoiceData } from '@/lib/xml-parser'
-import { useSort } from '@/hooks/use-sort'
-import { usePayments } from '@/hooks/use-payments'
-import { useDeleteConfirm } from '@/hooks/use-delete-confirm'
-import { useStore } from '@/store/use-store'
-import StatsCards from '@/components/stats-cards'
-import PendingInvoicesTable from '@/components/pending-invoices-table'
-import PaidInvoicesTable from '@/components/paid-invoices-table'
-import PaymentHistoryTable from '@/components/payment-history-table'
-import SelectionBar from '@/components/selection-bar'
-import InvoicePreviewModal from '@/components/invoice-preview-modal'
 import ConfirmModal from '@/components/confirm-modal'
-import InvoiceFormModal from '@/components/invoice-form-modal'
-import PaymentModal from '@/components/payment-modal'
-import EditPaymentModal from '@/components/edit-payment-modal'
-import ViewAttachmentModal from '@/components/view-attachment-modal'
-import type { Payment } from '@/features/payments/api'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Form } from '@/components/ui/form'
+import { Plus, FolderOpen, Edit2, Trash2, X, FileText, DollarSign } from 'lucide-react'
+import { fmtAmount } from '@/lib/utils'
+
+const projectFormSchema = z.object({
+  name: z.string().min(1, 'El nombre es obligatorio'),
+  description: z.string().optional().or(z.literal('')),
+})
+
+type ProjectFormValues = z.infer<typeof projectFormSchema>
+
+const defaultProjectValues: ProjectFormValues = {
+  name: '',
+  description: '',
+}
 
 export default function ClientDetail() {
-  const { id } = useParams()
+  const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { data: clients = [] } = useClients()
-  const { data: clientInvoices = [] } = useInvoicesByClient(id)
-  const { data: payments = [] } = usePaymentsTQ()
-  const createInvoice = useCreateInvoice()
-  const updateInvoice = useUpdateInvoice()
-  const deleteInvoice = useDeleteInvoice()
-  const createPayment = useCreatePayment()
-  const updatePayment = useUpdatePayment()
-  const deletePayment = useDeletePayment()
-  const batchUpdatePaymentDate = useBatchUpdateInvoicesPaymentDate()
+  const { data: projects = [] } = useProjectsByClient(id)
+  const { data: invoices = [] } = useInvoices()
+  const createProject = useCreateProject()
+  const updateProject = useUpdateProject()
+  const deleteProject = useDeleteProject()
 
   const [showForm, setShowForm] = useState(false)
-  const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null)
-  const [expandedDescId, setExpandedDescId] = useState<string | null>(null)
-  const [viewingAttachment, setViewingAttachment] = useState<string | null>(null)
+  const [editingProject, setEditingProject] = useState<Project | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+
+  const form = useForm<ProjectFormValues>({
+    resolver: zodResolver(projectFormSchema),
+    defaultValues: defaultProjectValues,
+  })
+
+  useEffect(() => {
+    if (editingProject) {
+      form.reset({
+        name: editingProject.name,
+        description: editingProject.description || '',
+      })
+    } else {
+      form.reset(defaultProjectValues)
+    }
+  }, [editingProject, form])
 
   const client = clients.find((c) => c.id === id)
-  const pendingInvoices = clientInvoices.filter((i) => i.status === 'pendiente')
-  const paidInvoices = clientInvoices.filter((i) => i.status === 'pagado')
-
-  const totalGenerated = useMemo(
-    () => clientInvoices.reduce((sum, i) => sum + (i.totalMxn || i.total), 0),
-    [clientInvoices],
-  )
-  const totalPaid = useMemo(
-    () => paidInvoices.reduce((sum, i) => sum + (i.totalMxn || i.total), 0),
-    [paidInvoices],
-  )
-  const totalPending = useMemo(
-    () => pendingInvoices.reduce((sum, i) => sum + (i.totalMxn || i.total), 0),
-    [pendingInvoices],
-  )
-
-  const [invoicePreviewUrl, setInvoicePreviewUrl] = useState<string | null>(null)
-  const addToast = useStore((s) => s.addToast)
-
-  const previewInvoice = async (inv: Invoice) => {
-    try {
-      if (inv.xmlPath) {
-        const url = await previewXMLAsPDF(inv.xmlPath)
-        if (url) {
-          setInvoicePreviewUrl(url)
-          return
-        }
-      }
-      const url = previewPDFFromInvoiceData({
-        serieFolio: inv.serieFolio,
-        rfcReceptor: inv.rfcReceptor,
-        receptorName: inv.receptorName,
-        invoiceDescription: inv.invoiceDescription,
-        totalMxn: inv.totalMxn,
-        total: inv.total,
-        certificationDate: inv.certificationDate,
-        tripDate: inv.tripDate,
-        fromLocation: inv.fromLocation,
-        toLocation: inv.toLocation,
-        clientName: inv.clientName,
-      })
-      setInvoicePreviewUrl(url)
-    } catch {
-      addToast({ type: 'error', message: 'Error al generar vista previa' })
-    }
-  }
-
-  const closePreview = () => {
-    if (invoicePreviewUrl) URL.revokeObjectURL(invoicePreviewUrl)
-    setInvoicePreviewUrl(null)
-  }
-
-  const sort = useSort(clientInvoices, pendingInvoices)
-  const paymentsCtrl = usePayments(clientInvoices, pendingInvoices, payments, {
-    addPayment: (p: Payment) => createPayment.mutateAsync(p),
-    updateInvoice: (id: string, data: Partial<Invoice>) => updateInvoice.mutate({ id, data }),
-    updatePayment: async (id: string, data: Partial<Payment>) => {
-      updatePayment.mutate({ id, data })
-    },
-    deletePayment: async (id: string) => {
-      deletePayment.mutate(id)
-    },
-    batchUpdatePaymentDate: (paymentId: string, paymentDate: string) => {
-      batchUpdatePaymentDate.mutate({ paymentId, paymentDate })
-    },
-  })
-  const del = useDeleteConfirm((id: string) => deleteInvoice.mutate(id))
-  const delPayment = useDeleteConfirm((id: string) => deletePayment.mutate(id))
 
   if (!client) {
     return (
       <div className="p-6 text-center">
         <p className="text-muted">Cliente no encontrado</p>
-        <Link to="/admin/clientes" className="text-error hover:underline">
-          Volver a clientes
-        </Link>
       </div>
     )
   }
 
-  const handleEdit = (invoice: Invoice) => {
-    setEditingInvoice(invoice)
+  const handleSubmit = (values: ProjectFormValues) => {
+    if (!id) return
+
+    if (editingProject) {
+      updateProject.mutate({
+        id: editingProject.id,
+        data: {
+          name: values.name,
+          description: values.description || undefined,
+        },
+      })
+    } else {
+      createProject.mutate({
+        clientId: id,
+        name: values.name,
+        description: values.description || undefined,
+      })
+    }
+
+    resetForm()
+  }
+
+  const resetForm = () => {
+    setShowForm(false)
+    setEditingProject(null)
+    form.reset(defaultProjectValues)
+  }
+
+  const handleEdit = (project: Project, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setEditingProject(project)
     setShowForm(true)
   }
 
-  const generatePDF = async () => {
-    await generatePendingReport(pendingInvoices, client.name, totalPending)
+  const handleDelete = (projectId: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setDeleteConfirm(projectId)
   }
 
-  const generateComplementsPDF = async () => {
-    await generatePendingComplementsReport(paidInvoices, client.name, totalPaid)
+  const confirmDelete = () => {
+    if (deleteConfirm) {
+      deleteProject.mutate(deleteConfirm)
+      setDeleteConfirm(null)
+    }
   }
-
-  const generatePaymentHistoryPDF = async () => {
-    await generatePaymentHistoryReport(payments, clientInvoices, client.name)
-  }
-
-  const stats = [
-    {
-      label: 'Pendiente',
-      value: `$${fmtAmount(totalPending)}`,
-      textClass: 'text-warning',
-    },
-    {
-      label: 'Pagado',
-      value: `$${fmtAmount(totalPaid)}`,
-      textClass: 'text-success',
-    },
-    {
-      label: 'Total generado',
-      value: `$${fmtAmount(totalGenerated)}`,
-      textClass: 'text-foreground',
-    },
-    {
-      label: 'Facturas pendientes de pago',
-      value: pendingInvoices.length.toString(),
-      textClass: 'text-accent',
-    },
-  ]
 
   return (
     <div className="p-4 md:p-6">
       <BackHeader to="/admin/clientes" label="Volver a clientes" />
 
-      <div className="mb-6 flex items-center justify-between">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-foreground">{client.name}</h1>
-          <p className="text-muted">
+          <p className="text-sm text-muted">
             {client.email && <>{client.email} • </>}
             {client.phone}
           </p>
-          {client.billingInterval > 0 &&
-            (() => {
-              const nextDate = getNextBillingDate(clientInvoices, client.billingInterval)
-              if (!nextDate) return null
-              return (
-                <p className="text-sm mt-1 text-muted">
-                  Intervalo de facturación:{' '}
-                  <span className="font-medium">{client.billingInterval} días</span>
-                  {' — '}
-                  Próxima facturación: <span className="font-medium">{formatDate(nextDate)}</span>
-                </p>
-              )
-            })()}
         </div>
-        <div className="flex gap-1.5" />
+        <Button onClick={() => setShowForm(true)}>
+          <Plus size={18} />
+          <span className="hidden sm:inline ml-2">Agregar proyecto</span>
+        </Button>
       </div>
 
-      <StatsCards stats={stats} />
+      {showForm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="rounded-xl max-w-lg w-full bg-card">
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <h2 className="font-bold text-lg text-foreground">
+                {editingProject ? 'Editar proyecto' : 'Nuevo proyecto'}
+              </h2>
+              <button
+                onClick={resetForm}
+                className="p-2 hover:bg-card-hover rounded text-foreground"
+              >
+                <X size={20} />
+              </button>
+            </div>
 
-      {client.requiresPapeleria && (
-        <button
-          onClick={() => navigate(`/admin/clientes/${id}/requisitos`)}
-          className="w-full mb-6 p-4 rounded-xl border-2 border-dashed border-accent/40 bg-accent/5 hover:bg-accent/10 transition-colors flex items-center justify-center gap-3"
-        >
-          <ClipboardCheck size={24} className="text-accent" />
-          <div className="text-left">
-            <p className="font-semibold text-accent-text">Gestión de requisitos</p>
-            <p className="text-sm text-muted">Administrar papelería y documentos</p>
+            <Form form={form} onSubmit={handleSubmit} className="p-4">
+              <Input
+                label="Nombre del proyecto *"
+                placeholder="Ej: Transporte Q4 2026"
+                {...form.register('name')}
+                error={form.formState.errors.name?.message}
+              />
+
+              <Input label="Descripción" placeholder="Opcional" {...form.register('description')} />
+
+              <div className="flex gap-2 pt-2">
+                <Button type="submit" className="flex-1">
+                  {editingProject ? 'Guardar cambios' : 'Agregar proyecto'}
+                </Button>
+                <Button type="button" variant="secondary" onClick={resetForm}>
+                  Cancelar
+                </Button>
+              </div>
+            </Form>
           </div>
-        </button>
+        </div>
       )}
 
-      <PendingInvoicesTable
-        invoices={sort.sortedPendingInvoices}
-        payments={payments}
-        sortKey={sort.sortKey}
-        sortDir={sort.sortDir}
-        selectingMode={paymentsCtrl.selectingMode}
-        selectedInvoiceIds={paymentsCtrl.selectedInvoiceIds}
-        expandedDescId={expandedDescId}
-        totalPending={totalPending}
-        onToggleSort={sort.toggleSort}
-        onToggleSelect={paymentsCtrl.toggleSelectInvoice}
-        onSelectAll={paymentsCtrl.handleSelectAll}
-        onPayment={paymentsCtrl.openPaymentModal}
-        onEdit={handleEdit}
-        onPreview={previewInvoice}
-        onDelete={del.handleDelete}
-        onViewAttachment={setViewingAttachment}
-        onEditPayment={paymentsCtrl.openEditPayment}
-        onToggleExpandDesc={setExpandedDescId}
-        onGeneratePDF={generatePDF}
-        onAddInvoice={() => {
-          setEditingInvoice(null)
-          setShowForm(true)
-        }}
-      />
-
-      {paymentsCtrl.selectingMode && (
-        <SelectionBar
-          count={paymentsCtrl.selectedInvoiceIds.length}
-          totalAmount={paymentsCtrl.selectedInvoices.reduce(
-            (s, i) => s + (i.totalMxn || i.total),
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch">
+        {projects.map((project) => {
+          const projectInvoices = invoices.filter((i) => i.projectId === project.id)
+          const totalGenerated = projectInvoices.reduce(
+            (sum, i) => sum + (i.totalMxn || i.total),
             0,
-          )}
-          onCancel={paymentsCtrl.cancelSelection}
-          onContinue={paymentsCtrl.continueToPayment}
-        />
+          )
+          const totalPaid = projectInvoices
+            .filter((i) => i.status === 'pagado')
+            .reduce((sum, i) => sum + (i.totalMxn || i.total), 0)
+          const pending = totalGenerated - totalPaid
+          const pendingCount = projectInvoices.filter((i) => i.status === 'pendiente').length
+
+          return (
+            <div
+              key={project.id}
+              className="rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer flex flex-col h-full bg-card border border-border"
+              onClick={() => navigate(`/admin/clientes/${id}/proyectos/${project.id}`)}
+            >
+              <div className="flex-1">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-accent-muted">
+                    <FolderOpen className="text-accent" size={24} />
+                  </div>
+
+                  <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      onClick={(e) => handleEdit(project, e)}
+                      className="p-1.5 rounded transition-colors text-accent bg-accent-muted"
+                    >
+                      <Edit2 size={16} />
+                    </button>
+                    <button
+                      onClick={(e) => handleDelete(project.id, e)}
+                      className="p-1.5 rounded transition-colors text-error bg-error/10"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+
+                <h3 className="font-bold text-lg mb-1 text-foreground">{project.name}</h3>
+
+                {project.description && (
+                  <p className="text-sm text-muted mb-3">{project.description}</p>
+                )}
+
+                {pendingCount > 0 && (
+                  <div className="mb-3 px-3 py-2 rounded-lg text-center bg-accent-muted">
+                    <span className="font-bold text-accent-text">
+                      {pendingCount} factura{pendingCount > 1 ? 's' : ''} pendiente
+                      {pendingCount > 1 ? 's' : ''}
+                    </span>
+                  </div>
+                )}
+
+                <div className="border-t border-border pt-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-1 text-xs text-muted">
+                      <FileText size={14} />
+                      <span>
+                        {projectInvoices.length} factura{projectInvoices.length !== 1 ? 's' : ''}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs text-muted">
+                      <DollarSign size={14} />
+                      <span>${fmtAmount(totalGenerated)}</span>
+                    </div>
+                  </div>
+                  <div className="text-right mt-1">
+                    {pending > 0 ? (
+                      <span className="text-sm font-bold text-warning">
+                        ${fmtAmount(pending)} pendiente
+                      </span>
+                    ) : projectInvoices.length > 0 ? (
+                      <span className="text-sm font-bold text-success">Al día</span>
+                    ) : (
+                      <span className="text-sm text-muted">Sin facturas</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {projects.length === 0 && (
+        <div className="text-center py-12 text-muted">
+          <FolderOpen size={48} className="mx-auto mb-4 opacity-50" />
+          <p className="text-lg mb-2">No hay proyectos registrados</p>
+          <p className="text-sm">Crea un proyecto para organizar las facturas de este cliente</p>
+        </div>
       )}
 
-      <PaidInvoicesTable
-        paidInvoices={paidInvoices}
-        payments={payments}
-        totalPaid={totalPaid}
-        onPreview={previewInvoice}
-        onViewAttachment={setViewingAttachment}
-        onEditPayment={paymentsCtrl.openEditPayment}
-        onDelete={del.handleDelete}
-        onGenerateComplementsPDF={generateComplementsPDF}
-      />
-
-      <PaymentHistoryTable
-        payments={payments}
-        invoices={clientInvoices}
-        onViewAttachment={setViewingAttachment}
-        onEditPayment={(payment) => {
-          const inv = clientInvoices.find((i) => i.paymentId === payment.id)
-          if (inv) paymentsCtrl.openEditPayment(inv)
-        }}
-        onDelete={delPayment.handleDelete}
-        onGeneratePaymentHistoryPDF={generatePaymentHistoryPDF}
-      />
-
-      <InvoiceFormModal
-        open={showForm}
-        clientId={id || ''}
-        clientName={client.name}
-        editingInvoice={editingInvoice}
-        onSave={(data) => {
-          if (editingInvoice) {
-            updateInvoice.mutate({ id: editingInvoice.id, data })
-          } else {
-            createInvoice.mutate(data)
-          }
-        }}
-        onClose={() => {
-          setShowForm(false)
-          setEditingInvoice(null)
-        }}
-      />
-
-      <PaymentModal
-        open={paymentsCtrl.showPaymentModal && paymentsCtrl.selectedInvoiceIds.length > 0}
-        invoices={paymentsCtrl.selectedInvoices}
-        paymentData={paymentsCtrl.paymentData}
-        onPaymentDataChange={paymentsCtrl.setPaymentData}
-        onConfirm={paymentsCtrl.registerPayment}
-        onAddMore={paymentsCtrl.addMoreInvoices}
-        onClose={paymentsCtrl.closePaymentModal}
-      />
-
-      <EditPaymentModal
-        open={paymentsCtrl.showEditPayment}
-        payment={paymentsCtrl.editingPayment}
-        invoice={paymentsCtrl.editingPaymentInvoice}
-        linkedInvoices={paymentsCtrl.editingLinkedInvoices}
-        availableInvoices={paidInvoices.filter(
-          (inv) => !paymentsCtrl.editingLinkedInvoices.some((l) => l.id === inv.id),
-        )}
-        editData={paymentsCtrl.editPaymentData}
-        onEditDataChange={paymentsCtrl.setEditPaymentData}
-        onAddInvoice={paymentsCtrl.addInvoiceToEdit}
-        onRemoveInvoice={paymentsCtrl.removeInvoiceFromEdit}
-        onSave={paymentsCtrl.saveEditPayment}
-        onClose={paymentsCtrl.closeEditPayment}
-        showDeletePaymentConfirm={paymentsCtrl.showDeletePaymentConfirm}
-        onConfirmDeletePayment={paymentsCtrl.confirmDeleteOrphanPayment}
-        onCancelDeletePayment={paymentsCtrl.cancelDeleteOrphanPayment}
-      />
-
-      <InvoicePreviewModal url={invoicePreviewUrl} onClose={closePreview} />
-
-      <ViewAttachmentModal
-        attachment={viewingAttachment}
-        onClose={() => setViewingAttachment(null)}
-      />
-
       <ConfirmModal
-        open={del.deleteModal.open}
-        title="Eliminar viaje/factura"
-        message="¿Estás seguro de que deseas eliminar este registro? Esta acción no se puede revertir."
+        open={deleteConfirm !== null}
+        title="Eliminar proyecto"
+        message="¿Estás seguro de que deseas eliminar este proyecto? Las facturas asociadas no se eliminarán, pero perderán la referencia al proyecto."
         confirmLabel="Eliminar"
         cancelLabel="Cancelar"
-        onConfirm={del.confirmDelete}
-        onCancel={del.cancelDelete}
-        danger={true}
-      />
-      <ConfirmModal
-        open={delPayment.deleteModal.open}
-        title="Eliminar pago"
-        message="¿Estás seguro de que deseas eliminar este pago? Esta acción no se puede revertir."
-        confirmLabel="Eliminar"
-        cancelLabel="Cancelar"
-        onConfirm={delPayment.confirmDelete}
-        onCancel={delPayment.cancelDelete}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteConfirm(null)}
         danger={true}
       />
     </div>
