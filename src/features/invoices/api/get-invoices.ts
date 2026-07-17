@@ -13,6 +13,7 @@ export const invoiceSchema = z.object({
   id: z.string(),
   clientId: z.string(),
   clientName: z.string(),
+  projectId: z.string().optional().nullable(),
   period: z.string().optional(),
   total: z.number(),
   status: invoiceStatusSchema,
@@ -43,6 +44,7 @@ const rowToInvoice = (row: InvoiceRow, clientName: string): Invoice => ({
   id: row.id,
   clientId: row.client_id || '',
   clientName,
+  projectId: row.project_id || null,
   period: row.period || '',
   total: row.total || 0,
   status: row.status as 'pendiente' | 'pagado',
@@ -104,6 +106,16 @@ export const useInvoicesByClient = (clientId?: string) =>
     enabled: !!clientId,
   })
 
+export const useInvoicesByProject = (projectId?: string) =>
+  useQuery({
+    queryKey: ['invoices', { projectId }],
+    queryFn: async () => {
+      const all = await getInvoices()
+      return all.filter((i) => i.projectId === projectId)
+    },
+    enabled: !!projectId,
+  })
+
 export type CreateInvoiceInput = Omit<Invoice, 'id' | 'clientName'>
 
 export const createInvoice = async (input: CreateInvoiceInput): Promise<Invoice> => {
@@ -111,6 +123,7 @@ export const createInvoice = async (input: CreateInvoiceInput): Promise<Invoice>
     .from('invoices')
     .insert({
       client_id: input.clientId,
+      project_id: input.projectId || null,
       total: input.total,
       status: input.status,
       created_at: input.createdAt,
@@ -153,6 +166,7 @@ export const updateInvoice = async (id: string, invoice: Partial<Invoice>): Prom
     .from('invoices')
     .update({
       client_id: invoice.clientId,
+      project_id: invoice.projectId || null,
       total: invoice.total,
       status: invoice.status,
       payment_date: invoice.paymentDate,

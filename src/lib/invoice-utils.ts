@@ -17,6 +17,7 @@ export interface InvoiceFormData {
   id: string
   clientId: string
   clientName: string
+  projectId?: string | null
   total: number
   status: 'pendiente' | 'pagado'
   createdAt: string
@@ -36,11 +37,13 @@ export function buildInvoiceData(
   clientName: string,
   editingInvoice?: Invoice | null,
   xmlPath?: string,
+  projectId?: string | null,
 ): InvoiceFormData {
   return {
     id: editingInvoice?.id || Date.now().toString(),
     clientId,
     clientName,
+    projectId: projectId || editingInvoice?.projectId || null,
     total: formData.total_mxn ? parseFloat(formData.total_mxn) : 0,
     status: formData.status || 'pendiente',
     createdAt: editingInvoice?.createdAt || new Date().toISOString(),

@@ -2,6 +2,7 @@ export {
   invoiceSchema,
   useInvoices,
   useInvoicesByClient,
+  useInvoicesByProject,
   useCreateInvoice,
   useUpdateInvoice,
   useDeleteInvoice,
