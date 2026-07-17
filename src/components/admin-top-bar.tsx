@@ -10,7 +10,11 @@ export default function AdminTopBar({ onMenuClick }: { onMenuClick: () => void }
       <button onClick={onMenuClick} className="text-admin-foreground">
         <Menu size={24} />
       </button>
-      <span className="font-bold text-lg tracking-wide text-admin-accent">SERVITUR</span>
+      <img
+        src={`${import.meta.env.BASE_URL}serviture_letter_v2.svg`}
+        alt="SERVITUR"
+        className="h-6 w-auto"
+      />
       <div className="w-6" />
     </nav>
   )
