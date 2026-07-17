@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { Upload } from 'lucide-react'
 import type { Invoice } from '@/features/invoices/api'
 import type { Client } from '@/features/clients/api'
+import type { Project } from '@/features/projects/api'
 import { parseCFDIFromText, uploadXML } from '@/lib/xml-parser'
 import { buildInvoiceData, type InvoiceFormData } from '@/lib/invoice-utils'
 import { useStore } from '@/store/use-store'
@@ -20,6 +21,8 @@ interface InvoiceFormModalProps {
   clientId?: string
   clientName?: string
   clients?: Client[]
+  projects?: Project[]
+  selectedProjectId?: string
   editingInvoice?: Invoice | null
   onSave: (data: InvoiceFormData) => void
   onClose: () => void
@@ -52,6 +55,8 @@ export default function InvoiceFormModal({
   clientId: propClientId = '',
   clientName: propClientName = '',
   clients,
+  projects = [],
+  selectedProjectId: propSelectedProjectId = '',
   editingInvoice,
   onSave,
   onClose,
@@ -60,6 +65,7 @@ export default function InvoiceFormModal({
   const [xmlFile, setXmlFile] = useState<File | null>(null)
   const [localClientId, setLocalClientId] = useState(propClientId)
   const [localClientName, setLocalClientName] = useState(propClientName)
+  const [localProjectId, setLocalProjectId] = useState(propSelectedProjectId)
 
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceFormSchema),
@@ -71,6 +77,7 @@ export default function InvoiceFormModal({
       setXmlFile(null)
       setLocalClientId(propClientId)
       setLocalClientName(propClientName)
+      setLocalProjectId(editingInvoice?.projectId || propSelectedProjectId)
       form.reset({
         status: editingInvoice?.status || 'pendiente',
         serieFolio: editingInvoice?.serieFolio || '',
@@ -81,7 +88,7 @@ export default function InvoiceFormModal({
         certificationDate: editingInvoice?.certificationDate?.split('T')[0] || '',
       })
     }
-  }, [open, propClientId, propClientName, editingInvoice, form])
+  }, [open, propClientId, propClientName, propSelectedProjectId, editingInvoice, form])
 
   const handleClientChange = (id: string) => {
     setLocalClientId(id)
@@ -156,6 +163,7 @@ export default function InvoiceFormModal({
       localClientName,
       editingInvoice,
       xmlPath,
+      localProjectId,
     )
 
     onSave(invoiceData)
@@ -208,6 +216,22 @@ export default function InvoiceFormModal({
             {clients.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
+              </option>
+            ))}
+          </Select>
+        )}
+
+        {projects.length > 0 && (
+          <Select
+            label="Proyecto"
+            value={localProjectId}
+            onChange={(e) => setLocalProjectId(e.target.value)}
+            placeholder="Sin proyecto"
+          >
+            <option value="">Sin proyecto</option>
+            {projects.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
               </option>
             ))}
           </Select>
