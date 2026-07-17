@@ -5,7 +5,7 @@ type ServiturLetterProps = {
   className?: string
 }
 
-export default function ServiturLetter({ size = 'h-6', className = '' }: ServiturLetterProps) {
+export default function ServiturLetter({ size = 'h-2', className = '' }: ServiturLetterProps) {
   const { theme } = useTheme()
   const src =
     theme === 'dark'
@@ -13,6 +13,6 @@ export default function ServiturLetter({ size = 'h-6', className = '' }: Servitu
       : `${import.meta.env.BASE_URL}serviture_letter.svg`
 
   return (
-    <img src={src} alt="SERVITUR" className={`${size} ${className}`} style={{ height: 'auto' }} />
+    <img src={src} alt="SERVITUR" className={`${size} ${className}`} style={{ height: '2rem' }} />
   )
 }
