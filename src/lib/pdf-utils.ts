@@ -22,11 +22,11 @@ export const setupPDFHeader = async (doc: jsPDF, titulo: string, clientName: str
   const logo = await svgToPng(`${import.meta.env.BASE_URL}serviturlogo.png`)
   doc.addImage(logo, 'PNG', 14, 8, 35, 29)
 
-  doc.setFontSize(22)
-  doc.setTextColor(13, 28, 47)
-  const s1 = 'SERVITURE'
-  doc.setFont('helvetica', 'bold')
-  doc.text(s1, (210 - doc.getTextWidth(s1)) / 2, 16)
+  const letter = await svgToPng(`${import.meta.env.BASE_URL}letter_soft.png`)
+  const letterAspect = 729 / 160
+  const letterHeight = 8
+  const letterWidth = letterHeight * letterAspect
+  doc.addImage(letter, 'PNG', (210 - letterWidth) / 2, 8, letterWidth, letterHeight)
 
   doc.setFontSize(20)
   doc.setTextColor(100)
