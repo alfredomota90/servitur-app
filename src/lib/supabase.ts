@@ -111,6 +111,7 @@ export type Database = {
         Row: {
           id: string
           client_id: string | null
+          project_id: string | null
           period: string
           total: number
           status: string
@@ -137,6 +138,7 @@ export type Database = {
         Insert: {
           id?: string
           client_id?: string | null
+          project_id?: string | null
           period: string
           total: number
           status?: string
@@ -162,6 +164,7 @@ export type Database = {
         Update: {
           id?: string
           client_id?: string | null
+          project_id?: string | null
           period?: string
           total?: number
           status?: string
@@ -352,6 +355,28 @@ export type Database = {
           file_url?: string | null
           notes?: string | null
           expiry_date?: string | null
+        }
+      }
+      projects: {
+        Row: {
+          id: string
+          client_id: string
+          name: string
+          description: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          client_id: string
+          name: string
+          description?: string | null
+        }
+        Update: {
+          id?: string
+          client_id?: string
+          name?: string
+          description?: string | null
         }
       }
       client_item_overrides: {
