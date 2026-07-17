@@ -75,8 +75,8 @@ export function sortInvoices(invoices: Invoice[], sortKey: SortKey, sortDir: Sor
         bVal = b.tripDate || b.certificationDate || b.createdAt || ''
         break
       case 'description':
-        aVal = a.invoiceDescription || a.period || ''
-        bVal = b.invoiceDescription || b.period || ''
+        aVal = a.invoiceDescription || ''
+        bVal = b.invoiceDescription || ''
         break
       case 'total':
         aVal = a.totalMxn || a.total || 0
