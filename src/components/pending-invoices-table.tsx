@@ -87,14 +87,14 @@ export default function PendingInvoicesTable({
             className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 rounded-full sm:rounded-lg bg-accent text-background hover:opacity-90 disabled:opacity-50 transition-colors text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_1px_2px_rgba(0,0,0,0.1)]"
           >
             <Download size={16} />
-            <span className="hidden sm:inline">Estado de Cuenta</span>
+            <span className="hidden bp:inline">Estado de Cuenta</span>
           </button>
           <button
             onClick={onAddInvoice}
             className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 rounded-full sm:rounded-lg bg-success text-white hover:opacity-90 transition-colors text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_1px_2px_rgba(0,0,0,0.1)]"
           >
             <Plus size={16} />
-            <span className="hidden sm:inline">Agregar</span>
+            <span className="hidden bp:inline">Agregar</span>
           </button>
         </div>
       </div>

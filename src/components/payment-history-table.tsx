@@ -48,7 +48,7 @@ export default function PaymentHistoryTable({
           className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 rounded-full sm:rounded-lg bg-accent text-background hover:opacity-90 disabled:opacity-50 transition-colors text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_1px_2px_rgba(0,0,0,0.1)]"
         >
           <Download size={16} />
-          <span className="hidden sm:inline">Historial de pagos</span>
+          <span className="hidden bp:inline">Historial de pagos</span>
         </button>
       </div>
       <div className="overflow-x-auto [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-track]:bg-transparent">

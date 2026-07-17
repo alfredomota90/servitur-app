@@ -147,7 +147,7 @@ export default function ClientsAdmin() {
         </div>
         <Button onClick={() => setShowForm(true)}>
           <Plus size={18} />
-          <span className="hidden sm:inline ml-2">Agregar</span>
+          <span className="hidden bp:inline ml-2">Agregar</span>
         </Button>
       </div>
 
