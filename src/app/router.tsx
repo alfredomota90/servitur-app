@@ -3,17 +3,17 @@ import { Routes, Route } from 'react-router-dom'
 import { ErrorElement } from '@/app/routes/error-element'
 import ProtectedRoute from '@/components/protected-route'
 
-const Landing = lazy(() => import('@/pages/landing'))
-const Services = lazy(() => import('@/pages/services'))
-const Contact = lazy(() => import('@/pages/contact'))
-const Admin = lazy(() => import('@/pages/admin'))
-const Dashboard = lazy(() => import('@/pages/admin/dashboard'))
-const Trips = lazy(() => import('@/pages/admin/trips'))
-const ClientsAdmin = lazy(() => import('@/pages/admin/clients-admin'))
-const ClientDetail = lazy(() => import('@/pages/admin/client-detail'))
-const ProjectDetail = lazy(() => import('@/pages/admin/project-detail'))
-const RequirementsPage = lazy(() => import('@/pages/admin/requirements-page'))
-const Login = lazy(() => import('@/pages/admin/login'))
+const Landing = lazy(() => import('@/app/routes/landing/landing-page'))
+const Services = lazy(() => import('@/app/routes/landing/services-page'))
+const Contact = lazy(() => import('@/app/routes/landing/contact-page'))
+const Login = lazy(() => import('@/app/routes/auth/login-page'))
+const Admin = lazy(() => import('@/app/routes/app/admin-layout'))
+const Dashboard = lazy(() => import('@/app/routes/app/dashboard-page'))
+const Trips = lazy(() => import('@/app/routes/app/trips-page'))
+const ClientsAdmin = lazy(() => import('@/app/routes/app/clientes/clients-admin-page'))
+const ClientDetail = lazy(() => import('@/app/routes/app/clientes/client-detail-page'))
+const ProjectDetail = lazy(() => import('@/app/routes/app/clientes/project-detail-page'))
+const RequirementsPage = lazy(() => import('@/app/routes/app/clientes/requirements-page'))
 
 function PageFallback() {
   return (
