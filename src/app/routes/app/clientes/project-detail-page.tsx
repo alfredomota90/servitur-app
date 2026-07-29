@@ -1,4 +1,4 @@
-import { ClipboardCheck, FileText } from 'lucide-react'
+import { ClipboardCheck } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
@@ -13,7 +13,6 @@ import PaymentModal from '@/components/payment-modal'
 import PendingInvoicesTable from '@/components/pending-invoices-table'
 import SelectionBar from '@/components/selection-bar'
 import StatsCards from '@/components/stats-cards'
-import { Button } from '@/components/ui/button'
 import ViewAttachmentModal from '@/components/view-attachment-modal'
 import { useClients } from '@/features/clients/api'
 import type { Invoice } from '@/features/invoices/api'
@@ -205,14 +204,7 @@ export default function ProjectDetail() {
               {project.description && <> — {project.description}</>}
             </p>
           </div>
-          <div className="flex gap-1.5">
-            <Link to={`/admin/clientes/${clientId}/requisitos`}>
-              <Button size="sm" variant="secondary">
-                <FileText size={16} />
-                <span className="ml-1">Requisitos</span>
-              </Button>
-            </Link>
-          </div>
+          <div className="flex gap-1.5" />
         </div>
 
         <StatsCards stats={stats} />
