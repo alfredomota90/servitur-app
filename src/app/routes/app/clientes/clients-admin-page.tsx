@@ -140,7 +140,7 @@ export default function ClientsAdmin() {
 
   return (
     <>
-      <BackHeader />
+      <BackHeader to="/admin" label="Volver al dashboard" />
       <div className="p-4 md:p-6">
         <div className="flex items-center justify-between mb-6">
           <div>

@@ -10,7 +10,6 @@ import {
   YAxis,
 } from 'recharts'
 
-import BackHeader from '@/components/back-header'
 import { useClients } from '@/features/clients/api'
 import { useInvoices } from '@/features/invoices/api'
 import { fmtDate } from '@/lib/utils'
@@ -174,7 +173,6 @@ export default function Dashboard() {
 
   return (
     <>
-      <BackHeader />
       <div className="p-4 md:p-6">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
