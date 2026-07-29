@@ -1,18 +1,8 @@
-import {
-  ArrowLeft,
-  Ban,
-  Edit2,
-  Eye,
-  FileText,
-  Plus,
-  Trash2,
-  Truck,
-  Upload,
-  User,
-} from 'lucide-react'
+import { Ban, Edit2, Eye, FileText, Plus, Trash2, Truck, Upload, User } from 'lucide-react'
 import { useState } from 'react'
-import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 
+import BackHeader from '@/components/back-header'
 import ConfirmModal from '@/components/confirm-modal'
 import { Button } from '@/components/ui/button'
 import { Modal } from '@/components/ui/modal'
@@ -225,15 +215,12 @@ export default function RequirementsPage() {
 
   return (
     <div className="p-4 md:p-6">
-      <Link
+      <BackHeader
         to={
           fromProject ? `/admin/clientes/${id}/proyectos/${fromProject}` : `/admin/clientes/${id}`
         }
-        className="flex items-center gap-2 mb-4 text-muted hover:text-foreground"
-      >
-        <ArrowLeft size={20} />
-        Volver{fromProject ? ' al proyecto' : ` a ${client.name}`}
-      </Link>
+        label={fromProject ? 'Volver al proyecto' : `Volver a ${client.name}`}
+      />
 
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-foreground">Requisitos - {client.name}</h1>
