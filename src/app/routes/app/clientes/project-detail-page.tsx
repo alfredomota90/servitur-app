@@ -1,4 +1,4 @@
-import { FileText } from 'lucide-react'
+import { ClipboardCheck, FileText } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
@@ -216,6 +216,19 @@ export default function ProjectDetail() {
         </div>
 
         <StatsCards stats={stats} />
+
+        {client.requiresPapeleria && (
+          <Link
+            to={`/admin/clientes/${clientId}/requisitos`}
+            className="w-full mb-6 p-4 rounded-xl border-2 border-dashed border-accent/40 bg-accent/5 hover:bg-accent/10 transition-colors flex items-center justify-center gap-3"
+          >
+            <ClipboardCheck size={24} className="text-accent" />
+            <div className="text-left">
+              <p className="font-semibold text-accent-text">Gestión de requisitos</p>
+              <p className="text-sm text-muted">Administrar papelería y documentos</p>
+            </div>
+          </Link>
+        )}
 
         <PendingInvoicesTable
           invoices={sort.sortedPendingInvoices}
