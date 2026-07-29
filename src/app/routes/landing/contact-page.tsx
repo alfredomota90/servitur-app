@@ -1,0 +1,225 @@
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { Phone, Mail, MapPin, CheckCircle } from 'lucide-react'
+import BackHeader from '@/components/back-header'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/input/textarea'
+import { Select } from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
+import { Form } from '@/components/ui/form'
+
+const contactSchema = z.object({
+  name: z.string().min(1, 'El nombre es requerido'),
+  email: z.string().email('Ingresa un email válido'),
+  phone: z.string().min(1, 'El teléfono es requerido'),
+  company: z.string().optional(),
+  origin: z.string().min(1, 'El origen es requerido'),
+  destination: z.string().min(1, 'El destino es requerido'),
+  passengers: z.string(),
+  tripType: z.string(),
+  message: z.string().optional(),
+})
+
+type ContactFormValues = z.infer<typeof contactSchema>
+
+const defaultValues: ContactFormValues = {
+  name: '',
+  email: '',
+  phone: '',
+  company: '',
+  origin: '',
+  destination: '',
+  passengers: '1-10',
+  tripType: 'one-way',
+  message: '',
+}
+
+export default function Contact() {
+  const [isSubmitted, setIsSubmitted] = useState(false)
+
+  const form = useForm<ContactFormValues>({
+    resolver: zodResolver(contactSchema),
+    defaultValues,
+  })
+
+  const handleSubmit = async (_values: ContactFormValues) => {
+    await new Promise((resolve) => setTimeout(resolve, 1500))
+    setIsSubmitted(true)
+  }
+
+  if (isSubmitted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+        <div className="rounded-2xl p-8 max-w-md w-full text-center shadow-sm bg-card">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-success/15">
+            <CheckCircle className="text-success" size={32} />
+          </div>
+          <h2 className="text-2xl font-bold mb-2 text-foreground">¡Mensaje enviado!</h2>
+          <p className="mb-6 text-muted">
+            Gracias por contactarnos. Nos pondremos en contacto contigo en breve para darte tu
+            cotización.
+          </p>
+          <Link to="/" className="font-medium hover:underline text-accent">
+            ← Volver al inicio
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="pb-20 md:pb-0 min-h-screen">
+      <BackHeader />
+
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <h1 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
+          Contacto & Cotización
+        </h1>
+        <p className="mb-10 max-w-2xl text-muted">
+          ¿Necesitas cotización para un viaje? Completa el formulario y te contactaremos.
+        </p>
+
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="space-y-6">
+            <div className="rounded-xl p-6 shadow-sm border bg-card border-border">
+              <h3 className="font-bold mb-4 text-foreground">Información de contacto</h3>
+
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-accent-muted">
+                    <Phone className="text-accent" size={20} />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted">Teléfono</p>
+                    <p className="font-medium text-foreground">618 123 4567</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-accent-muted">
+                    <Mail className="text-accent" size={20} />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted">Email</p>
+                    <p className="font-medium text-foreground">servitur@transporte.com</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-accent-muted">
+                    <MapPin className="text-accent" size={20} />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted">Ubicación</p>
+                    <p className="font-medium text-foreground">Durango, Durango, México</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-xl p-6 text-background bg-gradient-to-br from-accent to-accent-hover">
+              <h3 className="font-bold text-lg mb-2">¿Por qué cotizar con nosotros?</h3>
+              <ul className="space-y-2 text-sm opacity-90">
+                <li>✓ Respuesta rápida</li>
+                <li>✓ Precios competitivos</li>
+                <li>✓ Unidades en excelente estado</li>
+                <li>✓ Choferes profesionales</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="rounded-xl p-6 shadow-sm border bg-card border-border">
+            <Form form={form} onSubmit={handleSubmit}>
+              <div className="grid md:grid-cols-2 gap-4">
+                <Input
+                  label="Nombre *"
+                  placeholder="Tu nombre"
+                  error={form.formState.errors.name?.message}
+                  {...form.register('name')}
+                />
+                <Input
+                  label="Email *"
+                  type="email"
+                  placeholder="tu@email.com"
+                  error={form.formState.errors.email?.message}
+                  {...form.register('email')}
+                />
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <Input
+                  label="Teléfono *"
+                  type="tel"
+                  placeholder="618 123 4567"
+                  error={form.formState.errors.phone?.message}
+                  {...form.register('phone')}
+                />
+                <Input
+                  label="Empresa (opcional)"
+                  placeholder="Nombre de tu empresa"
+                  {...form.register('company')}
+                />
+              </div>
+
+              <div className="border-t border-border pt-4">
+                <h4 className="font-medium mb-4 text-foreground">Detalles del viaje</h4>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <Input
+                    label="Origen *"
+                    placeholder="Ciudad de origen"
+                    error={form.formState.errors.origin?.message}
+                    {...form.register('origin')}
+                  />
+                  <Input
+                    label="Destino *"
+                    placeholder="Ciudad de destino"
+                    error={form.formState.errors.destination?.message}
+                    {...form.register('destination')}
+                  />
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4 mt-4">
+                  <Select
+                    label="Pasajeros"
+                    error={form.formState.errors.passengers?.message}
+                    {...form.register('passengers')}
+                  >
+                    <option value="1-10">1-10 pasajeros</option>
+                    <option value="11-20">11-20 pasajeros</option>
+                    <option value="21-30">21-30 pasajeros</option>
+                    <option value="30+">Más de 30</option>
+                  </Select>
+
+                  <Select
+                    label="Tipo de viaje"
+                    error={form.formState.errors.tripType?.message}
+                    {...form.register('tripType')}
+                  >
+                    <option value="one-way">Solo ida</option>
+                    <option value="round-trip">Ida y vuelta</option>
+                    <option value="recurring">Recurrente</option>
+                  </Select>
+                </div>
+              </div>
+
+              <Textarea
+                label="Mensaje adicional"
+                rows={3}
+                placeholder="Comentarios adicionales sobre tu viaje..."
+                {...form.register('message')}
+              />
+
+              <Button type="submit" className="w-full" isLoading={form.formState.isSubmitting}>
+                Solicitar Cotización
+              </Button>
+            </Form>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

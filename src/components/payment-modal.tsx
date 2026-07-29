@@ -1,24 +1,41 @@
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import type { Invoice } from '@/features/invoices/api'
 import { Modal } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Form } from '@/components/ui/form'
 import { fmtAmount } from '@/lib/utils'
 import PaymentMethodSelector from '@/components/payment-method-selector'
 import AttachmentField from '@/components/attachment-field'
 
+const paymentMethodEnum = z.enum(['transferencia', 'efectivo', 'cheque'])
+
+const paymentSchema = z.object({
+  method: paymentMethodEnum,
+  reference: z.string(),
+  attachment: z.string(),
+  attachmentName: z.string(),
+  date: z.string().min(1, 'La fecha es requerida'),
+})
+
+export type PaymentFormValues = z.infer<typeof paymentSchema>
+
+export const defaultPaymentValues: PaymentFormValues = {
+  method: 'transferencia',
+  reference: '',
+  attachment: '',
+  attachmentName: '',
+  date: new Date().toISOString().split('T')[0],
+}
+
 interface PaymentModalProps {
   open: boolean
   invoices: Invoice[]
-  paymentData: {
-    method: Invoice['paymentMethod']
-    reference: string
-    notes: string
-    attachment: string
-    attachmentName: string
-    date: string
-  }
-  onPaymentDataChange: (data: PaymentModalProps['paymentData']) => void
-  onConfirm: () => void
+  defaultValues?: PaymentFormValues
+  onConfirm: (data: PaymentFormValues) => void
   onAddMore: () => void
   onClose: () => void
 }
@@ -26,24 +43,31 @@ interface PaymentModalProps {
 export default function PaymentModal({
   open,
   invoices,
-  paymentData,
-  onPaymentDataChange,
+  defaultValues: externalDefaults,
   onConfirm,
   onAddMore,
   onClose,
 }: PaymentModalProps) {
   const totalAmount = invoices.reduce((sum, inv) => sum + (inv.totalMxn || inv.total), 0)
 
+  const form = useForm<PaymentFormValues>({
+    resolver: zodResolver(paymentSchema),
+    defaultValues: externalDefaults || defaultPaymentValues,
+  })
+
+  useEffect(() => {
+    if (open && externalDefaults) {
+      form.reset(externalDefaults)
+    }
+  }, [open, externalDefaults, form])
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
       const reader = new FileReader()
       reader.onloadend = () => {
-        onPaymentDataChange({
-          ...paymentData,
-          attachment: reader.result as string,
-          attachmentName: file.name,
-        })
+        form.setValue('attachment', reader.result as string)
+        form.setValue('attachmentName', file.name)
       }
       reader.readAsDataURL(file)
     }
@@ -51,75 +75,63 @@ export default function PaymentModal({
 
   return (
     <Modal open={open} title="Registrar pago" onClose={onClose}>
-      <div className="p-4 space-y-4">
-        <div className="p-3 rounded-lg space-y-2 bg-background-secondary">
-          <p className="text-sm font-medium text-foreground">Facturas ({invoices.length})</p>
-          {invoices.map((inv) => (
-            <div key={inv.id} className="flex items-center justify-between">
-              <span className="text-muted">{inv.serieFolio || '—'}</span>
-              <span className="font-medium text-foreground">
-                ${fmtAmount(inv.totalMxn || inv.total)}
-              </span>
+      <Form form={form} onSubmit={onConfirm}>
+        <div className="p-4 space-y-4">
+          <div className="p-3 rounded-lg space-y-2 bg-background-secondary">
+            <p className="text-sm font-medium text-foreground">Facturas ({invoices.length})</p>
+            {invoices.map((inv) => (
+              <div key={inv.id} className="flex items-center justify-between">
+                <span className="text-muted">{inv.serieFolio || '—'}</span>
+                <span className="font-medium text-foreground">
+                  ${fmtAmount(inv.totalMxn || inv.total)}
+                </span>
+              </div>
+            ))}
+            <div className="border-t border-border pt-2 flex items-center justify-between font-bold">
+              <span className="text-foreground">Total</span>
+              <span className="text-success">${fmtAmount(totalAmount)}</span>
             </div>
-          ))}
-          <div className="border-t border-border pt-2 flex items-center justify-between font-bold">
-            <span className="text-foreground">Total</span>
-            <span className="text-success">${fmtAmount(totalAmount)}</span>
+          </div>
+
+          <Input
+            label="Fecha de pago"
+            type="date"
+            error={form.formState.errors.date?.message}
+            {...form.register('date')}
+          />
+
+          <PaymentMethodSelector
+            value={form.watch('method')}
+            onChange={(method) => form.setValue('method', method || 'transferencia')}
+          />
+
+          <Input
+            label="Referencia"
+            type="text"
+            placeholder="Número de transacción"
+            {...form.register('reference')}
+          />
+
+          <AttachmentField
+            value={form.watch('attachment')}
+            fileName={form.watch('attachmentName')}
+            onChange={handleFileChange}
+            onClear={() => {
+              form.setValue('attachment', '')
+              form.setValue('attachmentName', '')
+            }}
+          />
+
+          <div className="flex gap-2 pt-2">
+            <Button type="button" variant="secondary" onClick={onAddMore}>
+              + Agregar más facturas
+            </Button>
+            <Button type="submit" variant="primary" className="flex-1">
+              Confirmar pago
+            </Button>
           </div>
         </div>
-
-        <Input
-          label="Fecha de pago"
-          type="date"
-          value={paymentData.date}
-          onChange={(e) =>
-            onPaymentDataChange({
-              ...paymentData,
-              date: (e as React.ChangeEvent<HTMLInputElement>).target.value,
-            })
-          }
-        />
-
-        <PaymentMethodSelector
-          value={paymentData.method}
-          onChange={(method) => onPaymentDataChange({ ...paymentData, method })}
-        />
-
-        <Input
-          label="Referencia"
-          type="text"
-          value={paymentData.reference}
-          onChange={(e) =>
-            onPaymentDataChange({
-              ...paymentData,
-              reference: (e as React.ChangeEvent<HTMLInputElement>).target.value,
-            })
-          }
-          placeholder="Número de transacción"
-        />
-
-        <AttachmentField
-          value={paymentData.attachment}
-          fileName={paymentData.attachmentName}
-          onChange={handleFileChange}
-          onClear={() =>
-            onPaymentDataChange({
-              ...paymentData,
-              attachment: '',
-              attachmentName: '',
-            })
-          }
-        />
-
-        <div className="flex gap-2 pt-2">
-          <Button type="button" variant="secondary" onClick={onAddMore}>
-            + Agregar más facturas
-          </Button>
-          <Button type="button" variant="primary" className="flex-1" onClick={onConfirm}>
-            Confirmar pago
-          </Button>
-        </div>
-      </div>
+      </Form>
     </Modal>
   )
 }
