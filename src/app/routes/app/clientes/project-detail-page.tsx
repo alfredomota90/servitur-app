@@ -194,7 +194,7 @@ export default function ProjectDetail() {
 
   return (
     <>
-      <BackHeader to={`/admin/clientes/${clientId}`} label="Volver a proyectos" />
+      <BackHeader to={`/admin/clientes/${clientId}`} label={`Volver a ${client.name}`} />
       <div className="p-4 md:p-6">
         <div className="mb-6 flex items-center justify-between">
           <div>
