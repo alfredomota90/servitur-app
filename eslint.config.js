@@ -4,6 +4,7 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import eslintConfigPrettier from 'eslint-config-prettier'
 import globals from 'globals'
+import simpleImportSort from 'eslint-plugin-simple-import-sort'
 
 export default tseslint.config(
   { ignores: ['dist'] },
@@ -11,7 +12,11 @@ export default tseslint.config(
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],
     languageOptions: { ecmaVersion: 2020, globals: globals.browser },
-    plugins: { 'react-hooks': reactHooks, 'react-refresh': reactRefresh },
+    plugins: {
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
+      'simple-import-sort': simpleImportSort,
+    },
     rules: {
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
@@ -29,6 +34,21 @@ export default tseslint.config(
       curly: 'error',
       'no-var': 'error',
       eqeqeq: ['error', 'always'],
+
+      'simple-import-sort/imports': [
+        'error',
+        {
+          groups: [
+            ['^\\u0000'],
+            ['^node:'],
+            ['^@?\\w'],
+            ['^@/'],
+            ['^\\.\\.'],
+            ['^\\.'],
+          ],
+        },
+      ],
+      'simple-import-sort/exports': 'error',
     },
   },
   eslintConfigPrettier,

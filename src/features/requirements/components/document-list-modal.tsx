@@ -1,8 +1,9 @@
-import { Modal } from '@/components/ui/modal'
-import { Button } from '@/components/ui/button'
 import { ExternalLink, Trash2 } from 'lucide-react'
-import { fmtDate } from '@/lib/utils'
+
+import { Button } from '@/components/ui/button'
+import { Modal } from '@/components/ui/modal'
 import type { Document } from '@/features/requirements/api'
+import { fmtDate } from '@/lib/utils'
 
 function getExpiryStatus(expiryDate: string | null | undefined): {
   label: string

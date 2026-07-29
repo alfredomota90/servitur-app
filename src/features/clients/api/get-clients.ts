@@ -1,7 +1,8 @@
+import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { z } from 'zod'
-import { queryOptions, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { supabase } from '@/lib/supabase'
+
 import type { Database } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 
 type ClientRow = Database['public']['Tables']['clients']['Row']
 

@@ -1,5 +1,5 @@
+import { Bus, ChevronRight, MapPin } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { Bus, MapPin, ChevronRight } from 'lucide-react'
 
 export function ServicesPreview() {
   return (

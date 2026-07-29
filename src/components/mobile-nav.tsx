@@ -1,5 +1,5 @@
+import { Car, Home, Phone, Settings } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
-import { Home, Settings, Phone, Car } from 'lucide-react'
 
 const navItems = [
   { path: '/', icon: Home, label: 'Inicio' },

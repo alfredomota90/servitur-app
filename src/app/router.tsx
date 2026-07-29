@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
+
 import { ErrorElement } from '@/app/routes/error-element'
 import ProtectedRoute from '@/components/protected-route'
 

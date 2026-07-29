@@ -1,5 +1,6 @@
+import { AlertCircle, CheckCircle, Info, X } from 'lucide-react'
+
 import { useStore } from '@/store/use-store'
-import { X, CheckCircle, AlertCircle, Info } from 'lucide-react'
 
 const iconMap = {
   success: CheckCircle,

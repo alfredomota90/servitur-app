@@ -1,5 +1,6 @@
-import { supabase } from '@/lib/supabase'
 import { jsPDF } from 'jspdf'
+
+import { supabase } from '@/lib/supabase'
 import { fmtDate } from '@/lib/utils'
 
 export interface ConceptoDetalle {

@@ -1,5 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+
 import { supabase } from '@/lib/supabase'
+
 import type { Project } from './get-projects'
 
 export const updateProject = async (id: string, project: Partial<Project>): Promise<void> => {

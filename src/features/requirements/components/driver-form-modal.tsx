@@ -1,10 +1,11 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Modal } from '@/components/ui/modal'
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Modal } from '@/components/ui/modal'
 import type { Driver } from '@/features/requirements/api'
 
 const driverFormSchema = z.object({

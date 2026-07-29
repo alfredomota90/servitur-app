@@ -1,23 +1,24 @@
-import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { DollarSign, Edit2, FileText, FolderOpen, Plus, Trash2, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { useNavigate, useParams } from 'react-router-dom'
 import { z } from 'zod'
-import { useClients } from '@/features/clients/api'
-import {
-  useProjectsByClient,
-  useCreateProject,
-  useUpdateProject,
-  useDeleteProject,
-} from '@/features/projects/api'
-import type { Project } from '@/features/projects/api'
-import { useInvoices } from '@/features/invoices/api'
+
 import BackHeader from '@/components/back-header'
 import ConfirmModal from '@/components/confirm-modal'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Form } from '@/components/ui/form'
-import { Plus, FolderOpen, Edit2, Trash2, X, FileText, DollarSign } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { useClients } from '@/features/clients/api'
+import { useInvoices } from '@/features/invoices/api'
+import type { Project } from '@/features/projects/api'
+import {
+  useCreateProject,
+  useDeleteProject,
+  useProjectsByClient,
+  useUpdateProject,
+} from '@/features/projects/api'
 import { fmtAmount } from '@/lib/utils'
 
 const projectFormSchema = z.object({

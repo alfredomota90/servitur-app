@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { ToastContainer } from '@/components/notifications'
-import { AppRouter } from './router'
-import GlobalThemeToggle from '@/components/global-theme-toggle'
-import PublicSidebar from '@/components/public-sidebar'
-import MobileNav from '@/components/mobile-nav'
+
 import AdminSidebar from '@/components/admin-sidebar'
 import AdminTopBar from '@/components/admin-top-bar'
+import GlobalThemeToggle from '@/components/global-theme-toggle'
+import MobileNav from '@/components/mobile-nav'
+import { ToastContainer } from '@/components/notifications'
+import PublicSidebar from '@/components/public-sidebar'
+
+import { AppRouter } from './router'
 
 export function AppLayout() {
   const location = useLocation()

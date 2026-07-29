@@ -1,7 +1,8 @@
-import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Link } from 'react-router-dom'
+
 import ServiturLogo from '@/components/servitur-logo'
+import { Button } from '@/components/ui/button'
 
 export function HeroSection() {
   return (

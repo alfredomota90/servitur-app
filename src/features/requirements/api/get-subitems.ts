@@ -1,7 +1,8 @@
-import { z } from 'zod'
 import { queryOptions, useQuery } from '@tanstack/react-query'
-import { supabase } from '@/lib/supabase'
+import { z } from 'zod'
+
 import type { Database } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 
 type SubitemRow = Database['public']['Tables']['requirement_subitems']['Row']
 

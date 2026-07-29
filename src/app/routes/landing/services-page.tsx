@@ -1,5 +1,6 @@
+import { Building2, Bus, MapPin, Users } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { Bus, MapPin, Users, Building2 } from 'lucide-react'
+
 import BackHeader from '@/components/back-header'
 
 export default function Services() {
