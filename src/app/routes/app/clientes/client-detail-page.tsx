@@ -1,14 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import {
-  ClipboardCheck,
-  DollarSign,
-  Edit2,
-  FileText,
-  FolderOpen,
-  Plus,
-  Trash2,
-  X,
-} from 'lucide-react'
+import { DollarSign, Edit2, FileText, FolderOpen, Plus, Trash2, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -145,19 +136,6 @@ export default function ClientDetail() {
             <span className="hidden bp:inline ml-2">Agregar proyecto</span>
           </Button>
         </div>
-
-        {client.requiresPapeleria && (
-          <button
-            onClick={() => navigate(`/admin/clientes/${id}/requisitos`)}
-            className="w-full mb-6 p-4 rounded-xl border-2 border-dashed border-accent/40 bg-accent/5 hover:bg-accent/10 transition-colors flex items-center justify-center gap-3"
-          >
-            <ClipboardCheck size={24} className="text-accent" />
-            <div className="text-left">
-              <p className="font-semibold text-accent-text">Gestión de requisitos</p>
-              <p className="text-sm text-muted">Administrar papelería y documentos</p>
-            </div>
-          </button>
-        )}
 
         {showForm && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
