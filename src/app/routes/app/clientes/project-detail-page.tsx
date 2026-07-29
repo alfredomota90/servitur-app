@@ -211,7 +211,7 @@ export default function ProjectDetail() {
 
         {client.requiresPapeleria && (
           <Link
-            to={`/admin/clientes/${clientId}/requisitos`}
+            to={`/admin/clientes/${clientId}/requisitos?fromProject=${projectId}`}
             className="w-full mb-6 p-4 rounded-xl border-2 border-dashed border-accent/40 bg-accent/5 hover:bg-accent/10 transition-colors flex items-center justify-center gap-3"
           >
             <ClipboardCheck size={24} className="text-accent" />

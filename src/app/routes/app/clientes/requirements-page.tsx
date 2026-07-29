@@ -11,7 +11,7 @@ import {
   User,
 } from 'lucide-react'
 import { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 
 import ConfirmModal from '@/components/confirm-modal'
 import { Button } from '@/components/ui/button'
@@ -48,6 +48,8 @@ import { VehicleFormModal } from '@/features/requirements/components/vehicle-for
 
 export default function RequirementsPage() {
   const { id } = useParams()
+  const [searchParams] = useSearchParams()
+  const fromProject = searchParams.get('fromProject')
   const { data: clients = [] } = useClients()
   const { data: items = [] } = useRequirementItems()
   const { data: vehicles = [] } = useVehiclesByClient(id)
@@ -224,11 +226,13 @@ export default function RequirementsPage() {
   return (
     <div className="p-4 md:p-6">
       <Link
-        to={`/admin/clientes/${id}`}
+        to={
+          fromProject ? `/admin/clientes/${id}/proyectos/${fromProject}` : `/admin/clientes/${id}`
+        }
         className="flex items-center gap-2 mb-4 text-muted hover:text-foreground"
       >
         <ArrowLeft size={20} />
-        Volver a {client.name}
+        Volver{fromProject ? ' al proyecto' : ` a ${client.name}`}
       </Link>
 
       <div className="mb-6">
