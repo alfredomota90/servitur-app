@@ -1,30 +1,40 @@
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { LogIn } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
-import { LogIn, AlertCircle } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Form } from '@/components/ui/form'
+
+const loginSchema = z.object({
+  email: z.string().email('Ingresa un email válido'),
+  password: z.string().min(1, 'La contraseña es requerida'),
+})
+
+type LoginFormValues = z.infer<typeof loginSchema>
 
 export default function Login() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
   const { signIn } = useAuth()
   const navigate = useNavigate()
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: '', password: '' },
+  })
 
-    const { error } = await signIn(email, password)
+  const handleSubmit = async (values: LoginFormValues) => {
+    const { error } = await signIn(values.email, values.password)
 
     if (error) {
-      setError('Email o contraseña incorrectos')
-      setLoading(false)
+      form.setError('root', { message: 'Email o contraseña incorrectos' })
     } else {
       navigate('/admin')
     }
   }
+
+  const error = form.formState.errors.root?.message
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
@@ -39,51 +49,34 @@ export default function Login() {
           <p className="text-muted">Accede al panel de administración</p>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1 text-foreground">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border bg-background border-border text-foreground"
-              required
-            />
-          </div>
+        <Form form={form} onSubmit={handleSubmit}>
+          <Input
+            label="Email"
+            type="email"
+            placeholder="tu@email.com"
+            error={form.formState.errors.email?.message}
+            {...form.register('email')}
+          />
 
-          <div className="mb-6">
-            <label className="block text-sm font-medium mb-1 text-foreground">Contraseña</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border bg-background border-border text-foreground"
-              required
-            />
-          </div>
+          <Input
+            label="Contraseña"
+            type="password"
+            placeholder="••••••••"
+            error={form.formState.errors.password?.message}
+            {...form.register('password')}
+          />
 
           {error && (
-            <div className="mb-4 flex items-center gap-2 p-3 rounded-lg bg-error/10 text-error">
-              <AlertCircle size={18} />
-              <span className="text-sm">{error}</span>
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-error/10 text-error text-sm">
+              <LogIn size={18} />
+              <span>{error}</span>
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-colors bg-accent text-background"
-          >
-            {loading ? (
-              'Cargando...'
-            ) : (
-              <>
-                <LogIn size={20} />
-                Iniciar Sesión
-              </>
-            )}
-          </button>
-        </form>
+          <Button type="submit" className="w-full" isLoading={form.formState.isSubmitting}>
+            Iniciar Sesión
+          </Button>
+        </Form>
 
         <p className="mt-6 text-center text-sm text-muted">Solo usuarios autorizados</p>
       </div>

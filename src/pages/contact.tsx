@@ -1,35 +1,53 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Phone, Mail, MapPin, Send, Loader2, CheckCircle } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { Phone, Mail, MapPin, CheckCircle } from 'lucide-react'
 import BackHeader from '@/components/back-header'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/input/textarea'
+import { Select } from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
+import { Form } from '@/components/ui/form'
+
+const contactSchema = z.object({
+  name: z.string().min(1, 'El nombre es requerido'),
+  email: z.string().email('Ingresa un email válido'),
+  phone: z.string().min(1, 'El teléfono es requerido'),
+  company: z.string().optional(),
+  origin: z.string().min(1, 'El origen es requerido'),
+  destination: z.string().min(1, 'El destino es requerido'),
+  passengers: z.string(),
+  tripType: z.string(),
+  message: z.string().optional(),
+})
+
+type ContactFormValues = z.infer<typeof contactSchema>
+
+const defaultValues: ContactFormValues = {
+  name: '',
+  email: '',
+  phone: '',
+  company: '',
+  origin: '',
+  destination: '',
+  passengers: '1-10',
+  tripType: 'one-way',
+  message: '',
+}
 
 export default function Contact() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    company: '',
-    origin: '',
-    destination: '',
-    passengers: '1-10',
-    tripType: 'one-way',
-    message: '',
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    setIsSubmitting(false)
-    setIsSubmitted(true)
-  }
+  const form = useForm<ContactFormValues>({
+    resolver: zodResolver(contactSchema),
+    defaultValues,
+  })
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
-  ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
+  const handleSubmit = async (_values: ContactFormValues) => {
+    await new Promise((resolve) => setTimeout(resolve, 1500))
+    setIsSubmitted(true)
   }
 
   if (isSubmitted) {
@@ -114,167 +132,91 @@ export default function Contact() {
           </div>
 
           <div className="rounded-xl p-6 shadow-sm border bg-card border-border">
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <Form form={form} onSubmit={handleSubmit}>
               <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1 text-foreground">Nombre *</label>
-                  <input
-                    type="text"
-                    name="name"
-                    required
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 rounded-lg border bg-background border-border text-foreground"
-                    placeholder="Tu nombre"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1 text-foreground">Email *</label>
-                  <input
-                    type="email"
-                    name="email"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 rounded-lg border bg-background border-border text-foreground"
-                    placeholder="tu@email.com"
-                  />
-                </div>
+                <Input
+                  label="Nombre *"
+                  placeholder="Tu nombre"
+                  error={form.formState.errors.name?.message}
+                  {...form.register('name')}
+                />
+                <Input
+                  label="Email *"
+                  type="email"
+                  placeholder="tu@email.com"
+                  error={form.formState.errors.email?.message}
+                  {...form.register('email')}
+                />
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1 text-foreground">
-                    Teléfono *
-                  </label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    required
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 rounded-lg border bg-background border-border text-foreground"
-                    placeholder="618 123 4567"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1 text-foreground">
-                    Empresa (opcional)
-                  </label>
-                  <input
-                    type="text"
-                    name="company"
-                    value={formData.company}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 rounded-lg border bg-background border-border text-foreground"
-                    placeholder="Nombre de tu empresa"
-                  />
-                </div>
+                <Input
+                  label="Teléfono *"
+                  type="tel"
+                  placeholder="618 123 4567"
+                  error={form.formState.errors.phone?.message}
+                  {...form.register('phone')}
+                />
+                <Input
+                  label="Empresa (opcional)"
+                  placeholder="Nombre de tu empresa"
+                  {...form.register('company')}
+                />
               </div>
 
               <div className="border-t border-border pt-4">
                 <h4 className="font-medium mb-4 text-foreground">Detalles del viaje</h4>
 
                 <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1 text-foreground">
-                      Origen *
-                    </label>
-                    <input
-                      type="text"
-                      name="origin"
-                      required
-                      value={formData.origin}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 rounded-lg border bg-background border-border text-foreground"
-                      placeholder="Ciudad de origen"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1 text-foreground">
-                      Destino *
-                    </label>
-                    <input
-                      type="text"
-                      name="destination"
-                      required
-                      value={formData.destination}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 rounded-lg border bg-background border-border text-foreground"
-                      placeholder="Ciudad de destino"
-                    />
-                  </div>
+                  <Input
+                    label="Origen *"
+                    placeholder="Ciudad de origen"
+                    error={form.formState.errors.origin?.message}
+                    {...form.register('origin')}
+                  />
+                  <Input
+                    label="Destino *"
+                    placeholder="Ciudad de destino"
+                    error={form.formState.errors.destination?.message}
+                    {...form.register('destination')}
+                  />
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4 mt-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1 text-foreground">
-                      Pasajeros
-                    </label>
-                    <select
-                      name="passengers"
-                      value={formData.passengers}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 rounded-lg border bg-background border-border text-foreground"
-                    >
-                      <option value="1-10">1-10 pasajeros</option>
-                      <option value="11-20">11-20 pasajeros</option>
-                      <option value="21-30">21-30 pasajeros</option>
-                      <option value="30+">Más de 30</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1 text-foreground">
-                      Tipo de viaje
-                    </label>
-                    <select
-                      name="tripType"
-                      value={formData.tripType}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 rounded-lg border bg-background border-border text-foreground"
-                    >
-                      <option value="one-way">Solo ida</option>
-                      <option value="round-trip">Ida y vuelta</option>
-                      <option value="recurring">Recurrente</option>
-                    </select>
-                  </div>
+                  <Select
+                    label="Pasajeros"
+                    error={form.formState.errors.passengers?.message}
+                    {...form.register('passengers')}
+                  >
+                    <option value="1-10">1-10 pasajeros</option>
+                    <option value="11-20">11-20 pasajeros</option>
+                    <option value="21-30">21-30 pasajeros</option>
+                    <option value="30+">Más de 30</option>
+                  </Select>
+
+                  <Select
+                    label="Tipo de viaje"
+                    error={form.formState.errors.tripType?.message}
+                    {...form.register('tripType')}
+                  >
+                    <option value="one-way">Solo ida</option>
+                    <option value="round-trip">Ida y vuelta</option>
+                    <option value="recurring">Recurrente</option>
+                  </Select>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-1 text-foreground">
-                  Mensaje adicional
-                </label>
-                <textarea
-                  name="message"
-                  rows={3}
-                  value={formData.message}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-lg border bg-background border-border text-foreground"
-                  placeholder="Comentarios adicionales sobre tu viaje..."
-                />
-              </div>
+              <Textarea
+                label="Mensaje adicional"
+                rows={3}
+                placeholder="Comentarios adicionales sobre tu viaje..."
+                {...form.register('message')}
+              />
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className={`w-full py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 text-background ${
-                  isSubmitting ? 'bg-muted' : 'bg-accent'
-                }`}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="animate-spin" size={20} />
-                    Enviando...
-                  </>
-                ) : (
-                  <>
-                    <Send size={20} />
-                    Solicitar Cotización
-                  </>
-                )}
-              </button>
-            </form>
+              <Button type="submit" className="w-full" isLoading={form.formState.isSubmitting}>
+                Solicitar Cotización
+              </Button>
+            </Form>
           </div>
         </div>
       </div>

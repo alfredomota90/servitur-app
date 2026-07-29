@@ -1,22 +1,15 @@
 import { useState, useMemo } from 'react'
 import type { Invoice } from '@/features/invoices/api'
 import type { Payment } from '@/features/payments/api'
+import type { PaymentFormValues } from '@/components/payment-modal'
+import type { EditPaymentFormValues } from '@/components/edit-payment-modal'
 
-interface PaymentFormData {
-  method: Invoice['paymentMethod']
-  reference: string
-  notes: string
-  attachment: string
-  attachmentName: string
-  date: string
-}
-
-interface EditPaymentFormData {
-  method: Invoice['paymentMethod']
-  reference: string
-  attachment: string
-  attachmentName: string
-  date: string
+interface StoreActions {
+  addPayment: (payment: Payment) => Promise<Payment | null>
+  updateInvoice: (id: string, data: Partial<Invoice>) => void
+  updatePayment: (id: string, payment: Partial<Payment>) => Promise<void>
+  deletePayment: (id: string) => Promise<void>
+  batchUpdatePaymentDate: (paymentId: string, paymentDate: string) => void
 }
 
 function toInputDate(value?: string | null): string {
@@ -26,12 +19,27 @@ function toInputDate(value?: string | null): string {
   return m ? m[1] : ''
 }
 
-interface StoreActions {
-  addPayment: (payment: Payment) => Promise<Payment | null>
-  updateInvoice: (id: string, data: Partial<Invoice>) => void
-  updatePayment: (id: string, payment: Partial<Payment>) => Promise<void>
-  deletePayment: (id: string) => Promise<void>
-  batchUpdatePaymentDate: (paymentId: string, paymentDate: string) => void
+function buildDefaultPaymentValues(invoice?: Invoice): PaymentFormValues {
+  return {
+    method: invoice?.paymentMethod || 'transferencia',
+    reference: invoice?.paymentReference || '',
+    attachment: '',
+    attachmentName: '',
+    date: toInputDate(invoice?.paymentDate) || new Date().toISOString().split('T')[0],
+  }
+}
+
+function buildDefaultEditPaymentValues(
+  payment?: Payment | null,
+  invoice?: Invoice | null,
+): EditPaymentFormValues {
+  return {
+    method: payment?.method || invoice?.paymentMethod || 'transferencia',
+    reference: payment?.reference || invoice?.paymentReference || '',
+    attachment: payment?.attachmentPath || invoice?.paymentAttachmentPath || '',
+    attachmentName: '',
+    date: toInputDate(invoice?.paymentDate),
+  }
 }
 
 export function usePayments(
@@ -43,24 +51,13 @@ export function usePayments(
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [selectedInvoiceIds, setSelectedInvoiceIds] = useState<string[]>([])
   const [selectingMode, setSelectingMode] = useState(false)
-  const [paymentData, setPaymentData] = useState<PaymentFormData>({
-    method: 'transferencia',
-    reference: '',
-    notes: '',
-    attachment: '',
-    attachmentName: '',
-    date: new Date().toISOString().split('T')[0],
-  })
+  const [paymentModalDefaults, setPaymentModalDefaults] = useState<PaymentFormValues | undefined>()
 
   const [showEditPayment, setShowEditPayment] = useState(false)
   const [editingPaymentInvoice, setEditingPaymentInvoice] = useState<Invoice | null>(null)
-  const [editPaymentData, setEditPaymentData] = useState<EditPaymentFormData>({
-    method: 'transferencia',
-    reference: '',
-    attachment: '',
-    attachmentName: '',
-    date: '',
-  })
+  const [editPaymentDefaults, setEditPaymentDefaults] = useState<
+    EditPaymentFormValues | undefined
+  >()
   const [editingPayment, setEditingPayment] = useState<Payment | null>(null)
   const [editingLinkedInvoices, setEditingLinkedInvoices] = useState<Invoice[]>([])
   const [prevLinkedInvoiceIds, setPrevLinkedInvoiceIds] = useState<string[]>([])
@@ -73,14 +70,7 @@ export function usePayments(
 
   const openPaymentModal = (invoice: Invoice) => {
     setSelectedInvoiceIds([invoice.id])
-    setPaymentData({
-      method: invoice.paymentMethod || 'transferencia',
-      reference: invoice.paymentReference || '',
-      notes: '',
-      attachment: '',
-      attachmentName: '',
-      date: toInputDate(invoice.paymentDate) || new Date().toISOString().split('T')[0],
-    })
+    setPaymentModalDefaults(buildDefaultPaymentValues(invoice))
     setShowPaymentModal(true)
   }
 
@@ -115,7 +105,7 @@ export function usePayments(
     setSelectedInvoiceIds([])
   }
 
-  const registerPayment = () => {
+  const registerPayment = (formData: PaymentFormValues) => {
     if (selectedInvoiceIds.length === 0) return
 
     const totalAmount = selectedInvoices.reduce((sum, inv) => sum + (inv.totalMxn || inv.total), 0)
@@ -124,31 +114,24 @@ export function usePayments(
       .addPayment({
         id: '',
         amount: totalAmount,
-        method: paymentData.method || 'transferencia',
-        reference: paymentData.reference || undefined,
-        attachmentPath: paymentData.attachment || undefined,
+        method: formData.method || 'transferencia',
+        reference: formData.reference || undefined,
+        attachmentPath: formData.attachment || undefined,
       })
       .then((newPayment) => {
         if (newPayment) {
           selectedInvoiceIds.forEach((id) => {
             actions.updateInvoice(id, {
               status: 'pagado',
-              paymentDate: paymentData.date,
+              paymentDate: formData.date,
               paymentId: newPayment.id,
-              notes: paymentData.notes || undefined,
+              notes: undefined,
             })
           })
         }
         setShowPaymentModal(false)
         setSelectedInvoiceIds([])
-        setPaymentData({
-          method: 'transferencia',
-          reference: '',
-          notes: '',
-          attachment: '',
-          attachmentName: '',
-          date: new Date().toISOString().split('T')[0],
-        })
+        setPaymentModalDefaults(undefined)
       })
   }
 
@@ -162,25 +145,13 @@ export function usePayments(
       setEditingPayment(linkedPayment)
       setEditingLinkedInvoices(linkedInvs)
       setPrevLinkedInvoiceIds(linkedInvs.map((i) => i.id))
-      setEditPaymentData({
-        method: linkedPayment.method || 'transferencia',
-        reference: linkedPayment.reference || '',
-        attachment: linkedPayment.attachmentPath || '',
-        attachmentName: '',
-        date: toInputDate(invoice.paymentDate),
-      })
+      setEditPaymentDefaults(buildDefaultEditPaymentValues(linkedPayment, invoice))
       setEditingPaymentInvoice(invoice)
     } else {
       setEditingPayment(null)
       setEditingLinkedInvoices([invoice])
       setPrevLinkedInvoiceIds([invoice.id])
-      setEditPaymentData({
-        method: invoice.paymentMethod || 'transferencia',
-        reference: invoice.paymentReference || '',
-        attachment: invoice.paymentAttachmentPath || '',
-        attachmentName: '',
-        date: toInputDate(invoice.paymentDate),
-      })
+      setEditPaymentDefaults(buildDefaultEditPaymentValues(null, invoice))
       setEditingPaymentInvoice(invoice)
     }
     setShowEditPayment(true)
@@ -198,6 +169,7 @@ export function usePayments(
     setEditingLinkedInvoices([])
     setPrevLinkedInvoiceIds([])
     setShowDeletePaymentConfirm(false)
+    setEditPaymentDefaults(undefined)
   }
 
   const addInvoiceToEdit = (invoiceId: string) => {
@@ -230,7 +202,7 @@ export function usePayments(
     setShowDeletePaymentConfirm(false)
   }
 
-  const saveEditPayment = () => {
+  const saveEditPayment = (formData: EditPaymentFormValues) => {
     if (!editingPaymentInvoice) return
 
     if (editingPayment) {
@@ -240,9 +212,9 @@ export function usePayments(
       }
 
       actions.updatePayment(editingPayment.id, {
-        method: editPaymentData.method,
-        reference: editPaymentData.reference || undefined,
-        attachmentPath: editPaymentData.attachment || undefined,
+        method: formData.method,
+        reference: formData.reference || undefined,
+        attachmentPath: formData.attachment || undefined,
         amount: editingLinkedInvoices.reduce((sum, i) => sum + (i.totalMxn || i.total), 0),
       })
 
@@ -268,27 +240,27 @@ export function usePayments(
         }
       })
 
-      if (editPaymentData.date) {
-        actions.batchUpdatePaymentDate(editingPayment.id, editPaymentData.date)
+      if (formData.date) {
+        actions.batchUpdatePaymentDate(editingPayment.id, formData.date)
       }
     } else {
       const invoiceUpdates: Partial<Invoice> = {
-        paymentDate: editPaymentData.date || undefined,
+        paymentDate: formData.date || undefined,
       }
 
       if (editingPaymentInvoice.paymentId) {
         actions.updatePayment(editingPaymentInvoice.paymentId, {
-          method: editPaymentData.method,
-          reference: editPaymentData.reference || undefined,
-          attachmentPath: editPaymentData.attachment || undefined,
+          method: formData.method,
+          reference: formData.reference || undefined,
+          attachmentPath: formData.attachment || undefined,
         })
         actions.updateInvoice(editingPaymentInvoice.id, invoiceUpdates)
       } else {
         actions.updateInvoice(editingPaymentInvoice.id, {
           ...invoiceUpdates,
-          paymentMethod: editPaymentData.method,
-          paymentReference: editPaymentData.reference || undefined,
-          paymentAttachmentPath: editPaymentData.attachment || undefined,
+          paymentMethod: formData.method,
+          paymentReference: formData.reference || undefined,
+          paymentAttachmentPath: formData.attachment || undefined,
         })
       }
     }
@@ -300,15 +272,12 @@ export function usePayments(
     showPaymentModal,
     selectedInvoiceIds,
     selectingMode,
-    paymentData,
-    setPaymentData,
+    paymentModalDefaults,
     showEditPayment,
     editingPaymentInvoice,
-    editPaymentData,
-    setEditPaymentData,
+    editPaymentDefaults,
     editingPayment,
     editingLinkedInvoices,
-    prevLinkedInvoiceIds,
     showDeletePaymentConfirm,
     selectedInvoices,
     openPaymentModal,

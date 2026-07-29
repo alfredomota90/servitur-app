@@ -291,8 +291,7 @@ export default function ProjectDetail() {
         <PaymentModal
           open={paymentsCtrl.showPaymentModal && paymentsCtrl.selectedInvoiceIds.length > 0}
           invoices={paymentsCtrl.selectedInvoices}
-          paymentData={paymentsCtrl.paymentData}
-          onPaymentDataChange={paymentsCtrl.setPaymentData}
+          defaultValues={paymentsCtrl.paymentModalDefaults}
           onConfirm={paymentsCtrl.registerPayment}
           onAddMore={paymentsCtrl.addMoreInvoices}
           onClose={paymentsCtrl.closePaymentModal}
@@ -306,11 +305,10 @@ export default function ProjectDetail() {
           availableInvoices={paidInvoices.filter(
             (inv) => !paymentsCtrl.editingLinkedInvoices.some((l) => l.id === inv.id),
           )}
-          editData={paymentsCtrl.editPaymentData}
-          onEditDataChange={paymentsCtrl.setEditPaymentData}
+          defaultValues={paymentsCtrl.editPaymentDefaults}
+          onConfirm={paymentsCtrl.saveEditPayment}
           onAddInvoice={paymentsCtrl.addInvoiceToEdit}
           onRemoveInvoice={paymentsCtrl.removeInvoiceFromEdit}
-          onSave={paymentsCtrl.saveEditPayment}
           onClose={paymentsCtrl.closeEditPayment}
           showDeletePaymentConfirm={paymentsCtrl.showDeletePaymentConfirm}
           onConfirmDeletePayment={paymentsCtrl.confirmDeleteOrphanPayment}
