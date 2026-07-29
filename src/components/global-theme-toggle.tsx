@@ -1,4 +1,5 @@
-import { Sun, Moon } from 'lucide-react'
+import { Moon, Sun } from 'lucide-react'
+
 import { useTheme } from '@/lib/theme'
 
 export default function GlobalThemeToggle() {

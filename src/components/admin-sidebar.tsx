@@ -1,8 +1,9 @@
+import { Car, Home, LogOut, Users, X } from 'lucide-react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Home, Users, Car, X, LogOut } from 'lucide-react'
-import { useAuth } from '@/lib/auth'
-import ServiturLogo from '@/components/servitur-logo'
+
 import ServiturLetter from '@/components/servitur-letter'
+import ServiturLogo from '@/components/servitur-logo'
+import { useAuth } from '@/lib/auth'
 
 const SIDEBAR_WIDTH = 260
 

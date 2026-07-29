@@ -1,8 +1,9 @@
-import { forwardRef, type ComponentPropsWithoutRef } from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
-import { cn } from '@/utils/cn'
 import { Loader2 } from 'lucide-react'
+import { type ComponentPropsWithoutRef, forwardRef } from 'react'
+
+import { cn } from '@/utils/cn'
 
 const buttonVariants = cva(
   'inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none',

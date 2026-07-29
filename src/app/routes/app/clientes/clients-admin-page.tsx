@@ -1,36 +1,37 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import {
+  AlertCircle,
+  Building2,
+  Calendar,
+  ClipboardCheck,
+  Edit2,
+  FileText,
+  Image as ImageIcon,
+  Mail,
+  Phone,
+  Plus,
+  Trash2,
+  X,
+} from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
+
+import BackHeader from '@/components/back-header'
+import ConfirmModal from '@/components/confirm-modal'
+import { Button } from '@/components/ui/button'
+import { Form } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import type { Client } from '@/features/clients/api'
 import {
   useClients,
   useCreateClient,
-  useUpdateClient,
   useDeleteClient,
+  useUpdateClient,
 } from '@/features/clients/api'
-import type { Client } from '@/features/clients/api'
 import { useInvoices } from '@/features/invoices/api'
-import {
-  Plus,
-  Trash2,
-  Edit2,
-  X,
-  Mail,
-  Phone,
-  Building2,
-  FileText,
-  Calendar,
-  AlertCircle,
-  Image as ImageIcon,
-  ClipboardCheck,
-} from 'lucide-react'
-import { getNextBillingDate, getDaysUntil, formatDate } from '@/lib/utils'
-import ConfirmModal from '@/components/confirm-modal'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Form } from '@/components/ui/form'
-import BackHeader from '@/components/back-header'
+import { formatDate, getDaysUntil, getNextBillingDate } from '@/lib/utils'
 
 const clientFormSchema = z.object({
   name: z.string().min(1, 'El nombre es obligatorio'),

@@ -1,18 +1,19 @@
-import { DollarSign, TrendingUp, FileText } from 'lucide-react'
-import { useState, useMemo } from 'react'
+import { DollarSign, FileText, TrendingUp } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts'
+
+import BackHeader from '@/components/back-header'
 import { useClients } from '@/features/clients/api'
 import { useInvoices } from '@/features/invoices/api'
 import { fmtDate } from '@/lib/utils'
-import BackHeader from '@/components/back-header'
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts'
 
 type Period = 'week' | 'month' | 'year'
 

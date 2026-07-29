@@ -1,12 +1,13 @@
-import { useNavigate } from 'react-router-dom'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { LogIn } from 'lucide-react'
-import { useAuth } from '@/lib/auth'
-import { Input } from '@/components/ui/input'
+import { useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
+import { z } from 'zod'
+
 import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { useAuth } from '@/lib/auth'
 
 const loginSchema = z.object({
   email: z.string().email('Ingresa un email válido'),

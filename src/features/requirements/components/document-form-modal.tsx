@@ -1,11 +1,12 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { AlertTriangle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { AlertTriangle } from 'lucide-react'
-import { Modal } from '@/components/ui/modal'
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Modal } from '@/components/ui/modal'
 
 const documentFormSchema = z.object({
   fileUrl: z.string().url('Debe ser una URL válida').or(z.literal('')),

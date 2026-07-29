@@ -1,13 +1,14 @@
+import { ArrowUpDown, Trash2 } from 'lucide-react'
 import { useState } from 'react'
-import { Trash2, ArrowUpDown } from 'lucide-react'
+
+import BackHeader from '@/components/back-header'
+import ConfirmModal from '@/components/confirm-modal'
+import ExpandableTextCell from '@/components/expandable-text-cell'
 import { useInvoices } from '@/features/invoices/api'
 import { useDeleteInvoice } from '@/features/invoices/api'
-import ExpandableTextCell from '@/components/expandable-text-cell'
-import ConfirmModal from '@/components/confirm-modal'
 import { useDeleteConfirm } from '@/hooks/use-delete-confirm'
 import { sortInvoices, type SortKey } from '@/lib/invoice-utils'
 import { fmtDate } from '@/lib/utils'
-import BackHeader from '@/components/back-header'
 
 export default function Trips() {
   const { data: invoices = [] } = useInvoices()

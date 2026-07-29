@@ -1,6 +1,7 @@
+import { Building2, CheckCircle, Star, Users } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Users, Star, CheckCircle, Building2 } from 'lucide-react'
+
 import BackHeader from '@/components/back-header'
 
 function ExpandableText({ text }: { text: string }) {

@@ -1,4 +1,4 @@
-import { Clock, Shield, MapPin, type LucideIcon } from 'lucide-react'
+import { Clock, type LucideIcon, MapPin, Shield } from 'lucide-react'
 
 export interface Feature {
   icon: LucideIcon

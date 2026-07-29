@@ -1,6 +1,7 @@
-import { X } from 'lucide-react'
-import { forwardRef, useEffect, type ComponentPropsWithoutRef } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import { X } from 'lucide-react'
+import { type ComponentPropsWithoutRef, forwardRef, useEffect } from 'react'
+
 import { cn } from '@/utils/cn'
 
 const modalVariants = cva('rounded-xl bg-card w-full flex flex-col overflow-hidden max-h-[90vh]', {

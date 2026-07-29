@@ -1,45 +1,46 @@
-import { useState, useMemo } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { useClients } from '@/features/clients/api'
-import { useProjectsByClient } from '@/features/projects/api'
-import {
-  useInvoicesByProject,
-  useCreateInvoice,
-  useUpdateInvoice,
-  useDeleteInvoice,
-  useBatchUpdateInvoicesPaymentDate,
-} from '@/features/invoices/api'
-import {
-  usePaymentsTQ,
-  useCreatePayment,
-  useUpdatePayment,
-  useDeletePayment,
-} from '@/features/payments/api'
-import type { Invoice } from '@/features/invoices/api'
+import { useMemo, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
+
 import BackHeader from '@/components/back-header'
-import {
-  generatePendingReport,
-  generatePendingComplementsReport,
-  generatePaymentHistoryReport,
-} from '@/lib/pdf-service'
-import { fmtAmount } from '@/lib/utils'
-import { previewXMLAsPDF, previewPDFFromInvoiceData } from '@/lib/xml-parser'
-import { useSort } from '@/hooks/use-sort'
-import { usePayments } from '@/hooks/use-payments'
-import { useDeleteConfirm } from '@/hooks/use-delete-confirm'
-import { useStore } from '@/store/use-store'
-import StatsCards from '@/components/stats-cards'
-import PendingInvoicesTable from '@/components/pending-invoices-table'
+import ConfirmModal from '@/components/confirm-modal'
+import EditPaymentModal from '@/components/edit-payment-modal'
+import InvoiceFormModal from '@/components/invoice-form-modal'
+import InvoicePreviewModal from '@/components/invoice-preview-modal'
 import PaidInvoicesTable from '@/components/paid-invoices-table'
 import PaymentHistoryTable from '@/components/payment-history-table'
-import SelectionBar from '@/components/selection-bar'
-import InvoicePreviewModal from '@/components/invoice-preview-modal'
-import ConfirmModal from '@/components/confirm-modal'
-import InvoiceFormModal from '@/components/invoice-form-modal'
 import PaymentModal from '@/components/payment-modal'
-import EditPaymentModal from '@/components/edit-payment-modal'
+import PendingInvoicesTable from '@/components/pending-invoices-table'
+import SelectionBar from '@/components/selection-bar'
+import StatsCards from '@/components/stats-cards'
 import ViewAttachmentModal from '@/components/view-attachment-modal'
+import { useClients } from '@/features/clients/api'
+import type { Invoice } from '@/features/invoices/api'
+import {
+  useBatchUpdateInvoicesPaymentDate,
+  useCreateInvoice,
+  useDeleteInvoice,
+  useInvoicesByProject,
+  useUpdateInvoice,
+} from '@/features/invoices/api'
 import type { Payment } from '@/features/payments/api'
+import {
+  useCreatePayment,
+  useDeletePayment,
+  usePaymentsTQ,
+  useUpdatePayment,
+} from '@/features/payments/api'
+import { useProjectsByClient } from '@/features/projects/api'
+import { useDeleteConfirm } from '@/hooks/use-delete-confirm'
+import { usePayments } from '@/hooks/use-payments'
+import { useSort } from '@/hooks/use-sort'
+import {
+  generatePaymentHistoryReport,
+  generatePendingComplementsReport,
+  generatePendingReport,
+} from '@/lib/pdf-service'
+import { fmtAmount } from '@/lib/utils'
+import { previewPDFFromInvoiceData, previewXMLAsPDF } from '@/lib/xml-parser'
+import { useStore } from '@/store/use-store'
 
 export default function ProjectDetail() {
   const { clientId, projectId } = useParams<{ clientId: string; projectId: string }>()

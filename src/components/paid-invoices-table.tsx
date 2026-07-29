@@ -1,4 +1,5 @@
-import { Download, FileText, Eye, Edit2, Trash2 } from 'lucide-react'
+import { Download, Edit2, Eye, FileText, Trash2 } from 'lucide-react'
+
 import type { Invoice } from '@/features/invoices/api'
 import { getPaymentAttachmentUrl } from '@/lib/storage'
 import { fmtAmount, fmtDate } from '@/lib/utils'

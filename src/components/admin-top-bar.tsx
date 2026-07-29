@@ -1,5 +1,5 @@
-import { useLocation } from 'react-router-dom'
 import { Menu } from 'lucide-react'
+import { useLocation } from 'react-router-dom'
 
 export default function AdminTopBar({ onMenuClick }: { onMenuClick: () => void }) {
   const location = useLocation()

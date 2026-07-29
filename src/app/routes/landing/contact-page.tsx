@@ -1,15 +1,16 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { CheckCircle, Mail, MapPin, Phone } from 'lucide-react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { Link } from 'react-router-dom'
 import { z } from 'zod'
-import { Phone, Mail, MapPin, CheckCircle } from 'lucide-react'
+
 import BackHeader from '@/components/back-header'
+import { Button } from '@/components/ui/button'
+import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/input/textarea'
 import { Select } from '@/components/ui/select'
-import { Button } from '@/components/ui/button'
-import { Form } from '@/components/ui/form'
 
 const contactSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido'),

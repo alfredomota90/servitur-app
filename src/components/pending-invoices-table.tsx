@@ -1,19 +1,20 @@
 import {
-  FileText,
-  Wallet,
-  Eye,
-  Edit2,
-  Trash2,
   CheckCircle,
   Clock,
   Download,
+  Edit2,
+  Eye,
+  FileText,
   Plus,
+  Trash2,
+  Wallet,
 } from 'lucide-react'
-import type { Invoice } from '@/features/invoices/api'
-import { fmtAmount } from '@/lib/utils'
+
 import ExpandableTextCell from '@/components/expandable-text-cell'
+import type { Invoice } from '@/features/invoices/api'
 import { getInvoiceDate } from '@/lib/invoice-utils'
 import { getPaymentAttachmentUrl } from '@/lib/storage'
+import { fmtAmount } from '@/lib/utils'
 
 interface Props {
   invoices: Invoice[]

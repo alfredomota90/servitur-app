@@ -1,11 +1,11 @@
 import {
-  HeroSection,
-  StatsSection,
-  FeaturesSection,
-  TrustedBySection,
-  ServicesPreview,
   CtaSection,
+  FeaturesSection,
+  HeroSection,
   PublicFooter,
+  ServicesPreview,
+  StatsSection,
+  TrustedBySection,
 } from '@/features/landing/components'
 
 export default function Landing() {

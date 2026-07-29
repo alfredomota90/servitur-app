@@ -1,10 +1,11 @@
 import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
-import { setupPDFHeader } from '@/lib/pdf-utils'
-import { sortInvoices } from '@/lib/invoice-utils'
-import { fmtAmount, fmtDate } from '@/lib/utils'
+
 import type { Invoice } from '@/features/invoices/api'
 import type { Payment } from '@/features/payments/api'
+import { sortInvoices } from '@/lib/invoice-utils'
+import { setupPDFHeader } from '@/lib/pdf-utils'
+import { fmtAmount, fmtDate } from '@/lib/utils'
 
 export async function generatePendingReport(
   pendingInvoices: Invoice[],

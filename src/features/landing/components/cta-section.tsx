@@ -1,5 +1,6 @@
-import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
+import { Link } from 'react-router-dom'
+
 import { Button } from '@/components/ui/button'
 
 export function CtaSection() {

@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+
 import { supabase } from '@/lib/supabase'
 
 export const deleteProject = async (id: string): Promise<void> => {

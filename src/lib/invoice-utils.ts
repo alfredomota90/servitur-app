@@ -1,5 +1,5 @@
-import { fmtDate } from '@/lib/utils'
 import type { Invoice } from '@/features/invoices/api'
+import { fmtDate } from '@/lib/utils'
 
 export interface InvoiceFormFields {
   status: 'pendiente' | 'pagado'

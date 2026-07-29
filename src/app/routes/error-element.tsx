@@ -1,4 +1,5 @@
-import { useRouteError, isRouteErrorResponse } from 'react-router-dom'
+import { isRouteErrorResponse, useRouteError } from 'react-router-dom'
+
 import { MainErrorFallback } from '@/components/errors/main'
 
 export function ErrorElement() {

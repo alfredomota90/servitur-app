@@ -1,7 +1,8 @@
+import { Car, Home, Phone, Settings } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
-import { Home, Settings, Phone, Car } from 'lucide-react'
-import ServiturLogo from '@/components/servitur-logo'
+
 import ServiturLetter from '@/components/servitur-letter'
+import ServiturLogo from '@/components/servitur-logo'
 
 const PUBLIC_SIDEBAR_WIDTH = 220
 const navItems = [
