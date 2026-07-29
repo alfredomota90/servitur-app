@@ -1,8 +1,22 @@
 import { X } from 'lucide-react'
 import { forwardRef, useEffect, type ComponentPropsWithoutRef } from 'react'
+import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/utils/cn'
 
-interface ModalProps extends ComponentPropsWithoutRef<'div'> {
+const modalVariants = cva('rounded-xl bg-card w-full flex flex-col overflow-hidden max-h-[90vh]', {
+  variants: {
+    size: {
+      sm: 'max-w-sm',
+      md: 'max-w-lg',
+      lg: 'max-w-2xl',
+      xl: 'max-w-4xl',
+      full: 'max-w-6xl',
+    },
+  },
+  defaultVariants: { size: 'md' },
+})
+
+interface ModalProps extends ComponentPropsWithoutRef<'div'>, VariantProps<typeof modalVariants> {
   open: boolean
   title: string
   onClose: () => void
@@ -10,7 +24,7 @@ interface ModalProps extends ComponentPropsWithoutRef<'div'> {
 }
 
 export const Modal = forwardRef<HTMLDivElement, ModalProps>(
-  ({ open, title, onClose, children, className, maxWidth = 'max-w-lg', ...props }, ref) => {
+  ({ open, title, onClose, children, className, size, maxWidth, ...props }, ref) => {
     useEffect(() => {
       if (open) {
         document.body.style.overflow = 'hidden'
@@ -42,15 +56,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
           if (e.target === e.currentTarget) onClose()
         }}
       >
-        <div
-          ref={ref}
-          className={cn(
-            'rounded-xl bg-card w-full flex flex-col overflow-hidden max-h-[90vh]',
-            maxWidth,
-            className,
-          )}
-          {...props}
-        >
+        <div ref={ref} className={cn(modalVariants({ size }), maxWidth, className)} {...props}>
           <div className="flex items-center justify-between p-4 border-b border-border shrink-0">
             <h2 className="font-bold text-lg text-foreground">{title}</h2>
             <button
