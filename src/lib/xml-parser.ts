@@ -277,8 +277,7 @@ export function parseCFDIFromText(xmlText: string): ExtractedInvoiceData | null 
       conceptos: conceptosArr,
       traslados: trasladosArr,
     }
-  } catch (error) {
-    console.error('Error parsing XML:', error)
+  } catch {
     return null
   }
 }
@@ -293,11 +292,9 @@ export async function uploadXML(file: File, clientId: string): Promise<string | 
       error instanceof Object && 'message' in error
         ? (error as { message: string }).message
         : String(error)
-    console.error('Error uploading XML:', msg)
     throw new Error(msg)
   }
 
-  console.log('XML uploaded, path:', data.path)
   return data.path
 }
 
@@ -764,12 +761,8 @@ export function generatePDFFromInvoiceData(data: {
 }
 
 export async function downloadXMLAsPDF(xmlPath: string): Promise<void> {
-  try {
-    const { parsed, doc } = await generatePDFFromXML(xmlPath)
-    doc.save(`CFDI_${parsed.serie_folio || 'factura'}.pdf`)
-  } catch (error) {
-    console.warn('Error generando PDF:', error)
-  }
+  const { parsed, doc } = await generatePDFFromXML(xmlPath)
+  doc.save(`CFDI_${parsed.serie_folio || 'factura'}.pdf`)
 }
 
 export async function previewXMLAsPDF(xmlPath: string): Promise<string | null> {
