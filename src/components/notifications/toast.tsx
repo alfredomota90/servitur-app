@@ -1,4 +1,4 @@
-import { AlertCircle, CheckCircle, Info, X } from 'lucide-react'
+import { AlertCircle, AlertTriangle, CheckCircle, Info, X } from 'lucide-react'
 
 import { useStore } from '@/store/use-store'
 
@@ -6,12 +6,14 @@ const iconMap = {
   success: CheckCircle,
   error: AlertCircle,
   info: Info,
+  warning: AlertTriangle,
 }
 
 const colorMap = {
   success: 'text-green-500 bg-green-50 border-green-200',
   error: 'text-red-500 bg-red-50 border-red-200',
   info: 'text-blue-500 bg-blue-50 border-blue-200',
+  warning: 'text-amber-600 bg-amber-50 border-amber-200',
 }
 
 export function ToastContainer() {

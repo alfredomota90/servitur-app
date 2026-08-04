@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Upload } from 'lucide-react'
+import { AlertTriangle, Upload } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/input/textarea'
 import { Modal } from '@/components/ui/modal'
 import { Select } from '@/components/ui/select'
 import type { Client } from '@/features/clients/api'
-import type { Invoice } from '@/features/invoices/api'
+import { type Invoice, useInvoices } from '@/features/invoices/api'
 import type { Project } from '@/features/projects/api'
 import { buildInvoiceData, type InvoiceFormData } from '@/lib/invoice-utils'
 import { parseCFDIFromText, uploadXML } from '@/lib/xml-parser'
@@ -37,6 +37,7 @@ const invoiceFormSchema = z.object({
   invoiceDescription: z.string().optional(),
   totalMxn: z.string().optional(),
   certificationDate: z.string().optional(),
+  cfdiUuid: z.string().optional(),
 })
 
 type InvoiceFormValues = z.infer<typeof invoiceFormSchema>
@@ -49,6 +50,12 @@ const defaultValues: InvoiceFormValues = {
   invoiceDescription: '',
   totalMxn: '',
   certificationDate: '',
+  cfdiUuid: '',
+}
+
+interface SerieWarning {
+  folio: string
+  projectName: string
 }
 
 export default function InvoiceFormModal({
@@ -63,10 +70,12 @@ export default function InvoiceFormModal({
   onClose,
 }: InvoiceFormModalProps) {
   const addToast = useStore((s) => s.addToast)
+  const { data: allInvoices = [] } = useInvoices()
   const [xmlFile, setXmlFile] = useState<File | null>(null)
   const [localClientId, setLocalClientId] = useState(propClientId)
   const [localClientName, setLocalClientName] = useState(propClientName)
   const [localProjectId, setLocalProjectId] = useState(propSelectedProjectId)
+  const [serieWarning, setSerieWarning] = useState<SerieWarning | null>(null)
 
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceFormSchema),
@@ -76,6 +85,7 @@ export default function InvoiceFormModal({
   useEffect(() => {
     if (open) {
       setXmlFile(null)
+      setSerieWarning(null)
       setLocalClientId(propClientId)
       setLocalClientName(propClientName)
       setLocalProjectId(editingInvoice?.projectId || propSelectedProjectId)
@@ -87,6 +97,7 @@ export default function InvoiceFormModal({
         invoiceDescription: editingInvoice?.invoiceDescription || '',
         totalMxn: editingInvoice?.totalMxn?.toString() || '',
         certificationDate: editingInvoice?.certificationDate?.split('T')[0] || '',
+        cfdiUuid: editingInvoice?.cfdiUuid || '',
       })
     }
   }, [open, propClientId, propClientName, propSelectedProjectId, editingInvoice, form])
@@ -121,6 +132,7 @@ export default function InvoiceFormModal({
       form.setValue('invoiceDescription', data.invoice_description)
       form.setValue('totalMxn', data.total_mxn.toString())
       form.setValue('certificationDate', data.certification_date.split('T')[0])
+      form.setValue('cfdiUuid', data.uuid)
     } else {
       addToast({
         type: 'error',
@@ -131,10 +143,58 @@ export default function InvoiceFormModal({
 
   const resetForm = () => {
     setXmlFile(null)
+    setSerieWarning(null)
     form.reset(defaultValues)
   }
 
   const handleSubmit = async (values: InvoiceFormValues) => {
+    const uuidTrimmed = (values.cfdiUuid || '').trim()
+    const serieTrimmed = (values.serieFolio || '').trim().toLowerCase()
+    const editingId = editingInvoice?.id
+
+    // 1) Bloqueo: UUID duplicado global
+    if (uuidTrimmed) {
+      const dupUuid = allInvoices.find(
+        (inv) =>
+          inv.cfdiUuid &&
+          inv.cfdiUuid.toLowerCase() === uuidTrimmed.toLowerCase() &&
+          inv.id !== editingId,
+      )
+      if (dupUuid) {
+        addToast({
+          type: 'error',
+          message: `El folio fiscal ${uuidTrimmed} ya está registrado en otra factura`,
+        })
+        return
+      }
+    }
+
+    // 2) Warning: serie_folio duplicado en el MISMO cliente (otro proyecto)
+    if (serieTrimmed && !serieWarning) {
+      const dupSerie = allInvoices.find(
+        (inv) =>
+          inv.serieFolio &&
+          inv.serieFolio.trim().toLowerCase() === serieTrimmed &&
+          inv.clientId === localClientId &&
+          inv.id !== editingId,
+      )
+      if (dupSerie) {
+        const dupProjectName = dupSerie.projectId
+          ? projects.find((p) => p.id === dupSerie.projectId)?.name || 'otro proyecto'
+          : 'este cliente sin proyecto'
+        setSerieWarning({
+          folio: values.serieFolio || '',
+          projectName: dupProjectName,
+        })
+        addToast({
+          type: 'warning',
+          message: `El folio ${values.serieFolio} ya está guardado en "${dupProjectName}"`,
+        })
+        return
+      }
+    }
+
+    // Proceder con el guardado
     let xmlPath = ''
 
     if (xmlFile) {
@@ -156,6 +216,7 @@ export default function InvoiceFormModal({
       total_mxn: values.totalMxn || '',
       certification_date: values.certificationDate || '',
       xml_path: xmlPath,
+      cfdi_uuid: values.cfdiUuid || '',
     }
 
     const invoiceData = buildInvoiceData(
@@ -204,6 +265,17 @@ export default function InvoiceFormModal({
         {xmlFile && (
           <div className="p-2 rounded bg-success/10 text-success text-xs">
             ✅ Archivo XML seleccionado: {xmlFile.name}
+          </div>
+        )}
+
+        {serieWarning && (
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-sm mt-2">
+            <AlertTriangle size={16} className="shrink-0 mt-0.5" />
+            <span>
+              El folio <strong>{serieWarning.folio}</strong> ya está guardado en el proyecto{' '}
+              <strong>&quot;{serieWarning.projectName}&quot;</strong>. ¿Deseas continuar de todos
+              modos?
+            </span>
           </div>
         )}
 
@@ -300,8 +372,12 @@ export default function InvoiceFormModal({
         </div>
 
         <div className="flex gap-2 pt-2">
-          <Button type="submit" className="flex-1">
-            {editingInvoice ? 'Guardar cambios' : 'Agregar'}
+          <Button type="submit" className="flex-1" variant={serieWarning ? 'warning' : 'primary'}>
+            {serieWarning
+              ? 'Guardar de todos modos'
+              : editingInvoice
+                ? 'Guardar cambios'
+                : 'Agregar'}
           </Button>
           <Button type="button" variant="secondary" onClick={handleClose}>
             Cancelar

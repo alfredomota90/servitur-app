@@ -134,6 +134,7 @@ export type Database = {
           total_mxn: number | null
           certification_date: string | null
           xml_path: string | null
+          cfdi_uuid: string | null
         }
         Insert: {
           id?: string
@@ -160,6 +161,7 @@ export type Database = {
           total_mxn?: number | null
           certification_date?: string | null
           xml_path?: string | null
+          cfdi_uuid?: string | null
         }
         Update: {
           id?: string
@@ -186,6 +188,7 @@ export type Database = {
           total_mxn?: number | null
           certification_date?: string | null
           xml_path?: string | null
+          cfdi_uuid?: string | null
         }
       }
       requirement_items: {

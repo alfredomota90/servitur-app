@@ -3,6 +3,7 @@ import { z } from 'zod'
 
 import type { Database } from '@/lib/supabase'
 import { supabase } from '@/lib/supabase'
+import { useStore } from '@/store/use-store'
 
 type InvoiceRow = Database['public']['Tables']['invoices']['Row']
 
@@ -37,6 +38,7 @@ export const invoiceSchema = z.object({
   certificationDate: z.string().optional(),
   xmlPath: z.string().optional(),
   paymentId: z.string().optional().nullable(),
+  cfdiUuid: z.string().optional(),
 })
 
 export type Invoice = z.infer<typeof invoiceSchema>
@@ -73,6 +75,7 @@ const rowToInvoice = (row: InvoiceRow, clientName: string): Invoice => ({
   totalMxn: row.total_mxn || undefined,
   certificationDate: row.certification_date || undefined,
   xmlPath: row.xml_path || undefined,
+  cfdiUuid: row.cfdi_uuid || undefined,
 })
 
 export const getInvoices = async (): Promise<Invoice[]> => {
@@ -144,6 +147,7 @@ export const createInvoice = async (input: CreateInvoiceInput): Promise<Invoice>
       total_mxn: input.totalMxn || null,
       certification_date: input.certificationDate || null,
       xml_path: input.xmlPath || null,
+      cfdi_uuid: input.cfdiUuid || null,
       payment_id: input.paymentId || null,
     })
     .select()
@@ -152,12 +156,28 @@ export const createInvoice = async (input: CreateInvoiceInput): Promise<Invoice>
   return rowToInvoice(data, '')
 }
 
+const getDuplicateFolioMessage = (error: unknown): string | null => {
+  const msg = error instanceof Error ? error.message : ''
+  const code = (error as Record<string, string>)?.code
+  if (code === '23505' && msg.includes('invoices_cfdi_uuid_key')) {
+    return 'El folio fiscal (UUID) ya está registrado en otra factura'
+  }
+  return null
+}
+
 export const useCreateInvoice = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: createInvoice,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] })
+    },
+    onError: (error) => {
+      const msg = getDuplicateFolioMessage(error)
+      useStore.getState().addToast({
+        type: 'error',
+        message: msg || 'Error al crear la factura',
+      })
     },
   })
 }
@@ -187,6 +207,7 @@ export const updateInvoice = async (id: string, invoice: Partial<Invoice>): Prom
       total_mxn: invoice.totalMxn,
       certification_date: invoice.certificationDate,
       xml_path: invoice.xmlPath,
+      cfdi_uuid: invoice.cfdiUuid || null,
       payment_id: invoice.paymentId,
     })
     .eq('id', id)
@@ -198,6 +219,13 @@ export const useUpdateInvoice = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Invoice> }) => updateInvoice(id, data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['invoices'] }),
+    onError: (error) => {
+      const msg = getDuplicateFolioMessage(error)
+      useStore.getState().addToast({
+        type: 'error',
+        message: msg || 'Error al actualizar la factura',
+      })
+    },
   })
 }
 
