@@ -110,8 +110,7 @@ export default function ClientsAdmin() {
       email: values.email,
       phone: values.phone,
       billingInterval: values.billingInterval,
-      lastTripDate: undefined,
-      logoUrl: values.logoUrl || undefined,
+      logoUrl: values.logoUrl,
       requiresPapeleria: values.requiresPapeleria,
       entityType: values.entityType,
     }
