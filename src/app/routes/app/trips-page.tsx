@@ -4,14 +4,14 @@ import { useState } from 'react'
 import BackHeader from '@/components/back-header'
 import ConfirmModal from '@/components/confirm-modal'
 import ExpandableTextCell from '@/components/expandable-text-cell'
-import { useInvoices } from '@/features/invoices/api'
+import { useActiveInvoices } from '@/features/invoices/api'
 import { useDeleteInvoice } from '@/features/invoices/api'
 import { useDeleteConfirm } from '@/hooks/use-delete-confirm'
 import { sortInvoices, type SortKey } from '@/lib/invoice-utils'
 import { fmtDate } from '@/lib/utils'
 
 export default function Trips() {
-  const { data: invoices = [] } = useInvoices()
+  const { data: invoices = [] } = useActiveInvoices()
   const deleteInvoice = useDeleteInvoice()
   const [expandedDescId, setExpandedDescId] = useState<string | null>(null)
   const [sortKey, setSortKey] = useState<SortKey>('date')

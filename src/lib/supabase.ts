@@ -19,6 +19,7 @@ export type Database = {
           logo_url: string | null
           requires_papeleria: boolean
           entity_type: string
+          status: string
           created_at: string
           updated_at: string
         }
@@ -32,6 +33,7 @@ export type Database = {
           logo_url?: string | null
           requires_papeleria?: boolean
           entity_type?: string
+          status?: string
         }
         Update: {
           id?: string
@@ -43,6 +45,7 @@ export type Database = {
           logo_url?: string | null
           requires_papeleria?: boolean
           entity_type?: string
+          status?: string
         }
       }
       trips: {
@@ -366,6 +369,7 @@ export type Database = {
           client_id: string
           name: string
           description: string | null
+          status: string
           created_at: string
           updated_at: string
         }
@@ -374,12 +378,14 @@ export type Database = {
           client_id: string
           name: string
           description?: string | null
+          status?: string
         }
         Update: {
           id?: string
           client_id?: string
           name?: string
           description?: string | null
+          status?: string
         }
       }
       client_item_overrides: {

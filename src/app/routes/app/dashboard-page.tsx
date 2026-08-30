@@ -10,8 +10,8 @@ import {
   YAxis,
 } from 'recharts'
 
-import { useClients } from '@/features/clients/api'
-import { useInvoices } from '@/features/invoices/api'
+import { useActiveClients } from '@/features/clients/api'
+import { useActiveInvoices } from '@/features/invoices/api'
 import { fmtDate } from '@/lib/utils'
 
 type Period = 'week' | 'month' | 'year'
@@ -61,8 +61,8 @@ function CustomTooltip({
 }
 
 export default function Dashboard() {
-  const { data: invoices = [] } = useInvoices()
-  const { data: clients = [] } = useClients()
+  const { data: invoices = [] } = useActiveInvoices()
+  const { data: clients = [] } = useActiveClients()
   const [period, setPeriod] = useState<Period>('month')
   const [selectedClientId, setSelectedClientId] = useState<string>('')
 

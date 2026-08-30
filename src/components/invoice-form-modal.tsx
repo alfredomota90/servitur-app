@@ -302,11 +302,14 @@ export default function InvoiceFormModal({
             placeholder="Sin proyecto"
           >
             <option value="">Sin proyecto</option>
-            {projects.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
+            {projects
+              .filter((p) => p.status === 'active' || p.id === localProjectId)
+              .map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                  {p.status === 'inactive' ? ' (inactivo)' : ''}
+                </option>
+              ))}
           </Select>
         )}
 
