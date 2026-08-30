@@ -11,6 +11,7 @@ export const projectSchema = z.object({
   clientId: z.string(),
   name: z.string(),
   description: z.string().optional(),
+  status: z.enum(['active', 'inactive']),
   createdAt: z.string(),
   updatedAt: z.string().optional(),
 })
@@ -22,6 +23,7 @@ const rowToProject = (row: ProjectRow): Project => ({
   clientId: row.client_id,
   name: row.name,
   description: row.description || undefined,
+  status: (row.status as 'active' | 'inactive') || 'active',
   createdAt: row.created_at,
   updatedAt: row.updated_at || undefined,
 })
@@ -50,6 +52,16 @@ export const useProjectsByClient = (clientId?: string) =>
     queryFn: async () => {
       const all = await getProjects()
       return all.filter((p) => p.clientId === clientId)
+    },
+    enabled: !!clientId,
+  })
+
+export const useActiveProjectsByClient = (clientId?: string) =>
+  useQuery({
+    queryKey: ['projects', { clientId, status: 'active' }],
+    queryFn: async () => {
+      const all = await getProjects()
+      return all.filter((p) => p.clientId === clientId && p.status === 'active')
     },
     enabled: !!clientId,
   })

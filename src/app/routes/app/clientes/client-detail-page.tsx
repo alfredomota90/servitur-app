@@ -1,5 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { DollarSign, Edit2, FileText, FolderOpen, Plus, Trash2, X } from 'lucide-react'
+import {
+  DollarSign,
+  Edit2,
+  Eye,
+  EyeOff,
+  FileText,
+  FolderOpen,
+  Pause,
+  Play,
+  Plus,
+  Trash2,
+  X,
+} from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -11,7 +23,7 @@ import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { useClients } from '@/features/clients/api'
-import { useInvoices } from '@/features/invoices/api'
+import { useActiveInvoices, useInvoices } from '@/features/invoices/api'
 import type { Project } from '@/features/projects/api'
 import {
   useCreateProject,
@@ -38,7 +50,8 @@ export default function ClientDetail() {
   const navigate = useNavigate()
   const { data: clients = [] } = useClients()
   const { data: projects = [] } = useProjectsByClient(id)
-  const { data: invoices = [] } = useInvoices()
+  const { data: activeInvoices = [] } = useActiveInvoices()
+  const { data: allInvoices = [] } = useInvoices()
   const createProject = useCreateProject()
   const updateProject = useUpdateProject()
   const deleteProject = useDeleteProject()
@@ -46,6 +59,8 @@ export default function ClientDetail() {
   const [showForm, setShowForm] = useState(false)
   const [editingProject, setEditingProject] = useState<Project | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+  const [showInactive, setShowInactive] = useState(false)
+  const [toggleStatusProject, setToggleStatusProject] = useState<Project | null>(null)
 
   const form = useForm<ProjectFormValues>({
     resolver: zodResolver(projectFormSchema),
@@ -64,6 +79,10 @@ export default function ClientDetail() {
   }, [editingProject, form])
 
   const client = clients.find((c) => c.id === id)
+
+  const hasInactiveProjects = projects.some((p) => p.status === 'inactive')
+  const visibleProjects = showInactive ? projects : projects.filter((p) => p.status === 'active')
+  const invoices = showInactive ? allInvoices : activeInvoices
 
   if (!client) {
     return (
@@ -116,6 +135,23 @@ export default function ClientDetail() {
     if (deleteConfirm) {
       deleteProject.mutate(deleteConfirm)
       setDeleteConfirm(null)
+    }
+  }
+
+  const handleToggleStatus = (project: Project, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setToggleStatusProject(project)
+  }
+
+  const confirmToggleStatus = () => {
+    if (toggleStatusProject) {
+      updateProject.mutate({
+        id: toggleStatusProject.id,
+        data: {
+          status: toggleStatusProject.status === 'active' ? 'inactive' : 'active',
+        },
+      })
+      setToggleStatusProject(null)
     }
   }
 
@@ -179,8 +215,20 @@ export default function ClientDetail() {
           </div>
         )}
 
+        {hasInactiveProjects && (
+          <div className="mb-4 flex justify-end">
+            <button
+              onClick={() => setShowInactive(!showInactive)}
+              className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border border-border text-muted hover:text-foreground hover:bg-card-hover transition-colors"
+            >
+              {showInactive ? <EyeOff size={16} /> : <Eye size={16} />}
+              {showInactive ? 'Ocultar inactivos' : 'Mostrar inactivos'}
+            </button>
+          </div>
+        )}
+
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch">
-          {projects.map((project) => {
+          {visibleProjects.map((project) => {
             const projectInvoices = invoices.filter((i) => i.projectId === project.id)
             const totalGenerated = projectInvoices.reduce(
               (sum, i) => sum + (i.totalMxn || i.total),
@@ -191,17 +239,30 @@ export default function ClientDetail() {
               .reduce((sum, i) => sum + (i.totalMxn || i.total), 0)
             const pending = totalGenerated - totalPaid
             const pendingCount = projectInvoices.filter((i) => i.status === 'pendiente').length
+            const isInactive = project.status === 'inactive'
 
             return (
               <div
                 key={project.id}
-                className="rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer flex flex-col h-full bg-card border border-border"
-                onClick={() => navigate(`/admin/clientes/${id}/proyectos/${project.id}`)}
+                className={`rounded-xl p-5 shadow-sm transition-shadow flex flex-col h-full border ${
+                  isInactive
+                    ? 'bg-card/60 border-border opacity-70'
+                    : 'bg-card border-border hover:shadow-md cursor-pointer'
+                }`}
+                onClick={
+                  isInactive
+                    ? undefined
+                    : () => navigate(`/admin/clientes/${id}/proyectos/${project.id}`)
+                }
               >
                 <div className="flex-1">
                   <div className="flex items-start justify-between mb-4">
-                    <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-accent-muted">
-                      <FolderOpen className="text-accent" size={24} />
+                    <div
+                      className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                        isInactive ? 'bg-muted/20' : 'bg-accent-muted'
+                      }`}
+                    >
+                      <FolderOpen className={isInactive ? 'text-muted' : 'text-accent'} size={24} />
                     </div>
 
                     <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
@@ -212,6 +273,15 @@ export default function ClientDetail() {
                         <Edit2 size={16} />
                       </button>
                       <button
+                        onClick={(e) => handleToggleStatus(project, e)}
+                        className={`p-1.5 rounded transition-colors ${
+                          isInactive ? 'text-success bg-success/10' : 'text-warning bg-warning/10'
+                        }`}
+                        title={isInactive ? 'Reactivar proyecto' : 'Desactivar proyecto'}
+                      >
+                        {isInactive ? <Play size={16} /> : <Pause size={16} />}
+                      </button>
+                      <button
                         onClick={(e) => handleDelete(project.id, e)}
                         className="p-1.5 rounded transition-colors text-error bg-error/10"
                       >
@@ -220,7 +290,14 @@ export default function ClientDetail() {
                     </div>
                   </div>
 
-                  <h3 className="font-bold text-lg mb-1 text-foreground">{project.name}</h3>
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-bold text-lg text-foreground">{project.name}</h3>
+                    {isInactive && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-muted/20 text-muted font-medium">
+                        Inactivo
+                      </span>
+                    )}
+                  </div>
 
                   {project.description && (
                     <p className="text-sm text-muted mb-3">{project.description}</p>
@@ -274,6 +351,14 @@ export default function ClientDetail() {
           </div>
         )}
 
+        {projects.length > 0 && visibleProjects.length === 0 && (
+          <div className="text-center py-12 text-muted">
+            <FolderOpen size={48} className="mx-auto mb-4 opacity-50" />
+            <p className="text-lg mb-2">No hay proyectos activos</p>
+            <p className="text-sm">Activa un proyecto existente o crea uno nuevo</p>
+          </div>
+        )}
+
         <ConfirmModal
           open={deleteConfirm !== null}
           title="Eliminar proyecto"
@@ -283,6 +368,23 @@ export default function ClientDetail() {
           onConfirm={confirmDelete}
           onCancel={() => setDeleteConfirm(null)}
           danger={true}
+        />
+
+        <ConfirmModal
+          open={toggleStatusProject !== null}
+          title={
+            toggleStatusProject?.status === 'active' ? 'Desactivar proyecto' : 'Reactivar proyecto'
+          }
+          message={
+            toggleStatusProject?.status === 'active'
+              ? `¿Estás seguro de que deseas desactivar "${toggleStatusProject?.name}"? Sus facturas no aparecerán en las estadísticas ni en el selector de facturas nuevas.`
+              : `¿Estás seguro de que deseas reactivar "${toggleStatusProject?.name}"? Sus facturas volverán a aparecer en las estadísticas.`
+          }
+          confirmLabel={toggleStatusProject?.status === 'active' ? 'Desactivar' : 'Reactivar'}
+          cancelLabel="Cancelar"
+          onConfirm={confirmToggleStatus}
+          onCancel={() => setToggleStatusProject(null)}
+          danger={toggleStatusProject?.status === 'active'}
         />
       </div>
     </>

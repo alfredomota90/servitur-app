@@ -2,5 +2,10 @@ export type { CreateProjectInput } from './create-project'
 export { useCreateProject } from './create-project'
 export { useDeleteProject } from './delete-project'
 export type { Project } from './get-projects'
-export { projectSchema, useProjects, useProjectsByClient } from './get-projects'
+export {
+  projectSchema,
+  useActiveProjectsByClient,
+  useProjects,
+  useProjectsByClient,
+} from './get-projects'
 export { useUpdateProject } from './update-project'

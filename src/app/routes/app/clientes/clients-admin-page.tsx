@@ -5,10 +5,14 @@ import {
   Calendar,
   ClipboardCheck,
   Edit2,
+  Eye,
+  EyeOff,
   FileText,
   Image as ImageIcon,
   Mail,
+  Pause,
   Phone,
+  Play,
   Plus,
   Trash2,
   X,
@@ -30,7 +34,7 @@ import {
   useDeleteClient,
   useUpdateClient,
 } from '@/features/clients/api'
-import { useInvoices } from '@/features/invoices/api'
+import { useActiveInvoices } from '@/features/invoices/api'
 import { formatDate, getDaysUntil, getNextBillingDate } from '@/lib/utils'
 
 const clientFormSchema = z.object({
@@ -58,13 +62,15 @@ const defaultClientValues: ClientFormValues = {
 export default function ClientsAdmin() {
   const navigate = useNavigate()
   const { data: clients = [] } = useClients()
-  const { data: invoices = [] } = useInvoices()
+  const { data: invoices = [] } = useActiveInvoices()
   const createClient = useCreateClient()
   const updateClient = useUpdateClient()
   const deleteClient = useDeleteClient()
   const [showForm, setShowForm] = useState(false)
   const [editingClient, setEditingClient] = useState<Client | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+  const [showInactive, setShowInactive] = useState(false)
+  const [toggleStatusClient, setToggleStatusClient] = useState<Client | null>(null)
 
   const form = useForm<ClientFormValues>({
     resolver: zodResolver(clientFormSchema),
@@ -89,6 +95,9 @@ export default function ClientsAdmin() {
     }
   }, [editingClient, form])
 
+  const hasInactiveClients = clients.some((c) => c.status === 'inactive')
+  const visibleClients = showInactive ? clients : clients.filter((c) => c.status === 'active')
+
   const nextBillingPreview = (() => {
     const source = editingClient ? invoices.filter((inv) => inv.clientId === editingClient.id) : []
     const d = getNextBillingDate(source, watchedBillingInterval || 10)
@@ -110,7 +119,7 @@ export default function ClientsAdmin() {
     if (editingClient) {
       updateClient.mutate({ id: editingClient.id, data: clientData })
     } else {
-      createClient.mutate(clientData as Omit<Client, 'id'>)
+      createClient.mutate(clientData as Omit<Client, 'id' | 'status'>)
     }
 
     resetForm()
@@ -135,6 +144,22 @@ export default function ClientsAdmin() {
     if (deleteConfirm) {
       deleteClient.mutate(deleteConfirm)
       setDeleteConfirm(null)
+    }
+  }
+
+  const handleToggleStatus = (client: Client) => {
+    setToggleStatusClient(client)
+  }
+
+  const confirmToggleStatus = () => {
+    if (toggleStatusClient) {
+      updateClient.mutate({
+        id: toggleStatusClient.id,
+        data: {
+          status: toggleStatusClient.status === 'active' ? 'inactive' : 'active',
+        },
+      })
+      setToggleStatusClient(null)
     }
   }
 
@@ -292,8 +317,20 @@ export default function ClientsAdmin() {
           </div>
         )}
 
+        {hasInactiveClients && (
+          <div className="mb-4 flex justify-end">
+            <button
+              onClick={() => setShowInactive(!showInactive)}
+              className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border border-border text-muted hover:text-foreground hover:bg-card-hover transition-colors"
+            >
+              {showInactive ? <EyeOff size={16} /> : <Eye size={16} />}
+              {showInactive ? 'Ocultar inactivos' : 'Mostrar inactivos'}
+            </button>
+          </div>
+        )}
+
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch">
-          {clients.map((client) => {
+          {visibleClients.map((client) => {
             const clientInvoices = invoices.filter((i) => i.clientId === client.id)
             const totalGenerated = clientInvoices.reduce(
               (sum, i) => sum + (i.totalMxn || i.total),
@@ -304,12 +341,17 @@ export default function ClientsAdmin() {
               .reduce((sum, i) => sum + (i.totalMxn || i.total), 0)
             const pending = totalGenerated - totalPaid
             const pendingInvoices = clientInvoices.filter((i) => i.status === 'pendiente').length
+            const isInactive = client.status === 'inactive'
 
             return (
               <div
                 key={client.id}
-                className="rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer flex flex-col h-full bg-card border border-border"
-                onClick={() => navigate(`/admin/clientes/${client.id}`)}
+                className={`rounded-xl p-5 shadow-sm transition-shadow flex flex-col h-full border ${
+                  isInactive
+                    ? 'bg-card/60 border-border opacity-70'
+                    : 'bg-card border-border hover:shadow-md cursor-pointer'
+                }`}
+                onClick={isInactive ? undefined : () => navigate(`/admin/clientes/${client.id}`)}
               >
                 <div className="flex-1">
                   <div className="flex items-start justify-between mb-4">
@@ -320,8 +362,15 @@ export default function ClientsAdmin() {
                         className="w-24 h-12 rounded-lg object-contain border bg-background p-1 border-border"
                       />
                     ) : (
-                      <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-accent-muted">
-                        <Building2 className="text-accent" size={24} />
+                      <div
+                        className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                          isInactive ? 'bg-muted/20' : 'bg-accent-muted'
+                        }`}
+                      >
+                        <Building2
+                          className={isInactive ? 'text-muted' : 'text-accent'}
+                          size={24}
+                        />
                       </div>
                     )}
 
@@ -333,6 +382,15 @@ export default function ClientsAdmin() {
                         <Edit2 size={16} />
                       </button>
                       <button
+                        onClick={() => handleToggleStatus(client)}
+                        className={`p-1.5 rounded transition-colors ${
+                          isInactive ? 'text-success bg-success/10' : 'text-warning bg-warning/10'
+                        }`}
+                        title={isInactive ? 'Reactivar cliente' : 'Desactivar cliente'}
+                      >
+                        {isInactive ? <Play size={16} /> : <Pause size={16} />}
+                      </button>
+                      <button
                         onClick={() => handleDelete(client.id)}
                         className="p-1.5 rounded transition-colors text-error bg-error/10"
                       >
@@ -341,7 +399,14 @@ export default function ClientsAdmin() {
                     </div>
                   </div>
 
-                  <h3 className="font-bold text-lg mb-1 text-foreground">{client.name}</h3>
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-bold text-lg text-foreground">{client.name}</h3>
+                    {isInactive && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-muted/20 text-muted font-medium">
+                        Inactivo
+                      </span>
+                    )}
+                  </div>
 
                   <div className="space-y-2 text-sm mb-4">
                     {client.email && (
@@ -441,6 +506,14 @@ export default function ClientsAdmin() {
           <div className="text-center py-12 text-muted">No hay clientes registrados</div>
         )}
 
+        {clients.length > 0 && visibleClients.length === 0 && (
+          <div className="text-center py-12 text-muted">
+            <Building2 size={48} className="mx-auto mb-4 opacity-50" />
+            <p className="text-lg mb-2">No hay clientes activos</p>
+            <p className="text-sm">Activa un cliente existente o crea uno nuevo</p>
+          </div>
+        )}
+
         <ConfirmModal
           open={deleteConfirm !== null}
           title="Eliminar cliente"
@@ -450,6 +523,23 @@ export default function ClientsAdmin() {
           onConfirm={confirmDelete}
           onCancel={() => setDeleteConfirm(null)}
           danger={true}
+        />
+
+        <ConfirmModal
+          open={toggleStatusClient !== null}
+          title={
+            toggleStatusClient?.status === 'active' ? 'Desactivar cliente' : 'Reactivar cliente'
+          }
+          message={
+            toggleStatusClient?.status === 'active'
+              ? `¿Estás seguro de que deseas desactivar "${toggleStatusClient?.name}"? Sus proyectos también se desactivarán y no aparecerán en las estadísticas.`
+              : `¿Estás seguro de que deseas reactivar "${toggleStatusClient?.name}"? Sus proyectos también se reactivarán.`
+          }
+          confirmLabel={toggleStatusClient?.status === 'active' ? 'Desactivar' : 'Reactivar'}
+          cancelLabel="Cancelar"
+          onConfirm={confirmToggleStatus}
+          onCancel={() => setToggleStatusClient(null)}
+          danger={toggleStatusClient?.status === 'active'}
         />
       </div>
     </>

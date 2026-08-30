@@ -1,6 +1,7 @@
 export type { Client } from './get-clients'
 export {
   clientSchema,
+  useActiveClients,
   useClients,
   useCreateClient,
   useDeleteClient,

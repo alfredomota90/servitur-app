@@ -78,14 +78,61 @@ const rowToInvoice = (row: InvoiceRow, clientName: string): Invoice => ({
   cfdiUuid: row.cfdi_uuid || undefined,
 })
 
+const fetchClientMap = async () => {
+  const { data: clientsData } = await supabase.from('clients').select('id, name')
+  return new Map((clientsData || []).map((c) => [c.id, c.name]))
+}
+
 export const getInvoices = async (): Promise<Invoice[]> => {
   const { data: invoicesData, error: invoicesError } = await supabase.from('invoices').select('*')
   if (invoicesError) throw invoicesError
 
-  const { data: clientsData } = await supabase.from('clients').select('id, name')
-  const clientMap = new Map((clientsData || []).map((c) => [c.id, c.name]))
+  const clientMap = await fetchClientMap()
 
   return (invoicesData || []).map((row) => rowToInvoice(row, clientMap.get(row.client_id) || ''))
+}
+
+export const getInvoicesByProjectStatus = async (
+  projectStatus: 'active' | 'inactive',
+): Promise<Invoice[]> => {
+  const { data: projects } = await supabase
+    .from('projects')
+    .select('id')
+    .eq('status', projectStatus)
+
+  const projectIds = (projects || []).map((p) => p.id)
+
+  if (projectIds.length === 0) return []
+
+  const { data: invoicesData, error: invoicesError } = await supabase
+    .from('invoices')
+    .select('*')
+    .in('project_id', projectIds)
+
+  if (invoicesError) throw invoicesError
+
+  const clientMap = await fetchClientMap()
+
+  return (invoicesData || []).map((row) => rowToInvoice(row, clientMap.get(row.client_id) || ''))
+}
+
+export const getActiveInvoices = async (): Promise<Invoice[]> => {
+  const { data: activeProjects } = await supabase
+    .from('projects')
+    .select('id')
+    .eq('status', 'active')
+
+  const activeProjectIds = (activeProjects || []).map((p) => p.id)
+
+  const { data: invoicesData, error: invoicesError } = await supabase.from('invoices').select('*')
+
+  if (invoicesError) throw invoicesError
+
+  const clientMap = await fetchClientMap()
+
+  return (invoicesData || [])
+    .filter((row) => !row.project_id || activeProjectIds.includes(row.project_id))
+    .map((row) => rowToInvoice(row, clientMap.get(row.client_id) || ''))
 }
 
 export const getInvoicesByClientQueryOptions = (clientId: string) =>
@@ -100,11 +147,17 @@ export const useInvoices = () =>
     queryFn: getInvoices,
   })
 
+export const useActiveInvoices = () =>
+  useQuery({
+    queryKey: ['invoices', { projectStatus: 'active' }],
+    queryFn: getActiveInvoices,
+  })
+
 export const useInvoicesByClient = (clientId?: string) =>
   useQuery({
     queryKey: ['invoices', { clientId }],
     queryFn: async () => {
-      const all = await getInvoices()
+      const all = await getActiveInvoices()
       return all.filter((i) => i.clientId === clientId)
     },
     enabled: !!clientId,
@@ -182,35 +235,38 @@ export const useCreateInvoice = () => {
   })
 }
 
+const invoiceColumnMap = {
+  clientId: 'client_id',
+  projectId: 'project_id',
+  total: 'total',
+  status: 'status',
+  paymentDate: 'payment_date',
+  paymentMethod: 'payment_method',
+  paymentReference: 'payment_reference',
+  paymentAttachmentPath: 'payment_attachment_path',
+  tripDate: 'trip_date',
+  fromLocation: 'from_location',
+  toLocation: 'to_location',
+  frequency: 'frequency',
+  notes: 'notes',
+  serieFolio: 'serie_folio',
+  rfcReceptor: 'rfc_receptor',
+  receptorName: 'receptor_name',
+  invoiceDescription: 'invoice_description',
+  totalMxn: 'total_mxn',
+  certificationDate: 'certification_date',
+  xmlPath: 'xml_path',
+  cfdiUuid: 'cfdi_uuid',
+  paymentId: 'payment_id',
+} satisfies Record<string, string>
+
 export const updateInvoice = async (id: string, invoice: Partial<Invoice>): Promise<void> => {
-  const { error } = await supabase
-    .from('invoices')
-    .update({
-      client_id: invoice.clientId,
-      project_id: invoice.projectId || null,
-      total: invoice.total,
-      status: invoice.status,
-      payment_date: invoice.paymentDate,
-      payment_method: invoice.paymentMethod,
-      payment_reference: invoice.paymentReference,
-      payment_attachment_path: invoice.paymentAttachmentPath,
-      updated_at: new Date().toISOString(),
-      trip_date: invoice.tripDate,
-      from_location: invoice.fromLocation,
-      to_location: invoice.toLocation,
-      frequency: invoice.frequency,
-      notes: invoice.notes,
-      serie_folio: invoice.serieFolio,
-      rfc_receptor: invoice.rfcReceptor,
-      receptor_name: invoice.receptorName,
-      invoice_description: invoice.invoiceDescription,
-      total_mxn: invoice.totalMxn,
-      certification_date: invoice.certificationDate,
-      xml_path: invoice.xmlPath,
-      cfdi_uuid: invoice.cfdiUuid || null,
-      payment_id: invoice.paymentId,
-    })
-    .eq('id', id)
+  const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
+  for (const [key, column] of Object.entries(invoiceColumnMap)) {
+    const value = invoice[key as keyof Invoice]
+    if (value !== undefined) updates[column] = value
+  }
+  const { error } = await supabase.from('invoices').update(updates).eq('id', id)
   if (error) throw error
 }
 

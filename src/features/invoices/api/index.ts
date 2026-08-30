@@ -1,6 +1,7 @@
 export type { CreateInvoiceInput, Invoice } from './get-invoices'
 export {
   invoiceSchema,
+  useActiveInvoices,
   useBatchUpdateInvoicesPaymentDate,
   useCreateInvoice,
   useDeleteInvoice,
