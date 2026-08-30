@@ -70,21 +70,24 @@ export const useCreateClient = () => {
   })
 }
 
+const clientColumnMap = {
+  name: 'name',
+  email: 'email',
+  phone: 'phone',
+  billingInterval: 'billing_interval',
+  lastTripDate: 'last_trip_date',
+  logoUrl: 'logo_url',
+  requiresPapeleria: 'requires_papeleria',
+  entityType: 'entity_type',
+} satisfies Record<string, string>
+
 export const updateClient = async (id: string, client: Partial<Client>): Promise<void> => {
-  const { error } = await supabase
-    .from('clients')
-    .update({
-      name: client.name,
-      email: client.email || null,
-      phone: client.phone || null,
-      billing_interval: client.billingInterval,
-      last_trip_date: client.lastTripDate || null,
-      logo_url: client.logoUrl || null,
-      requires_papeleria: client.requiresPapeleria,
-      entity_type: client.entityType,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', id)
+  const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
+  for (const [key, column] of Object.entries(clientColumnMap)) {
+    const value = client[key as keyof Client]
+    if (value !== undefined) updates[column] = value
+  }
+  const { error } = await supabase.from('clients').update(updates).eq('id', id)
   if (error) throw error
 }
 

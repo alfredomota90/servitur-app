@@ -3,6 +3,7 @@ import { z } from 'zod'
 
 import type { Database } from '@/lib/supabase'
 import { supabase } from '@/lib/supabase'
+import { useStore } from '@/store/use-store'
 
 type InvoiceRow = Database['public']['Tables']['invoices']['Row']
 
@@ -37,6 +38,7 @@ export const invoiceSchema = z.object({
   certificationDate: z.string().optional(),
   xmlPath: z.string().optional(),
   paymentId: z.string().optional().nullable(),
+  cfdiUuid: z.string().optional(),
 })
 
 export type Invoice = z.infer<typeof invoiceSchema>
@@ -73,6 +75,7 @@ const rowToInvoice = (row: InvoiceRow, clientName: string): Invoice => ({
   totalMxn: row.total_mxn || undefined,
   certificationDate: row.certification_date || undefined,
   xmlPath: row.xml_path || undefined,
+  cfdiUuid: row.cfdi_uuid || undefined,
 })
 
 export const getInvoices = async (): Promise<Invoice[]> => {
@@ -144,12 +147,22 @@ export const createInvoice = async (input: CreateInvoiceInput): Promise<Invoice>
       total_mxn: input.totalMxn || null,
       certification_date: input.certificationDate || null,
       xml_path: input.xmlPath || null,
+      cfdi_uuid: input.cfdiUuid || null,
       payment_id: input.paymentId || null,
     })
     .select()
     .single()
   if (error) throw error
   return rowToInvoice(data, '')
+}
+
+const getDuplicateFolioMessage = (error: unknown): string | null => {
+  const msg = error instanceof Error ? error.message : ''
+  const code = (error as Record<string, string>)?.code
+  if (code === '23505' && msg.includes('invoices_cfdi_uuid_key')) {
+    return 'El folio fiscal (UUID) ya está registrado en otra factura'
+  }
+  return null
 }
 
 export const useCreateInvoice = () => {
@@ -159,37 +172,48 @@ export const useCreateInvoice = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] })
     },
+    onError: (error) => {
+      const msg = getDuplicateFolioMessage(error)
+      useStore.getState().addToast({
+        type: 'error',
+        message: msg || 'Error al crear la factura',
+      })
+    },
   })
 }
 
+const invoiceColumnMap = {
+  clientId: 'client_id',
+  projectId: 'project_id',
+  total: 'total',
+  status: 'status',
+  paymentDate: 'payment_date',
+  paymentMethod: 'payment_method',
+  paymentReference: 'payment_reference',
+  paymentAttachmentPath: 'payment_attachment_path',
+  tripDate: 'trip_date',
+  fromLocation: 'from_location',
+  toLocation: 'to_location',
+  frequency: 'frequency',
+  notes: 'notes',
+  serieFolio: 'serie_folio',
+  rfcReceptor: 'rfc_receptor',
+  receptorName: 'receptor_name',
+  invoiceDescription: 'invoice_description',
+  totalMxn: 'total_mxn',
+  certificationDate: 'certification_date',
+  xmlPath: 'xml_path',
+  cfdiUuid: 'cfdi_uuid',
+  paymentId: 'payment_id',
+} satisfies Record<string, string>
+
 export const updateInvoice = async (id: string, invoice: Partial<Invoice>): Promise<void> => {
-  const { error } = await supabase
-    .from('invoices')
-    .update({
-      client_id: invoice.clientId,
-      project_id: invoice.projectId || null,
-      total: invoice.total,
-      status: invoice.status,
-      payment_date: invoice.paymentDate,
-      payment_method: invoice.paymentMethod,
-      payment_reference: invoice.paymentReference,
-      payment_attachment_path: invoice.paymentAttachmentPath,
-      updated_at: new Date().toISOString(),
-      trip_date: invoice.tripDate,
-      from_location: invoice.fromLocation,
-      to_location: invoice.toLocation,
-      frequency: invoice.frequency,
-      notes: invoice.notes,
-      serie_folio: invoice.serieFolio,
-      rfc_receptor: invoice.rfcReceptor,
-      receptor_name: invoice.receptorName,
-      invoice_description: invoice.invoiceDescription,
-      total_mxn: invoice.totalMxn,
-      certification_date: invoice.certificationDate,
-      xml_path: invoice.xmlPath,
-      payment_id: invoice.paymentId,
-    })
-    .eq('id', id)
+  const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
+  for (const [key, column] of Object.entries(invoiceColumnMap)) {
+    const value = invoice[key as keyof Invoice]
+    if (value !== undefined) updates[column] = value
+  }
+  const { error } = await supabase.from('invoices').update(updates).eq('id', id)
   if (error) throw error
 }
 
@@ -198,6 +222,13 @@ export const useUpdateInvoice = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Invoice> }) => updateInvoice(id, data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['invoices'] }),
+    onError: (error) => {
+      const msg = getDuplicateFolioMessage(error)
+      useStore.getState().addToast({
+        type: 'error',
+        message: msg || 'Error al actualizar la factura',
+      })
+    },
   })
 }
 

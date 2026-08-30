@@ -11,6 +11,7 @@ export interface InvoiceFormFields {
   total_mxn: string
   certification_date: string
   xml_path: string
+  cfdi_uuid: string
 }
 
 export interface InvoiceFormData {
@@ -29,6 +30,7 @@ export interface InvoiceFormData {
   totalMxn: number | undefined
   certificationDate: string
   xmlPath: string
+  cfdiUuid: string
 }
 
 export function buildInvoiceData(
@@ -58,6 +60,7 @@ export function buildInvoiceData(
     totalMxn: formData.total_mxn ? parseFloat(formData.total_mxn) : undefined,
     certificationDate: formData.certification_date,
     xmlPath: xmlPath || formData.xml_path,
+    cfdiUuid: formData.cfdi_uuid || editingInvoice?.cfdiUuid || '',
   }
 }
 
