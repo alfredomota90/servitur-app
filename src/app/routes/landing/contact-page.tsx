@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { CheckCircle, Mail, MapPin, Phone } from 'lucide-react'
+import { CheckCircle, Facebook, Mail, MapPin, Phone } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
@@ -95,7 +95,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <p className="text-sm text-muted">Teléfono</p>
-                    <p className="font-medium text-foreground">618 123 4567</p>
+                    <p className="font-medium text-foreground">618 132 5365</p>
                   </div>
                 </div>
 
@@ -105,7 +105,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <p className="text-sm text-muted">Email</p>
-                    <p className="font-medium text-foreground">servitur@transporte.com</p>
+                    <p className="font-medium text-foreground">servitur.durango@gmail.com</p>
                   </div>
                 </div>
 
@@ -116,6 +116,23 @@ export default function Contact() {
                   <div>
                     <p className="text-sm text-muted">Ubicación</p>
                     <p className="font-medium text-foreground">Durango, Durango, México</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-accent-muted">
+                    <Facebook className="text-accent" size={20} />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted">Facebook</p>
+                    <a
+                      href="https://www.facebook.com/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium hover:underline text-accent"
+                    >
+                      SERVITUR
+                    </a>
                   </div>
                 </div>
               </div>

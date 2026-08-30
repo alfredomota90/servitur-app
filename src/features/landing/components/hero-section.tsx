@@ -13,15 +13,14 @@ export function HeroSection() {
       </div>
 
       <div className="relative max-w-6xl mx-auto px-4 py-16 md:py-24">
-        <div className="flex items-center gap-3 mb-6">
-          <ServiturLogo size="lg" />
+        <div className="flex flex-col md:flex-row items-center md:items-stretch gap-6 mb-8">
+          <ServiturLogo size="lg" className="shrink-0 h-28 md:h-40 lg:h-48 w-auto object-contain" />
+          <h1 className="text-5xl md:text-7xl font-bold leading-tight text-foreground text-center md:text-left">
+            Transporte de personas
+            <br />
+            <span className="text-accent">confiable y profesional</span>
+          </h1>
         </div>
-
-        <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight text-foreground">
-          Transporte de personas
-          <br />
-          <span className="text-accent">confiable y profesional</span>
-        </h1>
 
         <p className="text-lg md:text-xl mb-8 max-w-xl text-muted">
           Servicio de transporte para empresas, minas y turismo. Covers desde Durango hacia Puerto

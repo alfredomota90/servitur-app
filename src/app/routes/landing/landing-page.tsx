@@ -1,4 +1,5 @@
 import {
+  AboutSection,
   CtaSection,
   FeaturesSection,
   HeroSection,
@@ -13,6 +14,7 @@ export default function Landing() {
     <div className="pb-20 md:pb-0">
       <HeroSection />
       <StatsSection />
+      <AboutSection />
       <FeaturesSection />
       <TrustedBySection />
       <ServicesPreview />
