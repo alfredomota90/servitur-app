@@ -78,14 +78,61 @@ const rowToInvoice = (row: InvoiceRow, clientName: string): Invoice => ({
   cfdiUuid: row.cfdi_uuid || undefined,
 })
 
+const fetchClientMap = async () => {
+  const { data: clientsData } = await supabase.from('clients').select('id, name')
+  return new Map((clientsData || []).map((c) => [c.id, c.name]))
+}
+
 export const getInvoices = async (): Promise<Invoice[]> => {
   const { data: invoicesData, error: invoicesError } = await supabase.from('invoices').select('*')
   if (invoicesError) throw invoicesError
 
-  const { data: clientsData } = await supabase.from('clients').select('id, name')
-  const clientMap = new Map((clientsData || []).map((c) => [c.id, c.name]))
+  const clientMap = await fetchClientMap()
 
   return (invoicesData || []).map((row) => rowToInvoice(row, clientMap.get(row.client_id) || ''))
+}
+
+export const getInvoicesByProjectStatus = async (
+  projectStatus: 'active' | 'inactive',
+): Promise<Invoice[]> => {
+  const { data: projects } = await supabase
+    .from('projects')
+    .select('id')
+    .eq('status', projectStatus)
+
+  const projectIds = (projects || []).map((p) => p.id)
+
+  if (projectIds.length === 0) return []
+
+  const { data: invoicesData, error: invoicesError } = await supabase
+    .from('invoices')
+    .select('*')
+    .in('project_id', projectIds)
+
+  if (invoicesError) throw invoicesError
+
+  const clientMap = await fetchClientMap()
+
+  return (invoicesData || []).map((row) => rowToInvoice(row, clientMap.get(row.client_id) || ''))
+}
+
+export const getActiveInvoices = async (): Promise<Invoice[]> => {
+  const { data: activeProjects } = await supabase
+    .from('projects')
+    .select('id')
+    .eq('status', 'active')
+
+  const activeProjectIds = (activeProjects || []).map((p) => p.id)
+
+  const { data: invoicesData, error: invoicesError } = await supabase.from('invoices').select('*')
+
+  if (invoicesError) throw invoicesError
+
+  const clientMap = await fetchClientMap()
+
+  return (invoicesData || [])
+    .filter((row) => !row.project_id || activeProjectIds.includes(row.project_id))
+    .map((row) => rowToInvoice(row, clientMap.get(row.client_id) || ''))
 }
 
 export const getInvoicesByClientQueryOptions = (clientId: string) =>
@@ -100,11 +147,17 @@ export const useInvoices = () =>
     queryFn: getInvoices,
   })
 
+export const useActiveInvoices = () =>
+  useQuery({
+    queryKey: ['invoices', { projectStatus: 'active' }],
+    queryFn: getActiveInvoices,
+  })
+
 export const useInvoicesByClient = (clientId?: string) =>
   useQuery({
     queryKey: ['invoices', { clientId }],
     queryFn: async () => {
-      const all = await getInvoices()
+      const all = await getActiveInvoices()
       return all.filter((i) => i.clientId === clientId)
     },
     enabled: !!clientId,

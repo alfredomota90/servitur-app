@@ -16,6 +16,7 @@ export const clientSchema = z.object({
   logoUrl: z.string().optional().or(z.literal('')),
   requiresPapeleria: z.boolean().default(false),
   entityType: z.enum(['moral', 'fisica']).default('moral'),
+  status: z.enum(['active', 'inactive']),
 })
 
 export type Client = z.infer<typeof clientSchema>
@@ -30,6 +31,7 @@ const rowToClient = (row: ClientRow): Client => ({
   logoUrl: row.logo_url || undefined,
   requiresPapeleria: row.requires_papeleria ?? false,
   entityType: (row.entity_type as 'moral' | 'fisica') || 'moral',
+  status: (row.status as 'active' | 'inactive') || 'active',
 })
 
 export const getClients = async (): Promise<Client[]> => {
@@ -43,7 +45,16 @@ export const getClientsQueryOptions = () =>
 
 export const useClients = () => useQuery(getClientsQueryOptions())
 
-export const createClient = async (client: Omit<Client, 'id'>): Promise<Client> => {
+export const useActiveClients = () =>
+  useQuery({
+    queryKey: ['clients', { status: 'active' }],
+    queryFn: async () => {
+      const all = await getClients()
+      return all.filter((c) => c.status === 'active')
+    },
+  })
+
+export const createClient = async (client: Omit<Client, 'id' | 'status'>): Promise<Client> => {
   const { data, error } = await supabase
     .from('clients')
     .insert({
@@ -55,6 +66,7 @@ export const createClient = async (client: Omit<Client, 'id'>): Promise<Client> 
       logo_url: client.logoUrl || null,
       requires_papeleria: client.requiresPapeleria,
       entity_type: client.entityType,
+      status: 'active',
     })
     .select()
     .single()
@@ -79,6 +91,7 @@ const clientColumnMap = {
   logoUrl: 'logo_url',
   requiresPapeleria: 'requires_papeleria',
   entityType: 'entity_type',
+  status: 'status',
 } satisfies Record<string, string>
 
 export const updateClient = async (id: string, client: Partial<Client>): Promise<void> => {
@@ -89,13 +102,31 @@ export const updateClient = async (id: string, client: Partial<Client>): Promise
   }
   const { error } = await supabase.from('clients').update(updates).eq('id', id)
   if (error) throw error
+
+  // Cascade: deactivate/reactivate projects when client status changes
+  if (client.status === 'inactive') {
+    await supabase
+      .from('projects')
+      .update({ status: 'inactive', updated_at: new Date().toISOString() })
+      .eq('client_id', id)
+      .eq('status', 'active')
+  } else if (client.status === 'active') {
+    await supabase
+      .from('projects')
+      .update({ status: 'active', updated_at: new Date().toISOString() })
+      .eq('client_id', id)
+      .eq('status', 'inactive')
+  }
 }
 
 export const useUpdateClient = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Client> }) => updateClient(id, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['clients'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['clients'] })
+      queryClient.invalidateQueries({ queryKey: ['projects'] })
+    },
   })
 }
 

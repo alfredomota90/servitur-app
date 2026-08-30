@@ -198,7 +198,14 @@ export default function ProjectDetail() {
       <div className="p-4 md:p-6">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">{project.name}</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold text-foreground">{project.name}</h1>
+              {project.status === 'inactive' && (
+                <span className="text-xs px-2.5 py-1 rounded-full bg-muted/20 text-muted font-medium">
+                  Inactivo
+                </span>
+              )}
+            </div>
             <p className="text-muted">
               {client.name}
               {project.description && <> — {project.description}</>}
@@ -242,10 +249,14 @@ export default function ProjectDetail() {
           onEditPayment={paymentsCtrl.openEditPayment}
           onToggleExpandDesc={setExpandedDescId}
           onGeneratePDF={generatePDF}
-          onAddInvoice={() => {
-            setEditingInvoice(null)
-            setShowForm(true)
-          }}
+          onAddInvoice={
+            project.status === 'active'
+              ? () => {
+                  setEditingInvoice(null)
+                  setShowForm(true)
+                }
+              : undefined
+          }
         />
 
         {paymentsCtrl.selectingMode && (
