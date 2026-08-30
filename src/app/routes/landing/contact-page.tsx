@@ -12,6 +12,10 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/input/textarea'
 import { Select } from '@/components/ui/select'
 
+const WHATSAPP_API = 'https://api.callmebot.com/whatsapp.php'
+const WHATSAPP_PHONE = '526181168480'
+const WHATSAPP_API_KEY = '7773830'
+
 const contactSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido'),
   email: z.string().email('Ingresa un email válido'),
@@ -46,9 +50,28 @@ export default function Contact() {
     defaultValues,
   })
 
-  const handleSubmit = async (_values: ContactFormValues) => {
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    setIsSubmitted(true)
+  const handleSubmit = async (values: ContactFormValues) => {
+    const message =
+      `*Solicitud de Cotización*\n\n` +
+      `*Nombre:* ${values.name}\n` +
+      `*Email:* ${values.email}\n` +
+      `*Teléfono:* ${values.phone}\n` +
+      (values.company ? `*Empresa:* ${values.company}\n` : '') +
+      `\n*Detalles del viaje*\n` +
+      `*Origen:* ${values.origin}\n` +
+      `*Destino:* ${values.destination}\n` +
+      `*Pasajeros:* ${values.passengers}\n` +
+      `*Tipo:* ${values.tripType}\n` +
+      (values.message ? `\n*Mensaje:* ${values.message}` : '')
+
+    const url = `${WHATSAPP_API}?phone=${WHATSAPP_PHONE}&text=${encodeURIComponent(message)}&apikey=${WHATSAPP_API_KEY}`
+
+    const res = await fetch(url)
+    const data = await res.json()
+
+    if (data.success) {
+      setIsSubmitted(true)
+    }
   }
 
   if (isSubmitted) {
@@ -58,10 +81,9 @@ export default function Contact() {
           <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-success/15">
             <CheckCircle className="text-success" size={32} />
           </div>
-          <h2 className="text-2xl font-bold mb-2 text-foreground">¡Mensaje enviado!</h2>
+          <h2 className="text-2xl font-bold mb-2 text-foreground">¡Solicitud enviada!</h2>
           <p className="mb-6 text-muted">
-            Gracias por contactarnos. Nos pondremos en contacto contigo en breve para darte tu
-            cotización.
+            Revisa tu WhatsApp, recibirás la cotización con todos los datos de tu viaje.
           </p>
           <Link to="/" className="font-medium hover:underline text-accent">
             ← Volver al inicio
