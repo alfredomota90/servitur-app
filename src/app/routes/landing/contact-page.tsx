@@ -11,21 +11,36 @@ import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/input/textarea'
 import { Select } from '@/components/ui/select'
-
-const WHATSAPP_API = 'https://api.callmebot.com/whatsapp.php'
-const WHATSAPP_PHONE = '526181168480'
-const WHATSAPP_API_KEY = '7773830'
+import { supabaseUrl } from '@/lib/supabase'
 
 const contactSchema = z.object({
-  name: z.string().min(1, 'El nombre es requerido'),
-  email: z.string().email('Ingresa un email válido'),
-  phone: z.string().min(1, 'El teléfono es requerido'),
-  company: z.string().optional(),
-  origin: z.string().min(1, 'El origen es requerido'),
-  destination: z.string().min(1, 'El destino es requerido'),
-  passengers: z.string(),
-  tripType: z.string(),
-  message: z.string().optional(),
+  name: z
+    .string()
+    .trim()
+    .min(2, 'Mínimo 2 caracteres')
+    .max(100, 'Máximo 100 caracteres')
+    .regex(/^[a-zA-ZáéíóúñÑüÜ\s'-]+$/, 'Solo letras, espacios, guiones y apóstrofes'),
+  email: z.string().trim().email('Email inválido').max(255),
+  phone: z
+    .string()
+    .trim()
+    .regex(/^\d{10}$/, 'Ingresa 10 dígitos'),
+  company: z.string().trim().max(100, 'Máximo 100 caracteres').optional(),
+  origin: z
+    .string()
+    .trim()
+    .min(2, 'Mínimo 2 caracteres')
+    .max(100, 'Máximo 100 caracteres')
+    .regex(/^[a-zA-ZáéíóúñÑüÜ\s'-]+$/, 'Solo letras, espacios, guiones y apóstrofes'),
+  destination: z
+    .string()
+    .trim()
+    .min(2, 'Mínimo 2 caracteres')
+    .max(100, 'Máximo 100 caracteres')
+    .regex(/^[a-zA-ZáéíóúñÑüÜ\s'-]+$/, 'Solo letras, espacios, guiones y apóstrofes'),
+  passengers: z.enum(['1-10', '11-20', '21-30', '30+']),
+  tripType: z.enum(['one-way', 'round-trip', 'recurring']),
+  message: z.string().trim().max(500, 'Máximo 500 caracteres').optional(),
 })
 
 type ContactFormValues = z.infer<typeof contactSchema>
@@ -51,22 +66,15 @@ export default function Contact() {
   })
 
   const handleSubmit = async (values: ContactFormValues) => {
-    const message =
-      `*Solicitud de Cotización*\n\n` +
-      `*Nombre:* ${values.name}\n` +
-      `*Email:* ${values.email}\n` +
-      `*Teléfono:* ${values.phone}\n` +
-      (values.company ? `*Empresa:* ${values.company}\n` : '') +
-      `\n*Detalles del viaje*\n` +
-      `*Origen:* ${values.origin}\n` +
-      `*Destino:* ${values.destination}\n` +
-      `*Pasajeros:* ${values.passengers}\n` +
-      `*Tipo:* ${values.tripType}\n` +
-      (values.message ? `\n*Mensaje:* ${values.message}` : '')
-
-    const url = `${WHATSAPP_API}?phone=${WHATSAPP_PHONE}&text=${encodeURIComponent(message)}&apikey=${WHATSAPP_API_KEY}`
-
-    const res = await fetch(url)
+    const url = `${supabaseUrl}/functions/v1/smooth-responder`
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+      },
+      body: JSON.stringify(values),
+    })
     const data = await res.json()
 
     if (data.success) {
@@ -83,7 +91,8 @@ export default function Contact() {
           </div>
           <h2 className="text-2xl font-bold mb-2 text-foreground">¡Solicitud enviada!</h2>
           <p className="mb-6 text-muted">
-            Revisa tu WhatsApp, recibirás la cotización con todos los datos de tu viaje.
+            En breve recibirás la cotización con todos los datos de tu viaje mediante WhatsApp y
+            correo electronico
           </p>
           <Link to="/" className="font-medium hover:underline text-accent">
             ← Volver al inicio
@@ -148,7 +157,7 @@ export default function Contact() {
                   <div>
                     <p className="text-sm text-muted">Facebook</p>
                     <a
-                      href="https://www.facebook.com/"
+                      href="https://www.facebook.com/people/Serv%C3%ADturem/100095711310870/?rdid=Iz4mdRIDwU2WSMes&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F14oQktkmAo4%2F"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="font-medium hover:underline text-accent"

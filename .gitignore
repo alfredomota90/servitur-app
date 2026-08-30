@@ -11,3 +11,4 @@ roadmap/
 .vscode/
 .opencode/
 AGENTS.md
+supabase/functions/.env
